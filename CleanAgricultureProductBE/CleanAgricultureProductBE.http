@@ -1,0 +1,6 @@
+@CleanAgricultureProductBE_HostAddress = http://localhost:5216
+
+GET {{CleanAgricultureProductBE_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
