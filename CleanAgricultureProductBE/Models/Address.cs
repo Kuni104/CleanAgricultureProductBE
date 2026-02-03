@@ -13,5 +13,6 @@
         public Guid UserProfileId { get; set; }
 
         public UserProfile UserProfile { get; set; } = null!;
+        public ICollection<Order> Orders { get; set; } = new List<Order>();
     }
 }

@@ -28,7 +28,8 @@ namespace CleanAgricultureProductBE.Data
 
                 entity.HasOne(a => a.UserProfile)
                       .WithOne(up => up.Account)
-                      .HasForeignKey<UserProfile>(p => p.UserProfileId);
+                      .HasForeignKey<UserProfile>(p => p.UserProfileId)
+                      .OnDelete(DeleteBehavior.Cascade);
 
 
             });
@@ -89,6 +90,40 @@ namespace CleanAgricultureProductBE.Data
 
                 entity.Property(p => p.TotalAmount)
                       .HasPrecision(18, 2);
+            });
+
+            modelBuilder.Entity<DeliveryFee>(entity =>
+            {
+                entity.Property(df => df.FeeAmount)
+                      .HasPrecision(18, 2);
+            });
+
+            modelBuilder.Entity<Order>(entity =>
+            {
+                entity.HasOne(a => a.Customer)
+                      .WithMany(r => r.Orders)
+                      .HasForeignKey(a => a.CustomerId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(a => a.Address)
+                      .WithMany(r => r.Orders)
+                      .HasForeignKey(a => a.AddressId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(a => a.Schedule)
+                       .WithMany(r => r.Orders)
+                       .HasForeignKey(a => a.ScheduleId)
+                       .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(a => a.DeliveryFee)
+                       .WithMany(r => r.Orders)
+                       .HasForeignKey(a => a.DeliveryFeeId)
+                       .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(a => a.Payment)
+                       .WithMany(r => r.Orders)
+                       .HasForeignKey(a => a.PaymentId)
+                       .OnDelete(DeleteBehavior.Cascade);
             });
         }
     }

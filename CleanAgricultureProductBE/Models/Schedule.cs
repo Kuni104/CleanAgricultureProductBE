@@ -10,5 +10,6 @@
         public Guid DeliveryPersonId { get; set; }
 
         public Account DeliveryPerson { get; set; } = null!;
+        public ICollection<Order> Orders { get; set; } = new List<Order>();
     }
 }

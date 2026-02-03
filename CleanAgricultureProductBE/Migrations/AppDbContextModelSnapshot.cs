@@ -154,6 +154,80 @@ namespace CleanAgricultureProductBE.Migrations
                     b.ToTable("Complaints");
                 });
 
+            modelBuilder.Entity("CleanAgricultureProductBE.Models.DeliveryFee", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("District")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("EffectiveDay")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("EstimatedDay")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("FeeAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("DeliveryFee");
+                });
+
+            modelBuilder.Entity("CleanAgricultureProductBE.Models.Order", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("AddressId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CustomerId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("DeliveryFeeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("OrderDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("OrderStatus")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("PaymentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ScheduleId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AddressId");
+
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("DeliveryFeeId");
+
+                    b.HasIndex("PaymentId");
+
+                    b.HasIndex("ScheduleId");
+
+                    b.ToTable("Order");
+                });
+
             modelBuilder.Entity("CleanAgricultureProductBE.Models.Payment", b =>
                 {
                     b.Property<Guid>("Id")
@@ -369,6 +443,49 @@ namespace CleanAgricultureProductBE.Migrations
                     b.Navigation("Staff");
                 });
 
+            modelBuilder.Entity("CleanAgricultureProductBE.Models.Order", b =>
+                {
+                    b.HasOne("CleanAgricultureProductBE.Models.Address", "Address")
+                        .WithMany("Orders")
+                        .HasForeignKey("AddressId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("CleanAgricultureProductBE.Models.UserProfile", "Customer")
+                        .WithMany("Orders")
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CleanAgricultureProductBE.Models.DeliveryFee", "DeliveryFee")
+                        .WithMany("Orders")
+                        .HasForeignKey("DeliveryFeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CleanAgricultureProductBE.Models.Payment", "Payment")
+                        .WithMany("Orders")
+                        .HasForeignKey("PaymentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CleanAgricultureProductBE.Models.Schedule", "Schedule")
+                        .WithMany("Orders")
+                        .HasForeignKey("ScheduleId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Address");
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("DeliveryFee");
+
+                    b.Navigation("Payment");
+
+                    b.Navigation("Schedule");
+                });
+
             modelBuilder.Entity("CleanAgricultureProductBE.Models.Payment", b =>
                 {
                     b.HasOne("CleanAgricultureProductBE.Models.PaymentMethod", "PaymentMethod")
@@ -434,9 +551,24 @@ namespace CleanAgricultureProductBE.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("CleanAgricultureProductBE.Models.Address", b =>
+                {
+                    b.Navigation("Orders");
+                });
+
             modelBuilder.Entity("CleanAgricultureProductBE.Models.Category", b =>
                 {
                     b.Navigation("Products");
+                });
+
+            modelBuilder.Entity("CleanAgricultureProductBE.Models.DeliveryFee", b =>
+                {
+                    b.Navigation("Orders");
+                });
+
+            modelBuilder.Entity("CleanAgricultureProductBE.Models.Payment", b =>
+                {
+                    b.Navigation("Orders");
                 });
 
             modelBuilder.Entity("CleanAgricultureProductBE.Models.PaymentMethod", b =>
@@ -454,9 +586,16 @@ namespace CleanAgricultureProductBE.Migrations
                     b.Navigation("Accounts");
                 });
 
+            modelBuilder.Entity("CleanAgricultureProductBE.Models.Schedule", b =>
+                {
+                    b.Navigation("Orders");
+                });
+
             modelBuilder.Entity("CleanAgricultureProductBE.Models.UserProfile", b =>
                 {
                     b.Navigation("Addresses");
+
+                    b.Navigation("Orders");
                 });
 #pragma warning restore 612, 618
         }
