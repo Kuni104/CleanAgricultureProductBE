@@ -9,6 +9,7 @@
         public string PhoneNumber { get; set; } = string.Empty;
         public int RoleId { get; set; }
 
+        public UserProfile UserProfile { get; set; } = null!;
         public Role Role { get; set; } = null!;
     }
 }

@@ -71,6 +71,24 @@ namespace CleanAgricultureProductBE.Migrations
                     b.ToTable("Role");
                 });
 
+            modelBuilder.Entity("CleanAgricultureProductBE.Models.UserProfile", b =>
+                {
+                    b.Property<Guid>("UserProfileId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("UserProfileId");
+
+                    b.ToTable("UserProfiles");
+                });
+
             modelBuilder.Entity("CleanAgricultureProductBE.Models.Account", b =>
                 {
                     b.HasOne("CleanAgricultureProductBE.Models.Role", "Role")
@@ -80,6 +98,23 @@ namespace CleanAgricultureProductBE.Migrations
                         .IsRequired();
 
                     b.Navigation("Role");
+                });
+
+            modelBuilder.Entity("CleanAgricultureProductBE.Models.UserProfile", b =>
+                {
+                    b.HasOne("CleanAgricultureProductBE.Models.Account", "Account")
+                        .WithOne("UserProfile")
+                        .HasForeignKey("CleanAgricultureProductBE.Models.UserProfile", "UserProfileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Account");
+                });
+
+            modelBuilder.Entity("CleanAgricultureProductBE.Models.Account", b =>
+                {
+                    b.Navigation("UserProfile")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("CleanAgricultureProductBE.Models.Role", b =>
