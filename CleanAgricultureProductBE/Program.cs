@@ -1,4 +1,6 @@
 
+using Scalar.AspNetCore;
+
 namespace CleanAgricultureProductBE
 {
     public class Program
@@ -18,6 +20,7 @@ namespace CleanAgricultureProductBE
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
+                app.MapScalarApiReference();
                 app.MapOpenApi();
             }
 
