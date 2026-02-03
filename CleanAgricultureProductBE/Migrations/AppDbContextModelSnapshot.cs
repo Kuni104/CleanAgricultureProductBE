@@ -154,6 +154,54 @@ namespace CleanAgricultureProductBE.Migrations
                     b.ToTable("Complaints");
                 });
 
+            modelBuilder.Entity("CleanAgricultureProductBE.Models.Payment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("PaymentMethodId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PaymentStatus")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("TotalAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("TransactionCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PaymentMethodId");
+
+                    b.ToTable("Payments");
+                });
+
+            modelBuilder.Entity("CleanAgricultureProductBE.Models.PaymentMethod", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("MethodName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PaymentMethods");
+                });
+
             modelBuilder.Entity("CleanAgricultureProductBE.Models.Product", b =>
                 {
                     b.Property<Guid>("ProductId")
@@ -321,6 +369,17 @@ namespace CleanAgricultureProductBE.Migrations
                     b.Navigation("Staff");
                 });
 
+            modelBuilder.Entity("CleanAgricultureProductBE.Models.Payment", b =>
+                {
+                    b.HasOne("CleanAgricultureProductBE.Models.PaymentMethod", "PaymentMethod")
+                        .WithMany("Payments")
+                        .HasForeignKey("PaymentMethodId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("PaymentMethod");
+                });
+
             modelBuilder.Entity("CleanAgricultureProductBE.Models.Product", b =>
                 {
                     b.HasOne("CleanAgricultureProductBE.Models.Category", "Category")
@@ -378,6 +437,11 @@ namespace CleanAgricultureProductBE.Migrations
             modelBuilder.Entity("CleanAgricultureProductBE.Models.Category", b =>
                 {
                     b.Navigation("Products");
+                });
+
+            modelBuilder.Entity("CleanAgricultureProductBE.Models.PaymentMethod", b =>
+                {
+                    b.Navigation("Payments");
                 });
 
             modelBuilder.Entity("CleanAgricultureProductBE.Models.Product", b =>

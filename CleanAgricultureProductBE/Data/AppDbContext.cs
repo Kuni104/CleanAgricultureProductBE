@@ -14,6 +14,8 @@ namespace CleanAgricultureProductBE.Data
         public DbSet<Product> Products => Set<Product>();
         public DbSet<Category> Categories => Set<Category>();
         public DbSet<ProductImage> ProductImages => Set<ProductImage>();
+        public DbSet<PaymentMethod> PaymentMethods => Set<PaymentMethod>();
+        public DbSet<Payment> Payments => Set<Payment>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -76,6 +78,17 @@ namespace CleanAgricultureProductBE.Data
                       .WithMany(r => r.ProductImages)
                       .HasForeignKey(a => a.ProductId)
                       .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<Payment>(entity =>
+            {
+                entity.HasOne(a => a.PaymentMethod)
+                      .WithMany(r => r.Payments)
+                      .HasForeignKey(a => a.PaymentMethodId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                entity.Property(p => p.TotalAmount)
+                      .HasPrecision(18, 2);
             });
         }
     }
