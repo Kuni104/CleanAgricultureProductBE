@@ -26,7 +26,7 @@ namespace CleanAgricultureProductBE.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "DeliveryFee",
+                name: "DeliveryFees",
                 columns: table => new
                 {
                     DeliveryFeeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -38,7 +38,7 @@ namespace CleanAgricultureProductBE.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DeliveryFee", x => x.DeliveryFeeId);
+                    table.PrimaryKey("PK_DeliveryFees", x => x.DeliveryFeeId);
                 });
 
             migrationBuilder.CreateTable(
@@ -158,29 +158,6 @@ namespace CleanAgricultureProductBE.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Complaints",
-                columns: table => new
-                {
-                    ComplaintId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Subject = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ResolveAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Evidence = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    StaffId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Complaints", x => x.ComplaintId);
-                    table.ForeignKey(
-                        name: "FK_Complaints_Accounts_StaffId",
-                        column: x => x.StaffId,
-                        principalTable: "Accounts",
-                        principalColumn: "AccountId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Schedules",
                 columns: table => new
                 {
@@ -290,9 +267,9 @@ namespace CleanAgricultureProductBE.Migrations
                         principalColumn: "AddressId",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Orders_DeliveryFee_DeliveryFeeId",
+                        name: "FK_Orders_DeliveryFees_DeliveryFeeId",
                         column: x => x.DeliveryFeeId,
-                        principalTable: "DeliveryFee",
+                        principalTable: "DeliveryFees",
                         principalColumn: "DeliveryFeeId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -340,6 +317,36 @@ namespace CleanAgricultureProductBE.Migrations
                         principalTable: "Products",
                         principalColumn: "ProductId",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Complaints",
+                columns: table => new
+                {
+                    ComplaintId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Subject = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ResolveAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Evidence = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    StaffId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    OrderId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Complaints", x => x.ComplaintId);
+                    table.ForeignKey(
+                        name: "FK_Complaints_Accounts_StaffId",
+                        column: x => x.StaffId,
+                        principalTable: "Accounts",
+                        principalColumn: "AccountId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Complaints_Orders_OrderId",
+                        column: x => x.OrderId,
+                        principalTable: "Orders",
+                        principalColumn: "OrderId",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -396,6 +403,12 @@ namespace CleanAgricultureProductBE.Migrations
                 name: "IX_Carts_CustomerId",
                 table: "Carts",
                 column: "CustomerId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Complaints_OrderId",
+                table: "Complaints",
+                column: "OrderId",
                 unique: true);
 
             migrationBuilder.CreateIndex(
@@ -494,7 +507,7 @@ namespace CleanAgricultureProductBE.Migrations
                 name: "Addresses");
 
             migrationBuilder.DropTable(
-                name: "DeliveryFee");
+                name: "DeliveryFees");
 
             migrationBuilder.DropTable(
                 name: "Payments");

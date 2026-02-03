@@ -9,6 +9,10 @@
         public DateTime ResolveAt { get; set; }
         public string Evidence { get; set; } = string.Empty;
         public Guid StaffId { get; set; }
+        public Guid OrderId { get; set; }
+
         public Account Staff { get; set; } = null!;
+        public Order Order { get; set; } = null!;
+
     }
 }

@@ -188,6 +188,9 @@ namespace CleanAgricultureProductBE.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid>("OrderId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime>("ResolveAt")
                         .HasColumnType("datetime2");
 
@@ -199,6 +202,9 @@ namespace CleanAgricultureProductBE.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("ComplaintId");
+
+                    b.HasIndex("OrderId")
+                        .IsUnique();
 
                     b.HasIndex("StaffId");
 
@@ -233,7 +239,7 @@ namespace CleanAgricultureProductBE.Migrations
 
                     b.HasKey("DeliveryFeeId");
 
-                    b.ToTable("DeliveryFee");
+                    b.ToTable("DeliveryFees");
                 });
 
             modelBuilder.Entity("CleanAgricultureProductBE.Models.Order", b =>
@@ -557,11 +563,19 @@ namespace CleanAgricultureProductBE.Migrations
 
             modelBuilder.Entity("CleanAgricultureProductBE.Models.Complaint", b =>
                 {
+                    b.HasOne("CleanAgricultureProductBE.Models.Order", "Order")
+                        .WithOne("Complaint")
+                        .HasForeignKey("CleanAgricultureProductBE.Models.Complaint", "OrderId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("CleanAgricultureProductBE.Models.Account", "Staff")
                         .WithMany("Complaints")
                         .HasForeignKey("StaffId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Order");
 
                     b.Navigation("Staff");
                 });
@@ -715,6 +729,9 @@ namespace CleanAgricultureProductBE.Migrations
 
             modelBuilder.Entity("CleanAgricultureProductBE.Models.Order", b =>
                 {
+                    b.Navigation("Complaint")
+                        .IsRequired();
+
                     b.Navigation("OrderDetails");
                 });
 

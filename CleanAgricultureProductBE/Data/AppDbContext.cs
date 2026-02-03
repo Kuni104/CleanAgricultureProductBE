@@ -18,6 +18,7 @@ namespace CleanAgricultureProductBE.Data
         public DbSet<ProductImage> ProductImages => Set<ProductImage>();
         public DbSet<Order> Orders => Set<Order>();
         public DbSet<OrderDetail> OrderDetails => Set<OrderDetail>();
+        public DbSet<DeliveryFee> DeliveryFees => Set<DeliveryFee>();
         public DbSet<PaymentMethod> PaymentMethods => Set<PaymentMethod>();
         public DbSet<Payment> Payments => Set<Payment>();
 
@@ -139,6 +140,11 @@ namespace CleanAgricultureProductBE.Data
                        .WithMany(r => r.Orders)
                        .HasForeignKey(a => a.PaymentId)
                        .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(a => a.Complaint)
+                       .WithOne(c => c.Order)
+                       .HasForeignKey<Complaint>(c => c.OrderId)
+                       .OnDelete(DeleteBehavior.Restrict);
             });
 
             modelBuilder.Entity<CartItem>(entity =>
