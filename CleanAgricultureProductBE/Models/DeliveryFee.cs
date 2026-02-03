@@ -8,7 +8,7 @@
         public decimal FeeAmount { get; set; }
         public string EstimatedDay { get; set; } = string.Empty;
         public string EffectiveDay { get; set; } = string.Empty;
-
+        /*------------------------------------------------------------------------------------------------------------------------*/
         public ICollection<Order> Orders { get; set; } = new List<Order>();
     }
 }
