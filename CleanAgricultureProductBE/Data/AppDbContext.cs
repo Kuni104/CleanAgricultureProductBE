@@ -8,10 +8,12 @@ namespace CleanAgricultureProductBE.Data
         public DbSet<Account> Accounts => Set<Account>();
         public DbSet<UserProfile> UserProfiles => Set<UserProfile>();
         public DbSet<Role> Role => Set<Role>();
-
         public DbSet<Schedule> Schedules => Set<Schedule>();
-
         public DbSet<Complaint> Complaints => Set<Complaint>();
+        public DbSet<Address> Addresses => Set<Address>();
+        public DbSet<Product> Products => Set<Product>();
+        public DbSet<Category> Categories => Set<Category>();
+        public DbSet<ProductImage> ProductImages => Set<ProductImage>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -45,6 +47,35 @@ namespace CleanAgricultureProductBE.Data
                       .HasForeignKey(a => a.StaffId)
                       .OnDelete(DeleteBehavior.Cascade);
 
+            });
+
+            modelBuilder.Entity<Address>(entity =>
+            {
+                entity.HasOne(a => a.UserProfile)
+                      .WithMany(r => r.Addresses)
+                      .HasForeignKey(a => a.UserProfileId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+            });
+
+            modelBuilder.Entity<Product>(entity =>
+            {
+                entity.HasOne(a => a.Category)
+                      .WithMany(r => r.Products)
+                      .HasForeignKey(a => a.CategoryId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                entity.Property(p => p.Price)
+                      .HasPrecision(18, 2);
+
+            });
+
+            modelBuilder.Entity<ProductImage>(entity =>
+            {
+                entity.HasOne(a => a.Product)
+                      .WithMany(r => r.ProductImages)
+                      .HasForeignKey(a => a.ProductId)
+                      .OnDelete(DeleteBehavior.Cascade);
             });
         }
     }

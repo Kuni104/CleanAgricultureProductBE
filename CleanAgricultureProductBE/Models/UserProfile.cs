@@ -7,6 +7,7 @@
         public string LastName { get; set; } = string.Empty;
 
         public Account Account { get; set; } = null!;
+        public ICollection<Address> Addresses { get; set; } = new List<Address>();
 
     }
 }
