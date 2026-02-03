@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CleanAgricultureProductBE.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260203155925_Initial")]
+    [Migration("20260203160953_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -279,7 +279,42 @@ namespace CleanAgricultureProductBE.Migrations
 
                     b.HasIndex("ScheduleId");
 
-                    b.ToTable("Order");
+                    b.ToTable("Orders");
+                });
+
+            modelBuilder.Entity("CleanAgricultureProductBE.Models.OrderDetail", b =>
+                {
+                    b.Property<Guid>("OrderDetailId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ExpiryDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("OrderId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("TotalPrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("OrderDetailId");
+
+                    b.HasIndex("ProductId");
+
+                    b.HasIndex("OrderId", "ProductId")
+                        .IsUnique();
+
+                    b.ToTable("OrderDetails");
                 });
 
             modelBuilder.Entity("CleanAgricultureProductBE.Models.Payment", b =>
@@ -414,7 +449,7 @@ namespace CleanAgricultureProductBE.Migrations
 
                     b.HasKey("RoleId");
 
-                    b.ToTable("Role");
+                    b.ToTable("Roles");
                 });
 
             modelBuilder.Entity("CleanAgricultureProductBE.Models.Schedule", b =>
@@ -577,6 +612,25 @@ namespace CleanAgricultureProductBE.Migrations
                     b.Navigation("Schedule");
                 });
 
+            modelBuilder.Entity("CleanAgricultureProductBE.Models.OrderDetail", b =>
+                {
+                    b.HasOne("CleanAgricultureProductBE.Models.Order", "Order")
+                        .WithMany("OrderDetails")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CleanAgricultureProductBE.Models.Product", "Product")
+                        .WithMany("OrderDetails")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Order");
+
+                    b.Navigation("Product");
+                });
+
             modelBuilder.Entity("CleanAgricultureProductBE.Models.Payment", b =>
                 {
                     b.HasOne("CleanAgricultureProductBE.Models.PaymentMethod", "PaymentMethod")
@@ -662,6 +716,11 @@ namespace CleanAgricultureProductBE.Migrations
                     b.Navigation("Orders");
                 });
 
+            modelBuilder.Entity("CleanAgricultureProductBE.Models.Order", b =>
+                {
+                    b.Navigation("OrderDetails");
+                });
+
             modelBuilder.Entity("CleanAgricultureProductBE.Models.Payment", b =>
                 {
                     b.Navigation("Orders");
@@ -675,6 +734,8 @@ namespace CleanAgricultureProductBE.Migrations
             modelBuilder.Entity("CleanAgricultureProductBE.Models.Product", b =>
                 {
                     b.Navigation("CartItems");
+
+                    b.Navigation("OrderDetails");
 
                     b.Navigation("ProductImages");
                 });

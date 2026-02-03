@@ -55,7 +55,7 @@ namespace CleanAgricultureProductBE.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Role",
+                name: "Roles",
                 columns: table => new
                 {
                     RoleId = table.Column<int>(type: "int", nullable: false)
@@ -64,7 +64,7 @@ namespace CleanAgricultureProductBE.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Role", x => x.RoleId);
+                    table.PrimaryKey("PK_Roles", x => x.RoleId);
                 });
 
             migrationBuilder.CreateTable(
@@ -128,9 +128,9 @@ namespace CleanAgricultureProductBE.Migrations
                 {
                     table.PrimaryKey("PK_Accounts", x => x.AccountId);
                     table.ForeignKey(
-                        name: "FK_Accounts_Role_RoleId",
+                        name: "FK_Accounts_Roles_RoleId",
                         column: x => x.RoleId,
-                        principalTable: "Role",
+                        principalTable: "Roles",
                         principalColumn: "RoleId",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -268,7 +268,7 @@ namespace CleanAgricultureProductBE.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Order",
+                name: "Orders",
                 columns: table => new
                 {
                     OrderId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -282,33 +282,33 @@ namespace CleanAgricultureProductBE.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Order", x => x.OrderId);
+                    table.PrimaryKey("PK_Orders", x => x.OrderId);
                     table.ForeignKey(
-                        name: "FK_Order_Addresses_AddressId",
+                        name: "FK_Orders_Addresses_AddressId",
                         column: x => x.AddressId,
                         principalTable: "Addresses",
                         principalColumn: "AddressId",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Order_DeliveryFee_DeliveryFeeId",
+                        name: "FK_Orders_DeliveryFee_DeliveryFeeId",
                         column: x => x.DeliveryFeeId,
                         principalTable: "DeliveryFee",
                         principalColumn: "DeliveryFeeId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Order_Payments_PaymentId",
+                        name: "FK_Orders_Payments_PaymentId",
                         column: x => x.PaymentId,
                         principalTable: "Payments",
                         principalColumn: "PaymentId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Order_Schedules_ScheduleId",
+                        name: "FK_Orders_Schedules_ScheduleId",
                         column: x => x.ScheduleId,
                         principalTable: "Schedules",
                         principalColumn: "ScheduleId",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Order_UserProfiles_CustomerId",
+                        name: "FK_Orders_UserProfiles_CustomerId",
                         column: x => x.CustomerId,
                         principalTable: "UserProfiles",
                         principalColumn: "UserProfileId",
@@ -336,6 +336,35 @@ namespace CleanAgricultureProductBE.Migrations
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_CartItems_Products_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "Products",
+                        principalColumn: "ProductId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "OrderDetails",
+                columns: table => new
+                {
+                    OrderDetailId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Quantity = table.Column<int>(type: "int", nullable: false),
+                    TotalPrice = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ExpiryDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    OrderId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OrderDetails", x => x.OrderDetailId);
+                    table.ForeignKey(
+                        name: "FK_OrderDetails_Orders_OrderId",
+                        column: x => x.OrderId,
+                        principalTable: "Orders",
+                        principalColumn: "OrderId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_OrderDetails_Products_ProductId",
                         column: x => x.ProductId,
                         principalTable: "Products",
                         principalColumn: "ProductId",
@@ -375,28 +404,39 @@ namespace CleanAgricultureProductBE.Migrations
                 column: "StaffId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Order_AddressId",
-                table: "Order",
+                name: "IX_OrderDetails_OrderId_ProductId",
+                table: "OrderDetails",
+                columns: new[] { "OrderId", "ProductId" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_OrderDetails_ProductId",
+                table: "OrderDetails",
+                column: "ProductId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Orders_AddressId",
+                table: "Orders",
                 column: "AddressId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Order_CustomerId",
-                table: "Order",
+                name: "IX_Orders_CustomerId",
+                table: "Orders",
                 column: "CustomerId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Order_DeliveryFeeId",
-                table: "Order",
+                name: "IX_Orders_DeliveryFeeId",
+                table: "Orders",
                 column: "DeliveryFeeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Order_PaymentId",
-                table: "Order",
+                name: "IX_Orders_PaymentId",
+                table: "Orders",
                 column: "PaymentId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Order_ScheduleId",
-                table: "Order",
+                name: "IX_Orders_ScheduleId",
+                table: "Orders",
                 column: "ScheduleId");
 
             migrationBuilder.CreateIndex(
@@ -436,13 +476,19 @@ namespace CleanAgricultureProductBE.Migrations
                 name: "Complaints");
 
             migrationBuilder.DropTable(
-                name: "Order");
+                name: "OrderDetails");
 
             migrationBuilder.DropTable(
                 name: "ProductImages");
 
             migrationBuilder.DropTable(
                 name: "Carts");
+
+            migrationBuilder.DropTable(
+                name: "Orders");
+
+            migrationBuilder.DropTable(
+                name: "Products");
 
             migrationBuilder.DropTable(
                 name: "Addresses");
@@ -457,7 +503,7 @@ namespace CleanAgricultureProductBE.Migrations
                 name: "Schedules");
 
             migrationBuilder.DropTable(
-                name: "Products");
+                name: "Categories");
 
             migrationBuilder.DropTable(
                 name: "UserProfiles");
@@ -466,13 +512,10 @@ namespace CleanAgricultureProductBE.Migrations
                 name: "PaymentMethods");
 
             migrationBuilder.DropTable(
-                name: "Categories");
-
-            migrationBuilder.DropTable(
                 name: "Accounts");
 
             migrationBuilder.DropTable(
-                name: "Role");
+                name: "Roles");
         }
     }
 }

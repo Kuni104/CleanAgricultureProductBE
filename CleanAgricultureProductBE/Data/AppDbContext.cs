@@ -6,7 +6,7 @@ namespace CleanAgricultureProductBE.Data
     public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
     {
         public DbSet<Account> Accounts => Set<Account>();
-        public DbSet<Role> Role => Set<Role>();
+        public DbSet<Role> Roles => Set<Role>();
         public DbSet<UserProfile> UserProfiles => Set<UserProfile>();
         public DbSet<Cart> Carts => Set<Cart>();
         public DbSet<CartItem> CartItems => Set<CartItem>();
@@ -16,6 +16,8 @@ namespace CleanAgricultureProductBE.Data
         public DbSet<Product> Products => Set<Product>();
         public DbSet<Category> Categories => Set<Category>();
         public DbSet<ProductImage> ProductImages => Set<ProductImage>();
+        public DbSet<Order> Orders => Set<Order>();
+        public DbSet<OrderDetail> OrderDetails => Set<OrderDetail>();
         public DbSet<PaymentMethod> PaymentMethods => Set<PaymentMethod>();
         public DbSet<Payment> Payments => Set<Payment>();
 
@@ -153,6 +155,25 @@ namespace CleanAgricultureProductBE.Data
 
                 entity.HasIndex(e => new { e.CartId, e.ProductId })
                       .IsUnique();
+            });
+
+            modelBuilder.Entity<OrderDetail>(entity =>
+            {
+                entity.HasOne(a => a.Order)
+                      .WithMany(r => r.OrderDetails)
+                      .HasForeignKey(a => a.OrderId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(a => a.Product)
+                      .WithMany(r => r.OrderDetails)
+                      .HasForeignKey(a => a.ProductId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasIndex(e => new { e.OrderId, e.ProductId })
+                      .IsUnique();
+
+                entity.Property(od => od.TotalPrice)
+                      .HasPrecision(18, 2);
             });
         }
     }
