@@ -11,5 +11,7 @@
 
         public UserProfile UserProfile { get; set; } = null!;
         public Role Role { get; set; } = null!;
+        public ICollection<Schedule> Schedules { get; set; } = new List<Schedule>();
+        public ICollection<Complaint> Complaints { get; set; } = new List<Complaint>();
     }
 }

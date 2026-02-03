@@ -54,6 +54,40 @@ namespace CleanAgricultureProductBE.Migrations
                     b.ToTable("Accounts");
                 });
 
+            modelBuilder.Entity("CleanAgricultureProductBE.Models.Complaint", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Evidence")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("ResolveAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("StaffId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Subject")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StaffId");
+
+                    b.ToTable("Complaints");
+                });
+
             modelBuilder.Entity("CleanAgricultureProductBE.Models.Role", b =>
                 {
                     b.Property<int>("Id")
@@ -69,6 +103,35 @@ namespace CleanAgricultureProductBE.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Role");
+                });
+
+            modelBuilder.Entity("CleanAgricultureProductBE.Models.Schedule", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("DeliveryPersonId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("ScheduledDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DeliveryPersonId");
+
+                    b.ToTable("Schedules");
                 });
 
             modelBuilder.Entity("CleanAgricultureProductBE.Models.UserProfile", b =>
@@ -100,6 +163,28 @@ namespace CleanAgricultureProductBE.Migrations
                     b.Navigation("Role");
                 });
 
+            modelBuilder.Entity("CleanAgricultureProductBE.Models.Complaint", b =>
+                {
+                    b.HasOne("CleanAgricultureProductBE.Models.Account", "Staff")
+                        .WithMany("Complaints")
+                        .HasForeignKey("StaffId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Staff");
+                });
+
+            modelBuilder.Entity("CleanAgricultureProductBE.Models.Schedule", b =>
+                {
+                    b.HasOne("CleanAgricultureProductBE.Models.Account", "DeliveryPerson")
+                        .WithMany("Schedules")
+                        .HasForeignKey("DeliveryPersonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("DeliveryPerson");
+                });
+
             modelBuilder.Entity("CleanAgricultureProductBE.Models.UserProfile", b =>
                 {
                     b.HasOne("CleanAgricultureProductBE.Models.Account", "Account")
@@ -113,6 +198,10 @@ namespace CleanAgricultureProductBE.Migrations
 
             modelBuilder.Entity("CleanAgricultureProductBE.Models.Account", b =>
                 {
+                    b.Navigation("Complaints");
+
+                    b.Navigation("Schedules");
+
                     b.Navigation("UserProfile")
                         .IsRequired();
                 });

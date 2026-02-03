@@ -9,9 +9,14 @@ namespace CleanAgricultureProductBE.Data
         public DbSet<UserProfile> UserProfiles => Set<UserProfile>();
         public DbSet<Role> Role => Set<Role>();
 
+        public DbSet<Schedule> Schedules => Set<Schedule>();
+
+        public DbSet<Complaint> Complaints => Set<Complaint>();
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Account>(entity => {
+            modelBuilder.Entity<Account>(entity =>
+            {
                 entity.HasOne(a => a.Role)
                       .WithMany(r => r.Accounts)
                       .HasForeignKey(a => a.RoleId)
@@ -20,6 +25,26 @@ namespace CleanAgricultureProductBE.Data
                 entity.HasOne(a => a.UserProfile)
                       .WithOne(up => up.Account)
                       .HasForeignKey<UserProfile>(p => p.UserProfileId);
+
+
+            });
+
+            modelBuilder.Entity<Schedule>(entity =>
+            {
+                entity.HasOne(a => a.DeliveryPerson)
+                      .WithMany(r => r.Schedules)
+                      .HasForeignKey(a => a.DeliveryPersonId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+            });
+
+            modelBuilder.Entity<Complaint>(entity =>
+            {
+                entity.HasOne(a => a.Staff)
+                      .WithMany(r => r.Complaints)
+                      .HasForeignKey(a => a.StaffId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
             });
         }
     }
