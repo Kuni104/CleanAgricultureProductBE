@@ -2,7 +2,7 @@
 {
     public class Schedule
     {
-        public Guid Id { get; set; }
+        public Guid ScheduleId { get; set; }
         public DateTime ScheduledDate { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }

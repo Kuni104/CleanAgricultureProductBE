@@ -6,8 +6,9 @@ namespace CleanAgricultureProductBE.Data
     public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
     {
         public DbSet<Account> Accounts => Set<Account>();
-        public DbSet<UserProfile> UserProfiles => Set<UserProfile>();
         public DbSet<Role> Role => Set<Role>();
+        public DbSet<UserProfile> UserProfiles => Set<UserProfile>();
+        public DbSet<Cart> Carts => Set<Cart>();
         public DbSet<Schedule> Schedules => Set<Schedule>();
         public DbSet<Complaint> Complaints => Set<Complaint>();
         public DbSet<Address> Addresses => Set<Address>();
@@ -28,11 +29,22 @@ namespace CleanAgricultureProductBE.Data
 
                 entity.HasOne(a => a.UserProfile)
                       .WithOne(up => up.Account)
-                      .HasForeignKey<UserProfile>(p => p.UserProfileId)
+                      .HasForeignKey<UserProfile>(p => p.AccountId)
                       .OnDelete(DeleteBehavior.Cascade);
 
 
             });
+
+            modelBuilder.Entity<UserProfile>(entity =>
+            {
+                entity.HasOne(a => a.Cart)
+                      .WithOne(up => up.Customer)
+                      .HasForeignKey<Cart>(p => p.CustomerId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+
+            });
+
 
             modelBuilder.Entity<Schedule>(entity =>
             {

@@ -2,7 +2,7 @@
 {
     public class Order
     {
-        public Guid Id { get; set; }
+        public Guid OrderId { get; set; }
 
         public DateTime OrderDate { get; set; }
         public string OrderStatus { get; set; } = string.Empty;

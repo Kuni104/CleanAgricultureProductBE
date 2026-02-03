@@ -24,7 +24,7 @@ namespace CleanAgricultureProductBE.Migrations
 
             modelBuilder.Entity("CleanAgricultureProductBE.Models.Account", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<Guid>("AccountId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
@@ -47,7 +47,7 @@ namespace CleanAgricultureProductBE.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id");
+                    b.HasKey("AccountId");
 
                     b.HasIndex("RoleId");
 
@@ -97,6 +97,29 @@ namespace CleanAgricultureProductBE.Migrations
                     b.ToTable("Addresses");
                 });
 
+            modelBuilder.Entity("CleanAgricultureProductBE.Models.Cart", b =>
+                {
+                    b.Property<Guid>("CartId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("CustomerId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("CartId");
+
+                    b.HasIndex("CustomerId")
+                        .IsUnique();
+
+                    b.ToTable("carts");
+                });
+
             modelBuilder.Entity("CleanAgricultureProductBE.Models.Category", b =>
                 {
                     b.Property<Guid>("CategoryId")
@@ -122,7 +145,7 @@ namespace CleanAgricultureProductBE.Migrations
 
             modelBuilder.Entity("CleanAgricultureProductBE.Models.Complaint", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<Guid>("ComplaintId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
@@ -147,7 +170,7 @@ namespace CleanAgricultureProductBE.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id");
+                    b.HasKey("ComplaintId");
 
                     b.HasIndex("StaffId");
 
@@ -156,7 +179,7 @@ namespace CleanAgricultureProductBE.Migrations
 
             modelBuilder.Entity("CleanAgricultureProductBE.Models.DeliveryFee", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<Guid>("DeliveryFeeId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
@@ -180,14 +203,14 @@ namespace CleanAgricultureProductBE.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
-                    b.HasKey("Id");
+                    b.HasKey("DeliveryFeeId");
 
                     b.ToTable("DeliveryFee");
                 });
 
             modelBuilder.Entity("CleanAgricultureProductBE.Models.Order", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<Guid>("OrderId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
@@ -213,7 +236,7 @@ namespace CleanAgricultureProductBE.Migrations
                     b.Property<Guid>("ScheduleId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("Id");
+                    b.HasKey("OrderId");
 
                     b.HasIndex("AddressId");
 
@@ -230,7 +253,7 @@ namespace CleanAgricultureProductBE.Migrations
 
             modelBuilder.Entity("CleanAgricultureProductBE.Models.Payment", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<Guid>("PaymentId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
@@ -252,7 +275,7 @@ namespace CleanAgricultureProductBE.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id");
+                    b.HasKey("PaymentId");
 
                     b.HasIndex("PaymentMethodId");
 
@@ -261,17 +284,17 @@ namespace CleanAgricultureProductBE.Migrations
 
             modelBuilder.Entity("CleanAgricultureProductBE.Models.PaymentMethod", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("PaymentMethodId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PaymentMethodId"));
 
                     b.Property<string>("MethodName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id");
+                    b.HasKey("PaymentMethodId");
 
                     b.ToTable("PaymentMethods");
                 });
@@ -316,7 +339,7 @@ namespace CleanAgricultureProductBE.Migrations
 
             modelBuilder.Entity("CleanAgricultureProductBE.Models.ProductImage", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<Guid>("ProductImageId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
@@ -339,7 +362,7 @@ namespace CleanAgricultureProductBE.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id");
+                    b.HasKey("ProductImageId");
 
                     b.HasIndex("ProductId");
 
@@ -348,24 +371,24 @@ namespace CleanAgricultureProductBE.Migrations
 
             modelBuilder.Entity("CleanAgricultureProductBE.Models.Role", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("RoleId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RoleId"));
 
                     b.Property<string>("RoleName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id");
+                    b.HasKey("RoleId");
 
                     b.ToTable("Role");
                 });
 
             modelBuilder.Entity("CleanAgricultureProductBE.Models.Schedule", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<Guid>("ScheduleId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
@@ -385,7 +408,7 @@ namespace CleanAgricultureProductBE.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id");
+                    b.HasKey("ScheduleId");
 
                     b.HasIndex("DeliveryPersonId");
 
@@ -395,6 +418,10 @@ namespace CleanAgricultureProductBE.Migrations
             modelBuilder.Entity("CleanAgricultureProductBE.Models.UserProfile", b =>
                 {
                     b.Property<Guid>("UserProfileId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("AccountId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("FirstName")
@@ -406,6 +433,9 @@ namespace CleanAgricultureProductBE.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("UserProfileId");
+
+                    b.HasIndex("AccountId")
+                        .IsUnique();
 
                     b.ToTable("UserProfiles");
                 });
@@ -430,6 +460,17 @@ namespace CleanAgricultureProductBE.Migrations
                         .IsRequired();
 
                     b.Navigation("UserProfile");
+                });
+
+            modelBuilder.Entity("CleanAgricultureProductBE.Models.Cart", b =>
+                {
+                    b.HasOne("CleanAgricultureProductBE.Models.UserProfile", "Customer")
+                        .WithOne("Cart")
+                        .HasForeignKey("CleanAgricultureProductBE.Models.Cart", "CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
                 });
 
             modelBuilder.Entity("CleanAgricultureProductBE.Models.Complaint", b =>
@@ -534,7 +575,7 @@ namespace CleanAgricultureProductBE.Migrations
                 {
                     b.HasOne("CleanAgricultureProductBE.Models.Account", "Account")
                         .WithOne("UserProfile")
-                        .HasForeignKey("CleanAgricultureProductBE.Models.UserProfile", "UserProfileId")
+                        .HasForeignKey("CleanAgricultureProductBE.Models.UserProfile", "AccountId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -594,6 +635,9 @@ namespace CleanAgricultureProductBE.Migrations
             modelBuilder.Entity("CleanAgricultureProductBE.Models.UserProfile", b =>
                 {
                     b.Navigation("Addresses");
+
+                    b.Navigation("Cart")
+                        .IsRequired();
 
                     b.Navigation("Orders");
                 });

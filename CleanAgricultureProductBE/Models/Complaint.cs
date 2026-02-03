@@ -2,7 +2,7 @@
 {
     public class Complaint
     {
-        public Guid Id { get; set; }
+        public Guid ComplaintId { get; set; }
         public string Subject { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; }

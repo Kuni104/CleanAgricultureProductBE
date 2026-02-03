@@ -2,7 +2,7 @@
 {
     public class DeliveryFee
     {
-        public Guid Id { get; set; }
+        public Guid DeliveryFeeId { get; set; }
         public string District { get; set; } = string.Empty;
         public string City { get; set; } = string.Empty;
         public decimal FeeAmount { get; set; }
