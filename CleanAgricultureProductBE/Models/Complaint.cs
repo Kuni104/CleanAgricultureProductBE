@@ -13,6 +13,6 @@
 
         public Account Staff { get; set; } = null!;
         public Order Order { get; set; } = null!;
-
+        public ICollection<ProductComplaint> ProductComplaints { get; set; } = new List<ProductComplaint>();
     }
 }

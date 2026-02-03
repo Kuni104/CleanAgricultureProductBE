@@ -11,7 +11,9 @@ namespace CleanAgricultureProductBE.Data
         public DbSet<Cart> Carts => Set<Cart>();
         public DbSet<CartItem> CartItems => Set<CartItem>();
         public DbSet<Schedule> Schedules => Set<Schedule>();
+        public DbSet<CycleSchedule> CycleSchedules => Set<CycleSchedule>();
         public DbSet<Complaint> Complaints => Set<Complaint>();
+        public DbSet<ProductComplaint> ProductComplaints => Set<ProductComplaint>();
         public DbSet<Address> Addresses => Set<Address>();
         public DbSet<Product> Products => Set<Product>();
         public DbSet<Category> Categories => Set<Category>();
@@ -180,6 +182,30 @@ namespace CleanAgricultureProductBE.Data
 
                 entity.Property(od => od.TotalPrice)
                       .HasPrecision(18, 2);
+            });
+
+            modelBuilder.Entity<ProductComplaint>(entity =>
+            {
+                entity.HasOne(a => a.Complaint)
+                      .WithMany(r => r.ProductComplaints)
+                      .HasForeignKey(a => a.ComplaintId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(a => a.Product)
+                      .WithMany(r => r.ProductComplaints)
+                      .HasForeignKey(a => a.ProductId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasIndex(e => new { e.ComplaintId, e.ProductId })
+                      .IsUnique();
+            });
+
+            modelBuilder.Entity<CycleSchedule>(entity =>
+            {
+                entity.HasOne(a => a.Order)
+                      .WithMany(r => r.CycleSchedules)
+                      .HasForeignKey(a => a.OrderId)
+                      .OnDelete(DeleteBehavior.Cascade);
             });
         }
     }

@@ -143,7 +143,7 @@ namespace CleanAgricultureProductBE.Migrations
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    status = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
@@ -165,7 +165,7 @@ namespace CleanAgricultureProductBE.Migrations
                     ScheduledDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    status = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     DeliveryPersonId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
@@ -350,6 +350,30 @@ namespace CleanAgricultureProductBE.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "CycleSchedules",
+                columns: table => new
+                {
+                    CycleScheduleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    DayCycle = table.Column<int>(type: "int", nullable: false),
+                    isMonthly = table.Column<bool>(type: "bit", nullable: false),
+                    StartAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    OrderId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CycleSchedules", x => x.CycleScheduleId);
+                    table.ForeignKey(
+                        name: "FK_CycleSchedules_Orders_OrderId",
+                        column: x => x.OrderId,
+                        principalTable: "Orders",
+                        principalColumn: "OrderId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "OrderDetails",
                 columns: table => new
                 {
@@ -372,6 +396,31 @@ namespace CleanAgricultureProductBE.Migrations
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_OrderDetails_Products_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "Products",
+                        principalColumn: "ProductId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ProductComplaints",
+                columns: table => new
+                {
+                    ProductComplaintId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ComplaintId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProductComplaints", x => x.ProductComplaintId);
+                    table.ForeignKey(
+                        name: "FK_ProductComplaints_Complaints_ComplaintId",
+                        column: x => x.ComplaintId,
+                        principalTable: "Complaints",
+                        principalColumn: "ComplaintId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ProductComplaints_Products_ProductId",
                         column: x => x.ProductId,
                         principalTable: "Products",
                         principalColumn: "ProductId",
@@ -417,6 +466,11 @@ namespace CleanAgricultureProductBE.Migrations
                 column: "StaffId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_CycleSchedules_OrderId",
+                table: "CycleSchedules",
+                column: "OrderId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_OrderDetails_OrderId_ProductId",
                 table: "OrderDetails",
                 columns: new[] { "OrderId", "ProductId" },
@@ -458,6 +512,17 @@ namespace CleanAgricultureProductBE.Migrations
                 column: "PaymentMethodId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ProductComplaints_ComplaintId_ProductId",
+                table: "ProductComplaints",
+                columns: new[] { "ComplaintId", "ProductId" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProductComplaints_ProductId",
+                table: "ProductComplaints",
+                column: "ProductId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ProductImages_ProductId",
                 table: "ProductImages",
                 column: "ProductId");
@@ -486,10 +551,13 @@ namespace CleanAgricultureProductBE.Migrations
                 name: "CartItems");
 
             migrationBuilder.DropTable(
-                name: "Complaints");
+                name: "CycleSchedules");
 
             migrationBuilder.DropTable(
                 name: "OrderDetails");
+
+            migrationBuilder.DropTable(
+                name: "ProductComplaints");
 
             migrationBuilder.DropTable(
                 name: "ProductImages");
@@ -498,10 +566,16 @@ namespace CleanAgricultureProductBE.Migrations
                 name: "Carts");
 
             migrationBuilder.DropTable(
-                name: "Orders");
+                name: "Complaints");
 
             migrationBuilder.DropTable(
                 name: "Products");
+
+            migrationBuilder.DropTable(
+                name: "Orders");
+
+            migrationBuilder.DropTable(
+                name: "Categories");
 
             migrationBuilder.DropTable(
                 name: "Addresses");
@@ -514,9 +588,6 @@ namespace CleanAgricultureProductBE.Migrations
 
             migrationBuilder.DropTable(
                 name: "Schedules");
-
-            migrationBuilder.DropTable(
-                name: "Categories");
 
             migrationBuilder.DropTable(
                 name: "UserProfiles");

@@ -211,6 +211,41 @@ namespace CleanAgricultureProductBE.Migrations
                     b.ToTable("Complaints");
                 });
 
+            modelBuilder.Entity("CleanAgricultureProductBE.Models.CycleSchedule", b =>
+                {
+                    b.Property<Guid>("CycleScheduleId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("DayCycle")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("OrderId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("StartAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("isMonthly")
+                        .HasColumnType("bit");
+
+                    b.HasKey("CycleScheduleId");
+
+                    b.HasIndex("OrderId");
+
+                    b.ToTable("CycleSchedules");
+                });
+
             modelBuilder.Entity("CleanAgricultureProductBE.Models.DeliveryFee", b =>
                 {
                     b.Property<Guid>("DeliveryFeeId")
@@ -406,6 +441,28 @@ namespace CleanAgricultureProductBE.Migrations
                     b.ToTable("Products");
                 });
 
+            modelBuilder.Entity("CleanAgricultureProductBE.Models.ProductComplaint", b =>
+                {
+                    b.Property<Guid>("ProductComplaintId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ComplaintId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("ProductComplaintId");
+
+                    b.HasIndex("ProductId");
+
+                    b.HasIndex("ComplaintId", "ProductId")
+                        .IsUnique();
+
+                    b.ToTable("ProductComplaints");
+                });
+
             modelBuilder.Entity("CleanAgricultureProductBE.Models.ProductImage", b =>
                 {
                     b.Property<Guid>("ProductImageId")
@@ -427,7 +484,7 @@ namespace CleanAgricultureProductBE.Migrations
                     b.Property<Guid>("ProductId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("status")
+                    b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -470,12 +527,12 @@ namespace CleanAgricultureProductBE.Migrations
                     b.Property<DateTime>("ScheduledDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("status")
+                    b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("ScheduleId");
 
@@ -580,6 +637,17 @@ namespace CleanAgricultureProductBE.Migrations
                     b.Navigation("Staff");
                 });
 
+            modelBuilder.Entity("CleanAgricultureProductBE.Models.CycleSchedule", b =>
+                {
+                    b.HasOne("CleanAgricultureProductBE.Models.Order", "Order")
+                        .WithMany("CycleSchedules")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Order");
+                });
+
             modelBuilder.Entity("CleanAgricultureProductBE.Models.Order", b =>
                 {
                     b.HasOne("CleanAgricultureProductBE.Models.Address", "Address")
@@ -664,6 +732,25 @@ namespace CleanAgricultureProductBE.Migrations
                     b.Navigation("Category");
                 });
 
+            modelBuilder.Entity("CleanAgricultureProductBE.Models.ProductComplaint", b =>
+                {
+                    b.HasOne("CleanAgricultureProductBE.Models.Complaint", "Complaint")
+                        .WithMany("ProductComplaints")
+                        .HasForeignKey("ComplaintId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CleanAgricultureProductBE.Models.Product", "Product")
+                        .WithMany("ProductComplaints")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Complaint");
+
+                    b.Navigation("Product");
+                });
+
             modelBuilder.Entity("CleanAgricultureProductBE.Models.ProductImage", b =>
                 {
                     b.HasOne("CleanAgricultureProductBE.Models.Product", "Product")
@@ -722,6 +809,11 @@ namespace CleanAgricultureProductBE.Migrations
                     b.Navigation("Products");
                 });
 
+            modelBuilder.Entity("CleanAgricultureProductBE.Models.Complaint", b =>
+                {
+                    b.Navigation("ProductComplaints");
+                });
+
             modelBuilder.Entity("CleanAgricultureProductBE.Models.DeliveryFee", b =>
                 {
                     b.Navigation("Orders");
@@ -731,6 +823,8 @@ namespace CleanAgricultureProductBE.Migrations
                 {
                     b.Navigation("Complaint")
                         .IsRequired();
+
+                    b.Navigation("CycleSchedules");
 
                     b.Navigation("OrderDetails");
                 });
@@ -750,6 +844,8 @@ namespace CleanAgricultureProductBE.Migrations
                     b.Navigation("CartItems");
 
                     b.Navigation("OrderDetails");
+
+                    b.Navigation("ProductComplaints");
 
                     b.Navigation("ProductImages");
                 });

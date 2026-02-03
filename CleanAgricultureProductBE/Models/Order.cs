@@ -20,5 +20,6 @@
         public Payment Payment { get; set; } = null!;
         public Complaint Complaint { get; set; } = null!;
         public ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
+        public ICollection<CycleSchedule> CycleSchedules { get; set; } = new List<CycleSchedule>();
     }
 }
