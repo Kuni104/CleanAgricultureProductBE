@@ -117,7 +117,35 @@ namespace CleanAgricultureProductBE.Migrations
                     b.HasIndex("CustomerId")
                         .IsUnique();
 
-                    b.ToTable("carts");
+                    b.ToTable("Carts");
+                });
+
+            modelBuilder.Entity("CleanAgricultureProductBE.Models.CartItem", b =>
+                {
+                    b.Property<Guid>("CartItemId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CartId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.HasKey("CartItemId");
+
+                    b.HasIndex("ProductId");
+
+                    b.HasIndex("CartId", "ProductId")
+                        .IsUnique();
+
+                    b.ToTable("CartItems");
                 });
 
             modelBuilder.Entity("CleanAgricultureProductBE.Models.Category", b =>
@@ -473,6 +501,25 @@ namespace CleanAgricultureProductBE.Migrations
                     b.Navigation("Customer");
                 });
 
+            modelBuilder.Entity("CleanAgricultureProductBE.Models.CartItem", b =>
+                {
+                    b.HasOne("CleanAgricultureProductBE.Models.Cart", "Cart")
+                        .WithMany("CartItems")
+                        .HasForeignKey("CartId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CleanAgricultureProductBE.Models.Product", "Product")
+                        .WithMany("CartItems")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Cart");
+
+                    b.Navigation("Product");
+                });
+
             modelBuilder.Entity("CleanAgricultureProductBE.Models.Complaint", b =>
                 {
                     b.HasOne("CleanAgricultureProductBE.Models.Account", "Staff")
@@ -597,6 +644,11 @@ namespace CleanAgricultureProductBE.Migrations
                     b.Navigation("Orders");
                 });
 
+            modelBuilder.Entity("CleanAgricultureProductBE.Models.Cart", b =>
+                {
+                    b.Navigation("CartItems");
+                });
+
             modelBuilder.Entity("CleanAgricultureProductBE.Models.Category", b =>
                 {
                     b.Navigation("Products");
@@ -619,6 +671,8 @@ namespace CleanAgricultureProductBE.Migrations
 
             modelBuilder.Entity("CleanAgricultureProductBE.Models.Product", b =>
                 {
+                    b.Navigation("CartItems");
+
                     b.Navigation("ProductImages");
                 });
 

@@ -9,6 +9,7 @@ namespace CleanAgricultureProductBE.Data
         public DbSet<Role> Role => Set<Role>();
         public DbSet<UserProfile> UserProfiles => Set<UserProfile>();
         public DbSet<Cart> Carts => Set<Cart>();
+        public DbSet<CartItem> CartItems => Set<CartItem>();
         public DbSet<Schedule> Schedules => Set<Schedule>();
         public DbSet<Complaint> Complaints => Set<Complaint>();
         public DbSet<Address> Addresses => Set<Address>();
@@ -136,6 +137,22 @@ namespace CleanAgricultureProductBE.Data
                        .WithMany(r => r.Orders)
                        .HasForeignKey(a => a.PaymentId)
                        .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<CartItem>(entity =>
+            {
+                entity.HasOne(a => a.Cart)
+                      .WithMany(r => r.CartItems)
+                      .HasForeignKey(a => a.CartId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(a => a.Product)
+                      .WithMany(r => r.CartItems)
+                      .HasForeignKey(a => a.ProductId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasIndex(e => new { e.CartId, e.ProductId })
+                      .IsUnique();
             });
         }
     }
