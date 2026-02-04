@@ -40,12 +40,12 @@ namespace CleanAgricultureProductBE.Services
 
             var token = GenerateJwt(account);
 
-            return new
+            return new LoginResponseDto
             {
-                token = token,
-                accountId = account.AccountId,
-                email = account.Email,
-                role = account.Role.RoleName
+                Token = token,
+                AccountId = account.AccountId,
+                Email = account.Email,
+                Role = account.Role.RoleName
             };
         }
 
