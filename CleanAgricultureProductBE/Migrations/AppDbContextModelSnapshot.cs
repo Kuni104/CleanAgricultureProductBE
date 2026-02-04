@@ -510,6 +510,28 @@ namespace CleanAgricultureProductBE.Migrations
                     b.HasKey("RoleId");
 
                     b.ToTable("Roles");
+
+                    b.HasData(
+                        new
+                        {
+                            RoleId = 1,
+                            RoleName = "Admin"
+                        },
+                        new
+                        {
+                            RoleId = 2,
+                            RoleName = "Customer"
+                        },
+                        new
+                        {
+                            RoleId = 3,
+                            RoleName = "Staff"
+                        },
+                        new
+                        {
+                            RoleId = 4,
+                            RoleName = "DeliveryPerson"
+                        });
                 });
 
             modelBuilder.Entity("CleanAgricultureProductBE.Models.Schedule", b =>

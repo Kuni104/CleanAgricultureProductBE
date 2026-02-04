@@ -2,6 +2,8 @@ using CleanAgricultureProductBE.Data;
 using CleanAgricultureProductBE.Repositories;
 using CleanAgricultureProductBE.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using CleanAgricultureProductBE.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
@@ -18,9 +20,31 @@ namespace CleanAgricultureProductBE
             builder.Services.AddControllers();
 
             builder.Services.AddOpenApi();
+          
+            builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+            .UseSeeding((context, _) =>
+            {
+                // Seed initial data here if necessary
+                if (!context.Set<Account>().Any())
+                {
+                    var hasher = new PasswordHasher<Account>();
 
-            builder.Services.AddDbContext<AppDbContext>(options =>
-                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+                    var adminAccount = new Account
+                    {
+                        AccountId = Guid.NewGuid(),
+                        RoleId = 1,
+                        Email = "admin@gmail.com",
+                        PasswordHash = "12345",
+                        Status = "Active",
+                        PhoneNumber = "0123456789"
+                    };
+
+                    adminAccount.PasswordHash = hasher.HashPassword(adminAccount, adminAccount.PasswordHash);
+
+                    context.Set<Account>().Add(adminAccount);
+                    context.SaveChanges();
+                }
+            })
             );
 
             // Dependency Injection

@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace CleanAgricultureProductBE.Migrations
 {
     /// <inheritdoc />
@@ -425,6 +427,17 @@ namespace CleanAgricultureProductBE.Migrations
                         principalTable: "Products",
                         principalColumn: "ProductId",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.InsertData(
+                table: "Roles",
+                columns: new[] { "RoleId", "RoleName" },
+                values: new object[,]
+                {
+                    { 1, "Admin" },
+                    { 2, "Customer" },
+                    { 3, "Staff" },
+                    { 4, "DeliveryPerson" }
                 });
 
             migrationBuilder.CreateIndex(
