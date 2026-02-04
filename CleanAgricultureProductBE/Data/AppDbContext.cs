@@ -1,4 +1,5 @@
 ﻿using CleanAgricultureProductBE.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace CleanAgricultureProductBE.Data
@@ -207,6 +208,16 @@ namespace CleanAgricultureProductBE.Data
                       .HasForeignKey(a => a.OrderId)
                       .OnDelete(DeleteBehavior.Cascade);
             });
+
+            /*------------------------------------------------------------------------------------------------------------------------*/
+
+            // Seed initial data
+            modelBuilder.Entity<Role>().HasData(
+                new Role { RoleId = 1, RoleName = "Admin" },
+                new Role { RoleId = 2, RoleName = "Customer" },
+                new Role { RoleId = 3, RoleName = "Staff" },
+                new Role { RoleId = 4, RoleName = "DeliveryPerson" }
+            );
         }
     }
 }

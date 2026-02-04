@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CleanAgricultureProductBE.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260203164109_Initial")]
+    [Migration("20260204072909_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -513,6 +513,28 @@ namespace CleanAgricultureProductBE.Migrations
                     b.HasKey("RoleId");
 
                     b.ToTable("Roles");
+
+                    b.HasData(
+                        new
+                        {
+                            RoleId = 1,
+                            RoleName = "Admin"
+                        },
+                        new
+                        {
+                            RoleId = 2,
+                            RoleName = "Customer"
+                        },
+                        new
+                        {
+                            RoleId = 3,
+                            RoleName = "Staff"
+                        },
+                        new
+                        {
+                            RoleId = 4,
+                            RoleName = "DeliveryPerson"
+                        });
                 });
 
             modelBuilder.Entity("CleanAgricultureProductBE.Models.Schedule", b =>
