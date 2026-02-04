@@ -1,5 +1,7 @@
 
 using CleanAgricultureProductBE.Data;
+using CleanAgricultureProductBE.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 
@@ -16,7 +18,31 @@ namespace CleanAgricultureProductBE
             builder.Services.AddControllers();
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
-            builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+            builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+            .UseSeeding((context, _) =>
+            {
+                // Seed initial data here if necessary
+                if (!context.Set<Account>().Any())
+                {
+                    var hasher = new PasswordHasher<Account>();
+
+                    var adminAccount = new Account
+                    {
+                        AccountId = Guid.NewGuid(),
+                        RoleId = 1,
+                        Email = "admin@gmail.com",
+                        PasswordHash = "12345",
+                        Status = "Active",
+                        PhoneNumber = "0123456789"
+                    };
+
+                    adminAccount.PasswordHash = hasher.HashPassword(adminAccount, adminAccount.PasswordHash);
+
+                    context.Set<Account>().Add(adminAccount);
+                    context.SaveChanges();
+                }
+            })
+            );
 
             var app = builder.Build();
 
