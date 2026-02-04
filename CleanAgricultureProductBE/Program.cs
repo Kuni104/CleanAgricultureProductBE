@@ -20,10 +20,37 @@ namespace CleanAgricultureProductBE
             builder.Services.AddControllers();
 
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            builder.Services.AddSwaggerGen(options =>
+            {
+                options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+                {
+                    Name = "Authorization",
+                    Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,
+                    Scheme = "Bearer",
+                    BearerFormat = "JWT",
+                    In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+                    Description = "Nhập JWT token của bạn"
+                });
+
+                options.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+                {
+                    {
+                        new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+                        {
+                            Reference = new Microsoft.OpenApi.Models.OpenApiReference
+                            {
+                                Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        },
+                        new string[] {}
+                    }
+                });
+            });
+
 
             builder.Services.AddOpenApi();
-          
+
             builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
             .UseSeeding((context, _) =>
             {
@@ -67,6 +94,14 @@ namespace CleanAgricultureProductBE
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 
+            // Product DI
+            builder.Services.AddScoped<IProductService, ProductService>();
+            builder.Services.AddScoped<IProductRepository, ProductRepository>();
+
+            // Category DI
+            builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+            builder.Services.AddScoped<ICategoryService, CategoryService>();
+            
             // JWT Authentication
             builder.Services
                 .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -87,15 +122,15 @@ namespace CleanAgricultureProductBE
                     };
                 });
 
-            // Th�m CORS
+            // Th�m CORS
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowFrontend", builder =>
                 {
                     builder.WithOrigins("http://localhost:5173") // Port c?a React app
-                           .AllowAnyMethod()
-                           .AllowAnyHeader()
-                           .AllowCredentials();
+                        .AllowAnyMethod()
+                        .AllowAnyHeader()
+                        .AllowCredentials();
                 });
             });
 
