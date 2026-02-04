@@ -42,9 +42,22 @@ namespace CleanAgricultureProductBE
                         PhoneNumber = "0123456789"
                     };
 
+                    var userAccount = new Account
+                    {
+                        AccountId = Guid.NewGuid(),
+                        RoleId = 1,
+                        Email = "user@gmail.com",
+                        PasswordHash = "12345",
+                        Status = "Active",
+                        PhoneNumber = "0123456789"
+                    };
+
+
                     adminAccount.PasswordHash = hasher.HashPassword(adminAccount, adminAccount.PasswordHash);
+                    userAccount.PasswordHash = hasher.HashPassword(userAccount, userAccount.PasswordHash);
 
                     context.Set<Account>().Add(adminAccount);
+                    context.Set<Account>().Add(userAccount);
                     context.SaveChanges();
                 }
             })
@@ -74,6 +87,19 @@ namespace CleanAgricultureProductBE
                     };
                 });
 
+            // Thêm CORS
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowFrontend", builder =>
+                {
+                    builder.WithOrigins("http://localhost:5173") // Port c?a React app
+                           .AllowAnyMethod()
+                           .AllowAnyHeader()
+                           .AllowCredentials();
+                });
+            });
+
+
             builder.Services.AddAuthorization();
 
             var app = builder.Build();
@@ -88,6 +114,7 @@ namespace CleanAgricultureProductBE
 
             app.UseHttpsRedirection();
 
+            app.UseCors("AllowFrontend");
             // IMPORTANT ORDER
             app.UseAuthentication();
             app.UseAuthorization();
