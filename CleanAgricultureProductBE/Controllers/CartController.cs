@@ -16,11 +16,18 @@ namespace CleanAgricultureProductBE.Controllers
         [HttpPost]
         public async Task<IActionResult> AddToCart([FromBody] AddToCartRequestDto request)
         {
-            var accountId = ClaimTypes.NameIdentifier;
+            var accountId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            var result = await cartService.AddToCart(accountId, request);
+            var result = await cartService.AddToCart(accountId!, request);
 
-            return Ok();
+            var response = new ResponseObject<string>()
+            {
+                Success = "true",
+                Message = "Product added to cart successfully",
+                Data = result
+            };
+
+            return Ok(response);
         }
     }
 }
