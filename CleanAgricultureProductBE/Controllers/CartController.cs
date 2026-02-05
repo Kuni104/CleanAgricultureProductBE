@@ -19,7 +19,9 @@ namespace CleanAgricultureProductBE.Controllers
             {
                 Success = "true",
                 Message = "Product added to cart successfully",
-                Data = response
+                Data = response,
+                
+                Pagination = null
             };
 
             return Ok(responseDto);
