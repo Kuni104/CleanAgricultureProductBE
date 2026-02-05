@@ -86,6 +86,43 @@ namespace CleanAgricultureProductBE
                     context.Set<Account>().Add(adminAccount);
                     context.Set<Account>().Add(userAccount);
                     context.SaveChanges();
+
+                }
+
+                if (!context.Set<UserProfile>().Any())
+                {
+                    var userProfile = new UserProfile
+                    {
+                        UserProfileId = Guid.NewGuid(),
+                        AccountId = context.Set<Account>()
+                                            .Where(a => a.Email == "user@gmail.com")
+                                            .Select(a => a.AccountId)
+                                            .FirstOrDefault(),
+                        FirstName = "John",
+                        LastName = "Doe"
+                    };
+                    context.Set<UserProfile>().Add(userProfile);
+                    context.SaveChanges();
+                }
+
+                if (!context.Set<Cart>().Any())
+                {
+
+                    var account = context.Set<Account>()
+                                    .Include(a => a.UserProfile)
+                                    .Where(a => a.Email == "user@gmail.com")
+                                    .FirstOrDefault();
+
+                    var userCart = new Cart
+                    {
+                        CartId = Guid.NewGuid(),
+                        CustomerId = account!.UserProfile.UserProfileId,
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow
+                    };
+
+                    context.Set<Cart>().Add(userCart);
+                    context.SaveChanges();
                 }
             })
             );
