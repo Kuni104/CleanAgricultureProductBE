@@ -4,6 +4,10 @@
     {
         public Task AddCartItem(Models.CartItem cartItem);
 
-        //public Task<string> GetCartItemByCartIdAndProductId(Guid cartId, string productId);
+        public Task<bool> CheckCartItemByCartIdAndProductId(Guid cartId, Guid productId);
+
+        public Task<Models.CartItem?> GetCartItemByCartIdAndProductId(Guid cartId, Guid productId);
+
+        public Task UpdateCartItem(Models.CartItem cartItem);
     }
 }

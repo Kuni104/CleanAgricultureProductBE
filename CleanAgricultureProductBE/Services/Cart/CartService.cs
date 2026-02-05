@@ -16,26 +16,35 @@ namespace CleanAgricultureProductBE.Services.Cart
 
             var cart = await cartRepository.GetCartByCustomerId(customerId);
             var product = await productRepository.GetByIdAsync(request.ProductId);
-            //var cartItems = await cartItemRepository.GetCartItemByCartIdAndProductId
 
-            var cartItem = new CartItem
+            var cartItem = await cartItemRepository.GetCartItemByCartIdAndProductId(cart!.CartId, product!.ProductId);
+
+            if (cartItem is null)
             {
-                CartItemId = Guid.NewGuid(),
-                CartId = cart!.CartId,
-                ProductId = request.ProductId,
-                Quantity = request.Quantity,
-                CreatedAt = DateTime.UtcNow
-            };
+                cartItem = new CartItem
+                {
+                    CartItemId = Guid.NewGuid(),
+                    CartId = cart!.CartId,
+                    ProductId = request.ProductId,
+                    Quantity = request.Quantity,
+                    CreatedAt = DateTime.UtcNow
+                };
 
-            await cartItemRepository.AddCartItem(cartItem);
+                await cartItemRepository.AddCartItem(cartItem);
+            }
+            else
+            {
+                cartItem.Quantity += request.Quantity;
+                await cartItemRepository.UpdateCartItem(cartItem);
+            }
 
             return new AddToCartResponseDto
             {
                 CartItemId = cartItem.CartItemId,
                 CartId = cart.CartId,
                 ProductId = request.ProductId,
-                Quantity = request.Quantity,
-                TotalPrice = product!.Price * request.Quantity
+                Quantity = cartItem.Quantity,
+                TotalPrice = product!.Price * cartItem.Quantity
             };
         }
     }

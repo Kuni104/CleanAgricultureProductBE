@@ -1,4 +1,6 @@
 ﻿using CleanAgricultureProductBE.Data;
+using CleanAgricultureProductBE.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace CleanAgricultureProductBE.Repositories.CartItem
 {
@@ -10,9 +12,21 @@ namespace CleanAgricultureProductBE.Repositories.CartItem
             await context.SaveChangesAsync();
         }
 
-        //public Task<string> GetCartItemByCartIdAndProductId(Guid cartId, string productId)
-        //{
-            
-        //}
+        public async Task<Models.CartItem?> GetCartItemByCartIdAndProductId(Guid cartId, Guid productId)
+        {
+            return await context.CartItems.Where(ci => ci.CartId == cartId && ci.ProductId == productId)
+                                          .FirstOrDefaultAsync();
+        }
+
+        public async Task<bool> CheckCartItemByCartIdAndProductId(Guid cartId, Guid productId)
+        {
+            return await context.CartItems.AnyAsync(ci => ci.CartId == cartId && ci.ProductId == productId);
+        }
+
+        public async Task UpdateCartItem(Models.CartItem cartItem)
+        {
+            context.CartItems.Update(cartItem);
+            await context.SaveChangesAsync();
+        }
     }
 }
