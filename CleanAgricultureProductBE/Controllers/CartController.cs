@@ -13,18 +13,9 @@ namespace CleanAgricultureProductBE.Controllers
         [HttpPost]
         public async Task<IActionResult> AddToCart([FromBody] AddToCartRequestDto request)
         {
-            string response = request.ProductId.ToString() + " " + request.Quantity;
+            //var responseDto = await cartService.AddToCart(request);
 
-            var responseDto = new ResponseObject<string>
-            {
-                Success = "true",
-                Message = "Product added to cart successfully",
-                Data = response,
-                
-                Pagination = null
-            };
-
-            return Ok(responseDto);
+            return Ok();
         }
     }
 }
