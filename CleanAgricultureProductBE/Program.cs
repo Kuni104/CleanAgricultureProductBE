@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
 using System.Text;
+using CleanAgricultureProductBE.Services.Cart;
 
 namespace CleanAgricultureProductBE
 {
@@ -138,7 +139,10 @@ namespace CleanAgricultureProductBE
             // Category DI
             builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
             builder.Services.AddScoped<ICategoryService, CategoryService>();
-            
+
+            //Cart DI
+            builder.Services.AddScoped<ICartService, CartService>();
+
             // JWT Authentication
             builder.Services
                 .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
