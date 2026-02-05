@@ -72,7 +72,7 @@ namespace CleanAgricultureProductBE
                     var userAccount = new Account
                     {
                         AccountId = Guid.NewGuid(),
-                        RoleId = 1,
+                        RoleId = 2,
                         Email = "user@gmail.com",
                         PasswordHash = "12345",
                         Status = "Active",

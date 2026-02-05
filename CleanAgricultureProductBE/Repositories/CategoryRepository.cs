@@ -20,9 +20,31 @@ namespace CleanAgricultureProductBE.Repositories
             return category;
         }
 
-        public Task<Category?> GetByIdAsync(Guid id)
+        public async Task<List<Category>> GetAllAsync()
         {
-            return _context.Categories.FirstOrDefaultAsync(c => c.CategoryId == id);
+            return await _context.Categories.ToListAsync();
+        }
+
+        public async Task<Category?> GetByIdAsync(Guid id)
+        {
+            return await _context.Categories.FindAsync(id);
+        }
+
+        public async Task<Category> UpdateAsync(Category category)
+        {
+            _context.Categories.Update(category);
+            await _context.SaveChangesAsync();
+            return category;
+        }
+
+        public async Task<bool> DeleteAsync(Guid id)
+        {
+            var category = await GetByIdAsync(id);
+            if (category == null) return false;
+
+            _context.Categories.Remove(category);
+            await _context.SaveChangesAsync();
+            return true;
         }
     }
 }
