@@ -19,12 +19,5 @@ namespace CleanAgricultureProductBE.Repositories
                                     .Include(a => a.Role)
                                     .FirstOrDefaultAsync(a => a.Email == email);
         }
-
-        public Task<Account?> GetAccountById(string accountId)
-        {
-            return _context.Accounts.Include(a => a.UserProfile)
-                                    .Include(a => a.Role)
-                                    .FirstOrDefaultAsync(a => a.AccountId.ToString() == accountId);
-        }
     }
 }

@@ -9,5 +9,10 @@ namespace CleanAgricultureProductBE.Repositories.CartItem
             context.CartItems.Add(cartItem);
             await context.SaveChangesAsync();
         }
+
+        //public Task<string> GetCartItemByCartIdAndProductId(Guid cartId, string productId)
+        //{
+            
+        //}
     }
 }

@@ -8,7 +8,7 @@ using System.Security.Claims;
 
 namespace CleanAgricultureProductBE.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Customer")]
     [Route("api/[controller]")]
     [ApiController]
     public class CartController(ICartService cartService) : ControllerBase
@@ -16,11 +16,11 @@ namespace CleanAgricultureProductBE.Controllers
         [HttpPost]
         public async Task<IActionResult> AddToCart([FromBody] AddToCartRequestDto request)
         {
-            var accountId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var accountEmail = User.FindFirstValue(ClaimTypes.Email);
 
-            var result = await cartService.AddToCart(accountId!, request);
+            var result = await cartService.AddToCart(accountEmail!, request);
 
-            var response = new ResponseObject<string>()
+            var response = new ResponseObject<AddToCartResponseDto>()
             {
                 Success = "true",
                 Message = "Product added to cart successfully",
