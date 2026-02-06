@@ -120,7 +120,7 @@ namespace CleanAgricultureProductBE.Services
             };
 
             var key = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(_config["Jwt:Key"])
+                Encoding.UTF8.GetBytes(_config["Jwt:Key"]!)
             );
 
             var token = new JwtSecurityToken(

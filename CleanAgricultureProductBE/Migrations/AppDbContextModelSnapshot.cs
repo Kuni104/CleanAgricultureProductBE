@@ -97,6 +97,27 @@ namespace CleanAgricultureProductBE.Migrations
                     b.ToTable("Addresses");
                 });
 
+            modelBuilder.Entity("CleanAgricultureProductBE.Models.BlackListedToken", b =>
+                {
+                    b.Property<Guid>("BlacklistedTokenId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("BlacklistedTokenId");
+
+                    b.ToTable("BlacklistedTokens");
+                });
+
             modelBuilder.Entity("CleanAgricultureProductBE.Models.Cart", b =>
                 {
                     b.Property<Guid>("CartId")
