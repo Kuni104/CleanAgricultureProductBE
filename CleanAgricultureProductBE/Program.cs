@@ -8,12 +8,17 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
 using System.Text;
+using CleanAgricultureProductBE.Services.Cart;
+using CleanAgricultureProductBE.Repositories.Cart;
+using CleanAgricultureProductBE.Repositories.CartItem;
+using System.IdentityModel.Tokens.Jwt;
+using System.Threading.Tasks;
 
 namespace CleanAgricultureProductBE
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -51,85 +56,13 @@ namespace CleanAgricultureProductBE
 
             builder.Services.AddOpenApi();
 
-            builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
-            .UseSeeding((context, _) =>
-            {
-                // Seed initial data here if necessary
-                if (!context.Set<Account>().Any())
-                {
-                    var hasher = new PasswordHasher<Account>();
-
-                    var adminAccount = new Account
-                    {
-                        AccountId = Guid.NewGuid(),
-                        RoleId = 1,
-                        Email = "admin@gmail.com",
-                        PasswordHash = "12345",
-                        Status = "Active",
-                        PhoneNumber = "0123456789"
-                    };
-
-                    var userAccount = new Account
-                    {
-                        AccountId = Guid.NewGuid(),
-                        RoleId = 2,
-                        Email = "user@gmail.com",
-                        PasswordHash = "12345",
-                        Status = "Active",
-                        PhoneNumber = "0123456789"
-                    };
-
-
-                    adminAccount.PasswordHash = hasher.HashPassword(adminAccount, adminAccount.PasswordHash);
-                    userAccount.PasswordHash = hasher.HashPassword(userAccount, userAccount.PasswordHash);
-
-                    context.Set<Account>().Add(adminAccount);
-                    context.Set<Account>().Add(userAccount);
-                    context.SaveChanges();
-
-                }
-
-                if (!context.Set<UserProfile>().Any())
-                {
-                    var userProfile = new UserProfile
-                    {
-                        UserProfileId = Guid.NewGuid(),
-                        AccountId = context.Set<Account>()
-                                            .Where(a => a.Email == "user@gmail.com")
-                                            .Select(a => a.AccountId)
-                                            .FirstOrDefault(),
-                        FirstName = "John",
-                        LastName = "Doe"
-                    };
-                    context.Set<UserProfile>().Add(userProfile);
-                    context.SaveChanges();
-                }
-
-                if (!context.Set<Cart>().Any())
-                {
-
-                    var account = context.Set<Account>()
-                                    .Include(a => a.UserProfile)
-                                    .Where(a => a.Email == "user@gmail.com")
-                                    .FirstOrDefault();
-
-                    var userCart = new Cart
-                    {
-                        CartId = Guid.NewGuid(),
-                        CustomerId = account!.UserProfile.UserProfileId,
-                        CreatedAt = DateTime.UtcNow,
-                        UpdatedAt = DateTime.UtcNow
-                    };
-
-                    context.Set<Cart>().Add(userCart);
-                    context.SaveChanges();
-                }
-            })
-            );
+            builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
             // Dependency Injection
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IAccountRepository, AccountRepository>();
+            // register token blacklist repo
+            builder.Services.AddScoped<ITokenBlacklistRepository, TokenBlacklistRepository>();
 
             // Product DI
             builder.Services.AddScoped<IProductService, ProductService>();
@@ -138,7 +71,14 @@ namespace CleanAgricultureProductBE
             // Category DI
             builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
             builder.Services.AddScoped<ICategoryService, CategoryService>();
-            
+
+            //Cart DI
+            builder.Services.AddScoped<ICartService, CartService>();
+            builder.Services.AddScoped<ICartRepository, CartRepository>();
+
+            //Cart Item DI
+            builder.Services.AddScoped<ICartItemRepository, CartItemRepository>();
+
             // JWT Authentication
             builder.Services
                 .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -157,14 +97,40 @@ namespace CleanAgricultureProductBE
                             Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!)
                         )
                     };
+
+                    // Reject blacklisted tokens on validation
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnTokenValidated = async context =>
+                        {
+                            var token = context.SecurityToken as JwtSecurityToken;
+                            if (token == null)
+                            {
+                                context.Fail("Invalid token");
+                                return;
+                            }
+
+                            var tokenString = token.RawData;
+                            // Resolve repository from DI
+                            var repo = context.HttpContext.RequestServices.GetService<ITokenBlacklistRepository>();
+                            if (repo != null)
+                            {
+                                var isBlacklisted = await repo.IsBlacklistedAsync(tokenString);
+                                if (isBlacklisted)
+                                {
+                                    context.Fail("Token revoked");
+                                }
+                            }
+                        }
+                    };
                 });
 
-            // Th�m CORS
+            // Thêm CORS
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowFrontend", builder =>
                 {
-                    builder.WithOrigins("http://localhost:5173") // Port c?a React app
+                    builder.WithOrigins("http://localhost:5173") // Port của React app
                         .AllowAnyMethod()
                         .AllowAnyHeader()
                         .AllowCredentials();
@@ -176,13 +142,19 @@ namespace CleanAgricultureProductBE
 
             var app = builder.Build();
 
-            if (app.Environment.IsDevelopment())
+            using (var scope = app.Services.CreateScope())
             {
-                app.UseSwagger();
-                app.UseSwaggerUI();
-                app.MapScalarApiReference();
-                app.MapOpenApi();
-            }
+                var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+                await DatabaseSeeder.SeedAsync(dbContext);
+            };
+
+                if (app.Environment.IsDevelopment())
+                {
+                    app.UseSwagger();
+                    app.UseSwaggerUI();
+                    app.MapScalarApiReference();
+                    app.MapOpenApi();
+                }
 
             app.UseHttpsRedirection();
 

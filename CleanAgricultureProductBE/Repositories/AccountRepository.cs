@@ -13,6 +13,19 @@ namespace CleanAgricultureProductBE.Repositories
             _context = context;
         }
 
+        public async Task<Account> CreateAsync(Account account)
+        {
+            _context.Accounts.Add(account);
+            await _context.SaveChangesAsync();
+            
+            var created = await _context.Accounts
+                                .Include(a => a.UserProfile)
+                                .Include(a => a.Role)
+                                .FirstOrDefaultAsync(a => a.AccountId == account.AccountId);
+
+            return created ?? account;
+        }
+
         public Task<Account?> GetByEmailAsync(string email)
         {
             return _context.Accounts.Include(a => a.UserProfile)

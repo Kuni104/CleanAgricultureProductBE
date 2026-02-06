@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CleanAgricultureProductBE.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260205012417_Initial")]
+    [Migration("20260206130002_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -98,6 +98,27 @@ namespace CleanAgricultureProductBE.Migrations
                     b.HasIndex("UserProfileId");
 
                     b.ToTable("Addresses");
+                });
+
+            modelBuilder.Entity("CleanAgricultureProductBE.Models.BlackListedToken", b =>
+                {
+                    b.Property<Guid>("BlacklistedTokenId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("BlacklistedTokenId");
+
+                    b.ToTable("BlacklistedTokens");
                 });
 
             modelBuilder.Entity("CleanAgricultureProductBE.Models.Cart", b =>

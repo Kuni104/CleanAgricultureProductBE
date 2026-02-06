@@ -24,6 +24,8 @@ namespace CleanAgricultureProductBE.Data
         public DbSet<DeliveryFee> DeliveryFees => Set<DeliveryFee>();
         public DbSet<PaymentMethod> PaymentMethods => Set<PaymentMethod>();
         public DbSet<Payment> Payments => Set<Payment>();
+        // Blacklisted tokens for logout/revocation
+        public DbSet<BlackListedToken> BlacklistedTokens => Set<BlackListedToken>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -39,7 +41,6 @@ namespace CleanAgricultureProductBE.Data
                       .HasForeignKey<UserProfile>(p => p.AccountId)
                       .OnDelete(DeleteBehavior.Cascade);
 
-
             });
 
             modelBuilder.Entity<UserProfile>(entity =>
@@ -49,9 +50,7 @@ namespace CleanAgricultureProductBE.Data
                       .HasForeignKey<Cart>(p => p.CustomerId)
                       .OnDelete(DeleteBehavior.Cascade);
 
-
             });
-
 
             modelBuilder.Entity<Schedule>(entity =>
             {
