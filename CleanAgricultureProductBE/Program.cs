@@ -130,6 +130,8 @@ namespace CleanAgricultureProductBE
             // Dependency Injection
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IAccountRepository, AccountRepository>();
+            // register token blacklist repo
+            builder.Services.AddScoped<ITokenBlacklistRepository, TokenBlacklistRepository>();
 
             // Product DI
             builder.Services.AddScoped<IProductService, ProductService>();
@@ -157,14 +159,40 @@ namespace CleanAgricultureProductBE
                             Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!)
                         )
                     };
+
+                    // Reject blacklisted tokens on validation
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnTokenValidated = async context =>
+                        {
+                            var token = context.SecurityToken as JwtSecurityToken;
+                            if (token == null)
+                            {
+                                context.Fail("Invalid token");
+                                return;
+                            }
+
+                            var tokenString = token.RawData;
+                            // Resolve repository from DI
+                            var repo = context.HttpContext.RequestServices.GetService<ITokenBlacklistRepository>();
+                            if (repo != null)
+                            {
+                                var isBlacklisted = await repo.IsBlacklistedAsync(tokenString);
+                                if (isBlacklisted)
+                                {
+                                    context.Fail("Token revoked");
+                                }
+                            }
+                        }
+                    };
                 });
 
-            // Th�m CORS
+            // Thêm CORS
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowFrontend", builder =>
                 {
-                    builder.WithOrigins("http://localhost:5173") // Port c?a React app
+                    builder.WithOrigins("http://localhost:5173") // Port của React app
                         .AllowAnyMethod()
                         .AllowAnyHeader()
                         .AllowCredentials();
