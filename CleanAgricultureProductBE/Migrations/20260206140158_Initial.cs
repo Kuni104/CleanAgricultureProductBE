@@ -49,8 +49,8 @@ namespace CleanAgricultureProductBE.Migrations
                     District = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     City = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     FeeAmount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
-                    EstimatedDay = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    EffectiveDay = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    EstimatedDay = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EffectiveDay = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {

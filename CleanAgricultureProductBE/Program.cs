@@ -13,6 +13,8 @@ using CleanAgricultureProductBE.Repositories.Cart;
 using CleanAgricultureProductBE.Repositories.CartItem;
 using System.IdentityModel.Tokens.Jwt;
 using System.Threading.Tasks;
+using CleanAgricultureProductBE.Repositories.DeliveryFee;
+using CleanAgricultureProductBE.Services.DeliveryFee;
 
 namespace CleanAgricultureProductBE
 {
@@ -78,6 +80,10 @@ namespace CleanAgricultureProductBE
 
             //Cart Item DI
             builder.Services.AddScoped<ICartItemRepository, CartItemRepository>();
+
+            //Delivery Fee DI
+            builder.Services.AddScoped<IDeliveryFeeService, DeliveryFeeService>();
+            builder.Services.AddScoped<IDeliveryFeeRepository, DeliveryFeeRepository>();
 
             // JWT Authentication
             builder.Services
