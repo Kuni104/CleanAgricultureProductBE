@@ -49,6 +49,39 @@ namespace CleanAgricultureProductBE.Services
             };
         }
 
+        public async Task<LoginResponseDto> RegisterAsync(RegisterRequestDto dto)
+        {
+            var existing = await _accountRepo.GetByEmailAsync(dto.Email);
+            if(existing != null)    throw new Exception("Email already in use");
+
+            var account = new Account
+            {
+                AccountId = Guid.NewGuid(),
+                RoleId = 2,
+                Email = dto.Email,
+                Status = "Active",
+                PhoneNumber = dto.PhoneNumber ?? string.Empty,
+                UserProfile = new UserProfile
+                {
+                    UserProfileId = Guid.NewGuid(),
+                    FirstName = dto.FirstName,
+                    LastName = dto.LastName,
+                }
+            };
+
+            var hasher = new PasswordHasher<Account>();
+            account.PasswordHash = hasher.HashPassword(account, dto.Password);
+            var created = await _accountRepo.CreateAsync(account);
+            var token = GenerateJwt(created);
+            return new LoginResponseDto
+            {
+                Token = token,
+                AccountId = created.AccountId,
+                Email = created.Email,
+                Role = created.Role.RoleName ?? "Customer"
+            };
+        }
+
         private string GenerateJwt(Account account)
         {
             var claims = new[]
