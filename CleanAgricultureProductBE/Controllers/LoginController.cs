@@ -53,5 +53,34 @@ namespace CleanAgricultureProductBE.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout()
+        {
+            var authHeader = Request.Headers["Authorization"].ToString();
+            if (string.IsNullOrWhiteSpace(authHeader))
+                return BadRequest(new { message = "Authorization header missing" });
+
+            var token = authHeader.StartsWith("Bearer", StringComparison.OrdinalIgnoreCase)
+                ? authHeader.Substring("Bearer".Length).Trim()
+                : authHeader.Trim();
+
+            if (string.IsNullOrWhiteSpace(token))
+                return BadRequest(new { message = "Bearer token missing" });
+
+            try
+            {
+                await _authService.LogoutAsync(token);
+                return NoContent();
+            }
+            catch(ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new { message = "Unable to logout at this time" });
+            }
+        }
     }
 }

@@ -6,5 +6,6 @@ namespace CleanAgricultureProductBE.Services
     {
         Task<object> LoginAsync(LoginRequestDto dto);
         Task<LoginResponseDto> RegisterAsync(RegisterRequestDto dto);
+        Task LogoutAsync(string token);
     }
 }
