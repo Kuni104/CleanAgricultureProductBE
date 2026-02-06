@@ -48,5 +48,35 @@ namespace CleanAgricultureProductBE.Services.DeliveryFee
 
             return deliveryFeeDto;
         }
+
+        public async Task<GetDeliveryFeeResponseDto> UpdateDeliveryFee(GetDeliveryFeeResponseDto request)
+        {
+            var existingDeliveryFee = await deliveryFeeRepository.GetDeliveryFeeById(request.DeliveryFeeId);
+
+            if (existingDeliveryFee == null)
+            {
+                return null!;
+            }
+
+            existingDeliveryFee!.District = request.District.Trim() == "" ? existingDeliveryFee.District : request.District;
+            existingDeliveryFee!.City = request.City.Trim() == "" ? existingDeliveryFee.City : request.City;
+            existingDeliveryFee.FeeAmount = request.FeeAmount == 0 ? existingDeliveryFee.FeeAmount : request.FeeAmount;
+            existingDeliveryFee.EstimatedDay = request.EstimatedDay == null ? existingDeliveryFee.EstimatedDay : (DateTime)request.EstimatedDay;
+            existingDeliveryFee.EffectiveDay = request.EffectiveDay == null ? existingDeliveryFee.EffectiveDay : (DateTime)request.EffectiveDay;
+
+            await deliveryFeeRepository.UpdateDeliveryFee(existingDeliveryFee);
+
+            var updatedDeliveryFeeDto = new GetDeliveryFeeResponseDto
+            {
+                DeliveryFeeId = existingDeliveryFee.DeliveryFeeId,
+                District = existingDeliveryFee.District,
+                City = existingDeliveryFee.City,
+                FeeAmount = existingDeliveryFee.FeeAmount,
+                EstimatedDay = existingDeliveryFee.EstimatedDay,
+                EffectiveDay = existingDeliveryFee.EffectiveDay
+            };
+
+            return updatedDeliveryFeeDto;
+        }
     }
 }

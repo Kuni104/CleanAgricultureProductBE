@@ -67,5 +67,24 @@ namespace CleanAgricultureProductBE.Controllers
 
             return Ok(response);
         }
+
+        [HttpPut]
+        public async Task<IActionResult> UpdateDeliveryFee([FromBody] GetDeliveryFeeResponseDto resquest)
+        {
+            var result = await deliveryFeeService.UpdateDeliveryFee(resquest);
+            if (result == null)
+            {
+                return BadRequest("No Existed Delivery Fee With This ID");
+            }
+
+            var response = new ResponseObject<GetDeliveryFeeResponseDto>
+            {
+                Success = "true",
+                Message = "Delivery Fee Updated Successfully",
+                Data = result
+            };
+
+            return Ok(response);
+        }
     }
 }
