@@ -7,5 +7,6 @@ namespace CleanAgricultureProductBE.Repositories.DeliveryFee
         public Task<List<Models.DeliveryFee>> GetDeliveryFeeList();
         public Task AddDeliveryFee(Models.DeliveryFee newDeliveryFee);
         public Task UpdateDeliveryFee(Models.DeliveryFee updatedDeliveryFee);
+        public Task DeleteDeliveryFee(Models.DeliveryFee deliveryFeeToRemove);
     }
 }

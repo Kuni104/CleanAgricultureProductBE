@@ -25,5 +25,11 @@ namespace CleanAgricultureProductBE.Repositories.DeliveryFee
             context.DeliveryFees.Update(updatedDeliveryFee);
             await context.SaveChangesAsync();
         }
+
+        public async Task DeleteDeliveryFee(Models.DeliveryFee deliveryFeeToRemove)
+        {
+            context.DeliveryFees.Remove(deliveryFeeToRemove);
+            await context.SaveChangesAsync();
+        }
     }
 }

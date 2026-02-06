@@ -78,5 +78,20 @@ namespace CleanAgricultureProductBE.Services.DeliveryFee
 
             return updatedDeliveryFeeDto;
         }
+
+        public async Task<bool> DeleteDeliveryFeeById(Guid deliveryFeeId)
+        {
+            var existingDeliveryFee = await deliveryFeeRepository.GetDeliveryFeeById(deliveryFeeId);
+
+            if (existingDeliveryFee == null)
+            {
+                return false;
+            }
+            else
+            {
+                await deliveryFeeRepository.DeleteDeliveryFee(existingDeliveryFee);
+                return true;
+            }
+        }
     }
 }

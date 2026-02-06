@@ -86,5 +86,22 @@ namespace CleanAgricultureProductBE.Controllers
 
             return Ok(response);
         }
+
+        [HttpDelete("{deliveryFeeId}")]
+        public async Task<IActionResult> DeleteDeliveryFeeById(Guid deliveryFeeId)
+        {
+            var result = await deliveryFeeService.DeleteDeliveryFeeById(deliveryFeeId);
+            if (!result)
+            {
+                return BadRequest("No Existed Delivery Fee With This ID");
+            }
+            var response = new ResponseObject<bool>
+            {
+                Success = "true",
+                Message = "Delivery Fee Deleted Successfully",
+                Data = result
+            };
+            return Ok(response);
+        }
     }
 }

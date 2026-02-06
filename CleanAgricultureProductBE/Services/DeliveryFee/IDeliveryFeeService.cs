@@ -7,5 +7,6 @@ namespace CleanAgricultureProductBE.Services.DeliveryFee
         public Task<List<GetDeliveryFeeResponseDto>> GetDeliveryFeeList();
         public Task<GetDeliveryFeeResponseDto> AddDeliveryFee(CreateDeliveryFeeRequestDto request);
         public Task<GetDeliveryFeeResponseDto> UpdateDeliveryFee(GetDeliveryFeeResponseDto request);
+        public Task<bool> DeleteDeliveryFeeById(Guid deliveryFeeId);
     }
 }
