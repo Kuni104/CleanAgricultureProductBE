@@ -1,4 +1,5 @@
 ﻿using CleanAgricultureProductBE.DTOs.Cart;
+using CleanAgricultureProductBE.DTOs.CartItem;
 using CleanAgricultureProductBE.DTOs.Response;
 using CleanAgricultureProductBE.Services.Cart;
 using Microsoft.AspNetCore.Authorization;
@@ -46,8 +47,32 @@ namespace CleanAgricultureProductBE.Controllers
         [HttpGet("me")]
         public async Task<IActionResult> GetCartItems([FromQuery] int page, [FromQuery] int size, [FromQuery] string keyword)
         {
- 
-            return Ok();
+            var success = "";
+            var message = "";
+
+            var accountEmail = User.FindFirstValue(ClaimTypes.Email);
+
+            var result = await cartService.GetCartItem(accountEmail!);
+            if (result == null || result.Count == 0)
+            {
+                success = "false";
+                message = "No items in cart";
+            }
+            else
+            {
+                success = "true";
+                message = "Cart items retrieved successfully";
+            }
+
+            var response = new ResponseObject<List<GetCartItemDto>>()
+            {
+                Success = success,
+                Message = message,
+                Data = result
+            };
+
+
+            return Ok(response);
         }
     }
 }

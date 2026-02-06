@@ -11,6 +11,12 @@ namespace CleanAgricultureProductBE.Repositories.CartItem
             context.CartItems.Add(cartItem);
             await context.SaveChangesAsync();
         }
+        
+        public async Task<List<Models.CartItem>> GetCartItemsByCartId(Guid cartId)
+        {
+            return await context.CartItems.Where(ci => ci.CartId == cartId)
+                                          .ToListAsync();
+        }
 
         public async Task<Models.CartItem?> GetCartItemByCartIdAndProductId(Guid cartId, Guid productId)
         {

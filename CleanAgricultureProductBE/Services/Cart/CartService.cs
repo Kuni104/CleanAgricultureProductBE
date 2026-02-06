@@ -3,6 +3,7 @@ using CleanAgricultureProductBE.Repositories;
 using CleanAgricultureProductBE.Models;
 using CleanAgricultureProductBE.Repositories.Cart;
 using CleanAgricultureProductBE.Repositories.CartItem;
+using CleanAgricultureProductBE.DTOs.CartItem;
 
 namespace CleanAgricultureProductBE.Services.Cart
 {
@@ -46,6 +47,31 @@ namespace CleanAgricultureProductBE.Services.Cart
                 Quantity = cartItem.Quantity,
                 TotalPrice = product!.Price * cartItem.Quantity
             };
+        }
+
+        public async Task<List<GetCartItemDto>> GetCartItem(string accountEmail)
+        {
+            var account = await accountRepository.GetByEmailAsync(accountEmail);
+            var customerId = account!.UserProfile.UserProfileId;
+            var cart = await cartRepository.GetCartByCustomerId(customerId);
+
+            var cartItemList = await cartItemRepository.GetCartItemsByCartId(cart!.CartId);
+
+            List<GetCartItemDto> cartItems = new List<GetCartItemDto>();
+            foreach (var item in cartItemList)
+            {
+                var product = await productRepository.GetByIdAsync(item.ProductId);
+                cartItems.Add(new GetCartItemDto
+                {
+                    ProductId = product!.ProductId,
+                    ProductName = product!.Name,
+                    Price = product.Price,
+                    Quantity = item.Quantity,
+                    TotalPrice = product.Price * item.Quantity
+                });
+            }
+
+            return cartItems;
         }
     }
 }
