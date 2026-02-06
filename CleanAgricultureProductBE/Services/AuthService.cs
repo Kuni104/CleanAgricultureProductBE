@@ -13,11 +13,13 @@ namespace CleanAgricultureProductBE.Services
     {
         private readonly IAccountRepository _accountRepo;
         private readonly IConfiguration _config;
+        private readonly ITokenBlacklistRepository _tokenBlacklistRepo;
 
-        public AuthService(IAccountRepository accountRepo, IConfiguration config)
+        public AuthService(IAccountRepository accountRepo, IConfiguration config, ITokenBlacklistRepository tokenBlacklistRepo)
         {
             _accountRepo = accountRepo;
             _config = config;
+            _tokenBlacklistRepo = tokenBlacklistRepo;
         }
 
         public async Task<object> LoginAsync(LoginRequestDto dto)
@@ -47,6 +49,32 @@ namespace CleanAgricultureProductBE.Services
                 Email = account.Email,
                 Role = account.Role.RoleName
             };
+        }
+
+        public async Task LogoutAsync(string token)
+        {
+            if (string.IsNullOrWhiteSpace(token)) throw new ArgumentException("Token missing", nameof(token));
+
+            var handler = new JwtSecurityTokenHandler();
+            JwtSecurityToken? jwt;
+            try
+            {
+                jwt = handler.ReadJwtToken(token);
+            }
+            catch
+            {
+                throw new ArgumentException("Invalid token", nameof(token));
+            }
+
+            var expiry = jwt.ValidTo;
+            var blacklisted = new BlackListedToken
+            {
+                BlacklistedTokenId = Guid.NewGuid(),
+                Token = token,
+                ExpiresAt = expiry,
+            };
+
+            await _tokenBlacklistRepo.AddAsync(blacklisted);
         }
 
         public async Task<LoginResponseDto> RegisterAsync(RegisterRequestDto dto)
