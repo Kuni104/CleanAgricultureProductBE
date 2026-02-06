@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CleanAgricultureProductBE.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260206130002_Initial")]
+    [Migration("20260206140158_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -284,13 +284,11 @@ namespace CleanAgricultureProductBE.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("EffectiveDay")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("EffectiveDay")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("EstimatedDay")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("EstimatedDay")
+                        .HasColumnType("datetime2");
 
                     b.Property<decimal>("FeeAmount")
                         .HasPrecision(18, 2)

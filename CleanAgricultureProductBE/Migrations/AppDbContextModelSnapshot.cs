@@ -281,13 +281,11 @@ namespace CleanAgricultureProductBE.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("EffectiveDay")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("EffectiveDay")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("EstimatedDay")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("EstimatedDay")
+                        .HasColumnType("datetime2");
 
                     b.Property<decimal>("FeeAmount")
                         .HasPrecision(18, 2)
