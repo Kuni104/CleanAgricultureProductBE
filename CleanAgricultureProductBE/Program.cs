@@ -8,6 +8,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
 using System.Text;
+using CleanAgricultureProductBE.Services.Cart;
+using CleanAgricultureProductBE.Repositories.Cart;
+using CleanAgricultureProductBE.Repositories.CartItem;
 
 namespace CleanAgricultureProductBE
 {
@@ -72,7 +75,7 @@ namespace CleanAgricultureProductBE
                     var userAccount = new Account
                     {
                         AccountId = Guid.NewGuid(),
-                        RoleId = 1,
+                        RoleId = 2,
                         Email = "user@gmail.com",
                         PasswordHash = "12345",
                         Status = "Active",
@@ -138,7 +141,14 @@ namespace CleanAgricultureProductBE
             // Category DI
             builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
             builder.Services.AddScoped<ICategoryService, CategoryService>();
-            
+
+            //Cart DI
+            builder.Services.AddScoped<ICartService, CartService>();
+            builder.Services.AddScoped<ICartRepository, CartRepository>();
+
+            //Cart Item DI
+            builder.Services.AddScoped<ICartItemRepository, CartItemRepository>();
+
             // JWT Authentication
             builder.Services
                 .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
