@@ -1,11 +1,13 @@
 ﻿using CleanAgricultureProductBE.DTOs.DeliveryFee;
 using CleanAgricultureProductBE.DTOs.Response;
 using CleanAgricultureProductBE.Services.DeliveryFee;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CleanAgricultureProductBE.Controllers
 {
+    [Authorize(Roles = "Admin,Staff")]
     [Route("api/[controller]")]
     [ApiController]
     public class DeliveryFeeController(IDeliveryFeeService deliveryFeeService) : ControllerBase
@@ -68,10 +70,10 @@ namespace CleanAgricultureProductBE.Controllers
             return Ok(response);
         }
 
-        [HttpPut]
-        public async Task<IActionResult> UpdateDeliveryFee([FromBody] GetDeliveryFeeResponseDto resquest)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateDeliveryFee([FromRoute]Guid id, [FromBody]UpdateDeliveryFeeRequestDto resquest)
         {
-            var result = await deliveryFeeService.UpdateDeliveryFee(resquest);
+            var result = await deliveryFeeService.UpdateDeliveryFee(id, resquest);
             if (result == null)
             {
                 return BadRequest("No Existed Delivery Fee With This ID");
@@ -87,14 +89,15 @@ namespace CleanAgricultureProductBE.Controllers
             return Ok(response);
         }
 
-        [HttpDelete("{deliveryFeeId}")]
-        public async Task<IActionResult> DeleteDeliveryFeeById(Guid deliveryFeeId)
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteDeliveryFeeById([FromRoute]Guid id)
         {
-            var result = await deliveryFeeService.DeleteDeliveryFeeById(deliveryFeeId);
+            var result = await deliveryFeeService.DeleteDeliveryFeeById(id);
             if (!result)
             {
                 return BadRequest("No Existed Delivery Fee With This ID");
             }
+
             var response = new ResponseObject<bool>
             {
                 Success = "true",
