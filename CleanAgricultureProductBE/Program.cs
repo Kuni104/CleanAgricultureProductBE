@@ -15,6 +15,8 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Threading.Tasks;
 using CleanAgricultureProductBE.Repositories.DeliveryFee;
 using CleanAgricultureProductBE.Services.DeliveryFee;
+using CleanAgricultureProductBE.Repositories.PaymentMethod;
+using CleanAgricultureProductBE.Services.PaymentMethod;
 
 namespace CleanAgricultureProductBE
 {
@@ -84,6 +86,10 @@ namespace CleanAgricultureProductBE
             //Delivery Fee DI
             builder.Services.AddScoped<IDeliveryFeeService, DeliveryFeeService>();
             builder.Services.AddScoped<IDeliveryFeeRepository, DeliveryFeeRepository>();
+
+            //PaymentMethod DI
+            builder.Services.AddScoped<IPaymentMethodRepository, PaymentMethodRepository>();
+            builder.Services.AddScoped<IPaymentMethodService, PaymentMethodService>();
 
             // JWT Authentication
             builder.Services

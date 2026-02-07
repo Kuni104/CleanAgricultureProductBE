@@ -164,6 +164,18 @@ namespace CleanAgricultureProductBE.Data
                 context.Set<Product>().AddRange(products);
                 await context.SaveChangesAsync();
             }
+
+            //PaymentMethod seeding
+            if (!await context.Set<PaymentMethod>().AnyAsync())
+            {
+                var paymentMethods = new List<PaymentMethod>
+                {
+                    new PaymentMethod {MethodName = "Cash On Delivery" }
+                };
+
+                context.Set<PaymentMethod>().AddRange(paymentMethods);
+                await context.SaveChangesAsync();
+            }
         }
     }
 }
