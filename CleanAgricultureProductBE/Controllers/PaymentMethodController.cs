@@ -66,9 +66,31 @@ namespace CleanAgricultureProductBE.Controllers
         }
 
         [HttpPut("{id}")] 
-        public async Task<IActionResult> UpdatePaymentMethod([FromHeader]int id)
+        public async Task<IActionResult> UpdatePaymentMethod([FromHeader]int id, [FromBody]PaymentMethodRequestDto request)
         {
-            return Ok();
+            var success = "";
+            var message = "";
+
+            var result = await paymentMethodService.UpdatePaymentMethod(id, request);
+            if (result != null)
+            {
+                success = "true";
+                message = "Payment method updated successfully";
+            }
+            else
+            {
+                success = "false";
+                message = "Failed to update payment method | Payment method not found or already existed payment method!";
+            }
+
+            var response = new ResponseObject<PaymentMethodResponseDto>()
+            {
+                Success = success,
+                Message = message,
+                Data = result
+            };
+
+            return Ok(response);
         }
 
         [HttpDelete("{id}")]

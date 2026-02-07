@@ -5,9 +5,13 @@ namespace CleanAgricultureProductBE.Repositories.PaymentMethod
 {
     public class PaymentMethodRepository(AppDbContext context) : IPaymentMethodRepository
     {
+        public async Task<Models.PaymentMethod?> GetPaymentMethodById(int paymentMethodId)
+        {
+            return await context.PaymentMethods.FirstOrDefaultAsync(pm => pm.PaymentMethodId == paymentMethodId);
+        }
         public async Task<List<Models.PaymentMethod>> GetAllPaymentMethods()
         {
-            return await context.Set<Models.PaymentMethod>().ToListAsync();
+            return await context.PaymentMethods.ToListAsync();
         }
 
         public async Task CreatePaymentMethod(Models.PaymentMethod newPaymentMethod)
@@ -19,6 +23,12 @@ namespace CleanAgricultureProductBE.Repositories.PaymentMethod
         public async Task<bool> CheckExistedPaymentMethodByName(string paymentMethodName)
         {
             return await context.PaymentMethods.AnyAsync(pm => pm.MethodName.ToLower() == paymentMethodName.ToLower());
+        }
+
+        public async Task UpdatePaymentMethod(Models.PaymentMethod paymentMethod)
+        {
+            context.PaymentMethods.Update(paymentMethod);
+            await context.SaveChangesAsync();
         }
     }
 }
