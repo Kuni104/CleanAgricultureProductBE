@@ -1,4 +1,5 @@
 ﻿using CleanAgricultureProductBE.DTOs.Cart;
+using CleanAgricultureProductBE.DTOs.CartItem;
 using CleanAgricultureProductBE.DTOs.Response;
 using CleanAgricultureProductBE.Services.Cart;
 using Microsoft.AspNetCore.Authorization;
@@ -44,10 +45,41 @@ namespace CleanAgricultureProductBE.Controllers
         }
 
         [HttpGet("me")]
-        public async Task<IActionResult> GetCartItems([FromQuery] int page, [FromQuery] int size, [FromQuery] string keyword)
+        public async Task<IActionResult> GetCartItems([FromQuery] int? page, [FromQuery] int? size, [FromQuery] string? keyword)
         {
- 
-            return Ok();
+            var success = "";
+            var message = "";
+
+            var accountEmail = User.FindFirstValue(ClaimTypes.Email);
+
+            var result = await cartService.GetCartItem(accountEmail!, page, size, keyword);
+
+            var cartItems = result.CartItemReponseList;
+
+
+            if (cartItems == null || cartItems.Count == 0)
+            {
+                success = "true";
+                message = "No items in cart";
+            }
+            else
+            {
+                success = "true";
+                message = "Cart items retrieved successfully";
+            }
+
+            var pagination = result.Pagination == null ? null : result.Pagination;
+
+            var response = new ResponseObject<List<GetCartItemReponseDto>>()
+            {
+                Success = success,
+                Message = message,
+                Data = cartItems,
+                Pagination = pagination
+            };
+
+
+            return Ok(response);
         }
     }
 }

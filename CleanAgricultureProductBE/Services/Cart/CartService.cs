@@ -3,6 +3,8 @@ using CleanAgricultureProductBE.Repositories;
 using CleanAgricultureProductBE.Models;
 using CleanAgricultureProductBE.Repositories.Cart;
 using CleanAgricultureProductBE.Repositories.CartItem;
+using CleanAgricultureProductBE.DTOs.CartItem;
+using CleanAgricultureProductBE.DTOs.Response;
 
 namespace CleanAgricultureProductBE.Services.Cart
 {
@@ -46,6 +48,71 @@ namespace CleanAgricultureProductBE.Services.Cart
                 Quantity = cartItem.Quantity,
                 TotalPrice = product!.Price * cartItem.Quantity
             };
+        }
+        public async Task<CartItemWithPaginationDto> GetCartItem(string accountEmail, int? page, int? size, string? keyword)
+        {
+            bool isPagination = false;
+            int offset = 0;
+            int pageSize = 0;
+            if (page != null && size != null)
+            {
+                pageSize = (int) size;
+                offset = (int) ((page - 1) * size);
+                isPagination = true;
+            }
+
+            var account = await accountRepository.GetByEmailAsync(accountEmail);
+            var customerId = account!.UserProfile.UserProfileId;
+            var cart = await cartRepository.GetCartByCustomerId(customerId);
+
+            var cartItemList = await cartItemRepository.GetCartItemsByCartId(cart!.CartId);
+
+            int totalItems = cartItemList.Count;
+
+            if (isPagination) {
+                cartItemList = await cartItemRepository.GetCartItemsByCartIdWithPagination(cart!.CartId, offset, pageSize);
+            }
+
+
+            List<GetCartItemReponseDto> cartItems = new List<GetCartItemReponseDto>();
+
+            foreach (var item in cartItemList)
+            {
+                var product = await productRepository.GetByIdAsync(item.ProductId);
+                cartItems.Add(new GetCartItemReponseDto
+                {
+                    ProductId = product!.ProductId,
+                    ProductName = product!.Name,
+                    Price = product.Price,
+                    Quantity = item.Quantity,
+                    TotalPrice = product.Price * item.Quantity
+                });
+            }
+
+            var result = new CartItemWithPaginationDto
+            {
+                CartItemReponseList = cartItems,
+            };
+
+
+            if (isPagination)
+            {
+                int totalPage = totalItems / pageSize + (totalItems % pageSize == 0 ? 1 : 0);
+                if (totalItems < pageSize)
+                {
+                    totalPage = 1;
+                }
+
+                result.Pagination = new Pagination
+                {
+                    PageNumber = (int) page!,
+                    PageSize = pageSize,
+                    TotalItems = totalItems,
+                    TotalPages = totalPage
+                };
+            }
+
+            return result;
         }
     }
 }
