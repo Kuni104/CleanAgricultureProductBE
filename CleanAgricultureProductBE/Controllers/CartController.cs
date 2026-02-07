@@ -45,17 +45,21 @@ namespace CleanAgricultureProductBE.Controllers
         }
 
         [HttpGet("me")]
-        public async Task<IActionResult> GetCartItems([FromQuery] int page, [FromQuery] int size, [FromQuery] string keyword)
+        public async Task<IActionResult> GetCartItems([FromQuery] int? page, [FromQuery] int? size, [FromQuery] string? keyword)
         {
             var success = "";
             var message = "";
 
             var accountEmail = User.FindFirstValue(ClaimTypes.Email);
 
-            var result = await cartService.GetCartItem(accountEmail!);
-            if (result == null || result.Count == 0)
+            var result = await cartService.GetCartItem(accountEmail!, page, size, keyword);
+
+            var cartItems = result.CartItemReponseList;
+
+
+            if (cartItems == null || cartItems.Count == 0)
             {
-                success = "false";
+                success = "true";
                 message = "No items in cart";
             }
             else
@@ -64,11 +68,14 @@ namespace CleanAgricultureProductBE.Controllers
                 message = "Cart items retrieved successfully";
             }
 
-            var response = new ResponseObject<List<GetCartItemDto>>()
+            var pagination = result.Pagination == null ? null : result.Pagination;
+
+            var response = new ResponseObject<List<GetCartItemReponseDto>>()
             {
                 Success = success,
                 Message = message,
-                Data = result
+                Data = cartItems,
+                Pagination = pagination
             };
 
 

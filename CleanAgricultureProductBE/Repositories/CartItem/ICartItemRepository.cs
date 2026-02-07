@@ -5,6 +5,7 @@
         public Task AddCartItem(Models.CartItem cartItem);
 
         public Task<List<Models.CartItem>> GetCartItemsByCartId(Guid cartId);
+        public Task<List<Models.CartItem>> GetCartItemsByCartIdWithPagination(Guid cartId, int offset, int pageSize);
 
         public Task<bool> CheckCartItemByCartIdAndProductId(Guid cartId, Guid productId);
 

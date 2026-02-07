@@ -34,5 +34,14 @@ namespace CleanAgricultureProductBE.Repositories.CartItem
             context.CartItems.Update(cartItem);
             await context.SaveChangesAsync();
         }
+
+        public async Task<List<Models.CartItem>> GetCartItemsByCartIdWithPagination(Guid cartId, int offset, int pageSize)
+        {
+            return await context.CartItems.Where(ci => ci.CartId == cartId)
+                                          .OrderByDescending(ci => ci.CreatedAt)
+                                          .Skip(offset)
+                                          .Take(pageSize)
+                                          .ToListAsync();  
+        }
     }
 }
