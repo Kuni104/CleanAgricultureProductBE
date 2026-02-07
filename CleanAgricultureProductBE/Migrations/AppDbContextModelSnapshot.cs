@@ -97,6 +97,27 @@ namespace CleanAgricultureProductBE.Migrations
                     b.ToTable("Addresses");
                 });
 
+            modelBuilder.Entity("CleanAgricultureProductBE.Models.BlackListedToken", b =>
+                {
+                    b.Property<Guid>("BlacklistedTokenId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("BlacklistedTokenId");
+
+                    b.ToTable("BlacklistedTokens");
+                });
+
             modelBuilder.Entity("CleanAgricultureProductBE.Models.Cart", b =>
                 {
                     b.Property<Guid>("CartId")
@@ -260,13 +281,11 @@ namespace CleanAgricultureProductBE.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("EffectiveDay")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("EffectiveDay")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("EstimatedDay")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("EstimatedDay")
+                        .HasColumnType("datetime2");
 
                     b.Property<decimal>("FeeAmount")
                         .HasPrecision(18, 2)

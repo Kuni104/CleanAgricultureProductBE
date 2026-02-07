@@ -12,12 +12,18 @@ using CleanAgricultureProductBE.Services.Cart;
 using CleanAgricultureProductBE.Repositories.Cart;
 using CleanAgricultureProductBE.Repositories.CartItem;
 using System.IdentityModel.Tokens.Jwt;
+using System.Threading.Tasks;
+using CleanAgricultureProductBE.Repositories.DeliveryFee;
+using CleanAgricultureProductBE.Services.DeliveryFee;
+using CleanAgricultureProductBE.Repositories.PaymentMethod;
+using CleanAgricultureProductBE.Services.PaymentMethod;
+
 
 namespace CleanAgricultureProductBE
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -55,81 +61,7 @@ namespace CleanAgricultureProductBE
 
             builder.Services.AddOpenApi();
 
-            builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
-            .UseSeeding((context, _) =>
-            {
-                // Seed initial data here if necessary
-                if (!context.Set<Account>().Any())
-                {
-                    var hasher = new PasswordHasher<Account>();
-
-                    var adminAccount = new Account
-                    {
-                        AccountId = Guid.NewGuid(),
-                        RoleId = 1,
-                        Email = "admin@gmail.com",
-                        PasswordHash = "12345",
-                        Status = "Active",
-                        PhoneNumber = "0123456789"
-                    };
-
-                    var userAccount = new Account
-                    {
-                        AccountId = Guid.NewGuid(),
-                        RoleId = 2,
-                        Email = "user@gmail.com",
-                        PasswordHash = "12345",
-                        Status = "Active",
-                        PhoneNumber = "0123456789"
-                    };
-
-
-                    adminAccount.PasswordHash = hasher.HashPassword(adminAccount, adminAccount.PasswordHash);
-                    userAccount.PasswordHash = hasher.HashPassword(userAccount, userAccount.PasswordHash);
-
-                    context.Set<Account>().Add(adminAccount);
-                    context.Set<Account>().Add(userAccount);
-                    context.SaveChanges();
-
-                }
-
-                if (!context.Set<UserProfile>().Any())
-                {
-                    var userProfile = new UserProfile
-                    {
-                        UserProfileId = Guid.NewGuid(),
-                        AccountId = context.Set<Account>()
-                                            .Where(a => a.Email == "user@gmail.com")
-                                            .Select(a => a.AccountId)
-                                            .FirstOrDefault(),
-                        FirstName = "John",
-                        LastName = "Doe"
-                    };
-                    context.Set<UserProfile>().Add(userProfile);
-                    context.SaveChanges();
-                }
-
-                if (!context.Set<Cart>().Any())
-                {
-
-                    var account = context.Set<Account>()
-                                    .Include(a => a.UserProfile)
-                                    .Where(a => a.Email == "user@gmail.com")
-                                    .FirstOrDefault();
-
-                    var userCart = new Cart
-                    {
-                        CartId = Guid.NewGuid(),
-                        CustomerId = account!.UserProfile.UserProfileId,
-                        CreatedAt = DateTime.UtcNow,
-                        UpdatedAt = DateTime.UtcNow
-                    };
-
-                    context.Set<Cart>().Add(userCart);
-                    context.SaveChanges();
-                }
-            })
-            );
+            builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
             // Dependency Injection
             builder.Services.AddScoped<IAuthService, AuthService>();
@@ -151,6 +83,14 @@ namespace CleanAgricultureProductBE
 
             //Cart Item DI
             builder.Services.AddScoped<ICartItemRepository, CartItemRepository>();
+
+            //Delivery Fee DI
+            builder.Services.AddScoped<IDeliveryFeeService, DeliveryFeeService>();
+            builder.Services.AddScoped<IDeliveryFeeRepository, DeliveryFeeRepository>();
+
+            //PaymentMethod DI
+            builder.Services.AddScoped<IPaymentMethodRepository, PaymentMethodRepository>();
+            builder.Services.AddScoped<IPaymentMethodService, PaymentMethodService>();
 
             // JWT Authentication
             builder.Services
@@ -215,13 +155,19 @@ namespace CleanAgricultureProductBE
 
             var app = builder.Build();
 
-            if (app.Environment.IsDevelopment())
+            using (var scope = app.Services.CreateScope())
             {
-                app.UseSwagger();
-                app.UseSwaggerUI();
-                app.MapScalarApiReference();
-                app.MapOpenApi();
-            }
+                var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+                await DatabaseSeeder.SeedAsync(dbContext);
+            };
+
+                if (app.Environment.IsDevelopment())
+                {
+                    app.UseSwagger();
+                    app.UseSwaggerUI();
+                    app.MapScalarApiReference();
+                    app.MapOpenApi();
+                }
 
             app.UseHttpsRedirection();
 
