@@ -2,7 +2,7 @@
 {
     public class GetCartItemsResponseWithTotalPrice
     {
-        public List<GetCartItemReponseDto>? CartItemReponseList { get; set; }
+        public List<GetCartItemResponseDto>? CartItemReponseList { get; set; }
         public decimal? TotalPriceOfAll { get; set; }
     }
 }

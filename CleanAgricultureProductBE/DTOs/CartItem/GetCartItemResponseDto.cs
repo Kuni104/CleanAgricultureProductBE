@@ -1,6 +1,6 @@
 ﻿namespace CleanAgricultureProductBE.DTOs.CartItem
 {
-    public class GetCartItemReponseDto
+    public class GetCartItemResponseDto
     {
         public Guid ProductId { get; set; }
         public string ProductName { get; set; } = null!;

@@ -86,14 +86,14 @@ namespace CleanAgricultureProductBE.Controllers
             return Ok(response);
         }
 
-        [HttpPut("me/items")]
-        public async Task<IActionResult> UpdateCartItems([FromBody] UpdateCartItemRequestDto request)
+        [HttpPut("me/items/{id}")]
+        public async Task<IActionResult> UpdateCartItems(Guid id, [FromBody] UpdateCartItemRequestDto request)
         {
             var accountEmail = User.FindFirstValue(ClaimTypes.Email);
 
-            var result = await cartService.UpdateCartItem(accountEmail!, request);
+            var result = await cartService.UpdateCartItem(accountEmail!, id, request);
 
-            var response = new ResponseObject<GetCartItemReponseDto>
+            var response = new ResponseObject<UpdateCartItemResponseDto>
             {
                 Success = "true",
                 Message = "Updated",
@@ -102,5 +102,34 @@ namespace CleanAgricultureProductBE.Controllers
 
             return Ok(response);
         }
+
+        [HttpDelete("me/items/{id}")]
+        public async Task<IActionResult> DeleteCartItems(Guid id)
+        {
+            var accountEmail = User.FindFirstValue(ClaimTypes.Email);
+
+            var result = await cartService.DeleteCartItem(accountEmail!, id);
+
+            if (result.Status == "ID 404")
+            {
+
+                return NotFound(new ResponseObject<string>
+                {
+                    Success = "fail",
+                    Message = "Product Not Found",
+                    Data = "404"
+                });
+            }
+
+            var response = new ResponseObject<decimal>
+            {
+                Success = "true",
+                Message = "Remove Product From Cart And Return New Total Price Of Cart",
+                Data = result.Data,
+            };
+
+            return Ok(response);
+        }
+
     }
 }

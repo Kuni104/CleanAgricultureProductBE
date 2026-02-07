@@ -11,7 +11,7 @@ namespace CleanAgricultureProductBE.Repositories.CartItem
             context.CartItems.Add(cartItem);
             await context.SaveChangesAsync();
         }
-        
+
         public async Task<List<Models.CartItem>> GetCartItemsByCartId(Guid cartId)
         {
             return await context.CartItems.Where(ci => ci.CartId == cartId)
@@ -41,7 +41,13 @@ namespace CleanAgricultureProductBE.Repositories.CartItem
                                           .OrderByDescending(ci => ci.CreatedAt)
                                           .Skip(offset)
                                           .Take(pageSize)
-                                          .ToListAsync();  
+                                          .ToListAsync();
+        }
+
+        public async Task DeleteCartItem(Models.CartItem cartItem)
+        {
+            context.CartItems.Remove(cartItem);
+            await context.SaveChangesAsync();
         }
 
     }

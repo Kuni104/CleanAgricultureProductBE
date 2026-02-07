@@ -12,5 +12,7 @@
         public Task<Models.CartItem?> GetCartItemByCartIdAndProductId(Guid cartId, Guid productId);
 
         public Task UpdateCartItem(Models.CartItem cartItem);
+
+        public Task DeleteCartItem(Models.CartItem cartItem);
     }
 }

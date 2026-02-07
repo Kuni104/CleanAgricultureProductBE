@@ -1,4 +1,4 @@
-﻿namespace CleanAgricultureProductBE.DTOs
+﻿namespace CleanAgricultureProductBE.DTOs.ApiResponse
 {
     public class ResultStatusWithData<T>
     {
