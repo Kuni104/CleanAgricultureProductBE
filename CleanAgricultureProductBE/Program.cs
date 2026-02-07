@@ -112,6 +112,7 @@ namespace CleanAgricultureProductBE
                     };
 
                     // Reject blacklisted tokens on validation
+                    // Comment from here for temporary fix the JWT error
                     options.Events = new JwtBearerEvents
                     {
                         OnTokenValidated = async context =>
@@ -136,6 +137,7 @@ namespace CleanAgricultureProductBE
                             }
                         }
                     };
+                    // Comment End Here
                 });
 
             // Thêm CORS
