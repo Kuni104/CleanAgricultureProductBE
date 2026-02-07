@@ -1,11 +1,13 @@
 ﻿using CleanAgricultureProductBE.DTOs.DeliveryFee;
 using CleanAgricultureProductBE.DTOs.Response;
 using CleanAgricultureProductBE.Services.DeliveryFee;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CleanAgricultureProductBE.Controllers
 {
+    [Authorize(Roles = "Admin,Staff")]
     [Route("api/[controller]")]
     [ApiController]
     public class DeliveryFeeController(IDeliveryFeeService deliveryFeeService) : ControllerBase
