@@ -66,7 +66,7 @@ namespace CleanAgricultureProductBE.Controllers
         }
 
         [HttpPut("{id}")] 
-        public async Task<IActionResult> UpdatePaymentMethod([FromHeader]int id, [FromBody]PaymentMethodRequestDto request)
+        public async Task<IActionResult> UpdatePaymentMethod(int id, [FromBody]PaymentMethodRequestDto request)
         {
             var success = "";
             var message = "";
@@ -94,9 +94,31 @@ namespace CleanAgricultureProductBE.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeletePaymentMethod([FromHeader]int id)
+        public async Task<IActionResult> DeletePaymentMethod(int id)
         {
-            return Ok();
+            var success = "";
+            var message = "";
+
+            var result = await paymentMethodService.DeletePaymentMethod(id);
+            if (result)
+            {
+                success = "true";
+                message = "Payment method deleted successfully";
+            }
+            else
+            {
+                success = "false";
+                message = "Failed to delete payment method | Payment method not found!";
+            }
+
+            var response = new ResponseObject<string>()
+            {
+                Success = success,
+                Message = message,
+                Data = result ? "Deleted" : "Not Deleted"
+            };
+
+            return Ok(response);
         }
     }
 }

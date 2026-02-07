@@ -70,5 +70,18 @@ namespace CleanAgricultureProductBE.Services.PaymentMethod
 
             return result;
         }
+
+        public async Task<bool> DeletePaymentMethod(int paymentMethodId)
+        {
+            var existingPaymentMethod = await paymentMethodRepository.GetPaymentMethodById(paymentMethodId);
+
+            if (existingPaymentMethod == null)
+            {
+                return false;
+            }
+
+            await paymentMethodRepository.DeletePaymentMethod(existingPaymentMethod);
+            return true;
+        }
     }
 }

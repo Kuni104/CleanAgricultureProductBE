@@ -7,7 +7,7 @@ namespace CleanAgricultureProductBE.Repositories.PaymentMethod
     {
         public async Task<Models.PaymentMethod?> GetPaymentMethodById(int paymentMethodId)
         {
-            return await context.PaymentMethods.FirstOrDefaultAsync(pm => pm.PaymentMethodId == paymentMethodId);
+            return await context.PaymentMethods.FindAsync(paymentMethodId);
         }
         public async Task<List<Models.PaymentMethod>> GetAllPaymentMethods()
         {
@@ -28,6 +28,12 @@ namespace CleanAgricultureProductBE.Repositories.PaymentMethod
         public async Task UpdatePaymentMethod(Models.PaymentMethod paymentMethod)
         {
             context.PaymentMethods.Update(paymentMethod);
+            await context.SaveChangesAsync();
+        }
+
+        public async Task DeletePaymentMethod(Models.PaymentMethod paymentMethod)
+        {
+            context.PaymentMethods.Remove(paymentMethod);
             await context.SaveChangesAsync();
         }
     }
