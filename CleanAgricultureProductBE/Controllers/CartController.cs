@@ -4,6 +4,7 @@ using CleanAgricultureProductBE.DTOs.Response;
 using CleanAgricultureProductBE.Services.Cart;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
@@ -14,7 +15,7 @@ namespace CleanAgricultureProductBE.Controllers
     [ApiController]
     public class CartController(ICartService cartService) : ControllerBase
     {
-        [HttpPost("me")]
+        [HttpPost("me/items")]
         public async Task<IActionResult> AddToCart([FromBody] AddToCartRequestDto request)
         {
             var success = "";
@@ -54,10 +55,13 @@ namespace CleanAgricultureProductBE.Controllers
 
             var result = await cartService.GetCartItem(accountEmail!, page, size, keyword);
 
-            var cartItems = result.CartItemReponseList;
+            var cartItems = new GetCartItemsResponseWithTotalPrice
+            {
+                CartItemReponseList = result.CartItemsResponseWithTotalPrice?.CartItemReponseList,
+                TotalPriceOfAll = result.CartItemsResponseWithTotalPrice?.TotalPriceOfAll
+            };
 
-
-            if (cartItems == null || cartItems.Count == 0)
+            if (cartItems.CartItemReponseList == null || cartItems.CartItemReponseList.Count == 0)
             {
                 success = "true";
                 message = "No items in cart";
@@ -70,7 +74,7 @@ namespace CleanAgricultureProductBE.Controllers
 
             var pagination = result.Pagination == null ? null : result.Pagination;
 
-            var response = new ResponseObject<List<GetCartItemReponseDto>>()
+            var response = new ResponseObject<GetCartItemsResponseWithTotalPrice>()
             {
                 Success = success,
                 Message = message,
@@ -78,6 +82,23 @@ namespace CleanAgricultureProductBE.Controllers
                 Pagination = pagination
             };
 
+
+            return Ok(response);
+        }
+
+        [HttpPut("me/items")]
+        public async Task<IActionResult> UpdateCartItems([FromBody] UpdateCartItemRequestDto request)
+        {
+            var accountEmail = User.FindFirstValue(ClaimTypes.Email);
+
+            var result = await cartService.UpdateCartItem(accountEmail!, request);
+
+            var response = new ResponseObject<GetCartItemReponseDto>
+            {
+                Success = "true",
+                Message = "Updated",
+                Data = result,
+            };
 
             return Ok(response);
         }

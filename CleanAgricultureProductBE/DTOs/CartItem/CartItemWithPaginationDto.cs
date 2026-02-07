@@ -4,7 +4,7 @@ namespace CleanAgricultureProductBE.DTOs.CartItem
 {
     public class CartItemWithPaginationDto
     {
-        public List<GetCartItemReponseDto>? CartItemReponseList {  get; set; }
+        public GetCartItemsResponseWithTotalPrice? CartItemsResponseWithTotalPrice { get; set; }
         public Pagination? Pagination { get; set; }
     }
 }

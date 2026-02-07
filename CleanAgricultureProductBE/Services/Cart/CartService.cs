@@ -89,9 +89,23 @@ namespace CleanAgricultureProductBE.Services.Cart
                 });
             }
 
-            var result = new CartItemWithPaginationDto
+            decimal total = 0;
+
+            foreach (var item in cartItems)
+            {
+                total = total + item.TotalPrice;
+            }
+
+
+            var cartItemWithTotalPrice = new GetCartItemsResponseWithTotalPrice
             {
                 CartItemReponseList = cartItems,
+                TotalPriceOfAll = total
+            };
+
+            var result = new CartItemWithPaginationDto
+            {
+                CartItemsResponseWithTotalPrice = cartItemWithTotalPrice
             };
 
 
@@ -111,6 +125,31 @@ namespace CleanAgricultureProductBE.Services.Cart
                     TotalPages = totalPage
                 };
             }
+
+            return result;
+        }
+
+        public async Task<GetCartItemReponseDto> UpdateCartItem(string accountEmail, UpdateCartItemRequestDto request)
+        {
+            var account = await accountRepository.GetByEmailAsync(accountEmail);
+            var customerId = account!.UserProfile.UserProfileId;
+            var cart = await cartRepository.GetCartByCustomerId(customerId);
+
+            var cartItem = await cartItemRepository.GetCartItemByCartIdAndProductId(cart!.CartId, request.ProductId);
+            var product = await productRepository.GetByIdAsync(request.ProductId);
+
+            cartItem!.Quantity = request.Quanity;
+
+            await cartItemRepository.UpdateCartItem(cartItem);
+
+            var result = new GetCartItemReponseDto
+            {
+                ProductId = cartItem.ProductId,
+                ProductName = cartItem.Product.Name,
+                Price = product!.Price,
+                Quantity = cartItem.Quantity,
+                TotalPrice = product.Price * cartItem.Quantity
+            };
 
             return result;
         }

@@ -43,5 +43,6 @@ namespace CleanAgricultureProductBE.Repositories.CartItem
                                           .Take(pageSize)
                                           .ToListAsync();  
         }
+
     }
 }
