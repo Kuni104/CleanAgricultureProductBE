@@ -17,6 +17,8 @@ using CleanAgricultureProductBE.Repositories.DeliveryFee;
 using CleanAgricultureProductBE.Services.DeliveryFee;
 using CleanAgricultureProductBE.Repositories.PaymentMethod;
 using CleanAgricultureProductBE.Services.PaymentMethod;
+using CleanAgricultureProductBE.Services.Order;
+using CleanAgricultureProductBE.Repositories.Order;
 
 
 namespace CleanAgricultureProductBE
@@ -91,6 +93,10 @@ namespace CleanAgricultureProductBE
             //PaymentMethod DI
             builder.Services.AddScoped<IPaymentMethodRepository, PaymentMethodRepository>();
             builder.Services.AddScoped<IPaymentMethodService, PaymentMethodService>();
+            
+            //Order DI
+            builder.Services.AddScoped<IOrderService, OrderService>();
+            builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 
             // JWT Authentication
             builder.Services
