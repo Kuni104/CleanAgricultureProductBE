@@ -13,11 +13,11 @@ namespace CleanAgricultureProductBE.Services.Cart
     public class CartService(IAccountRepository accountRepository, IProductRepository productRepository, ICartRepository cartRepository, ICartItemRepository cartItemRepository) : ICartService
     {
 
-        public async Task<AddToCartResponseDto> AddToCart(string accountEmail, AddToCartRequestDto request)
+        public async Task<AddToCartResponseDto> AddToCart(string accountEmail, Guid productId, CartRequestDto request)
         {
             var cart = await GetCartByAccoutEmail(accountEmail);
 
-            var product = await productRepository.GetByIdAsync(request.ProductId);
+            var product = await productRepository.GetByIdAsync(productId);
 
             var cartItem = await cartItemRepository.GetCartItemByCartIdAndProductId(cart!.CartId, product!.ProductId);
 
@@ -27,7 +27,7 @@ namespace CleanAgricultureProductBE.Services.Cart
                 {
                     CartItemId = Guid.NewGuid(),
                     CartId = cart!.CartId,
-                    ProductId = request.ProductId,
+                    ProductId = productId,
                     Quantity = request.Quantity,
                     CreatedAt = DateTime.UtcNow
                 };
@@ -44,13 +44,13 @@ namespace CleanAgricultureProductBE.Services.Cart
             {
                 CartItemId = cartItem.CartItemId,
                 CartId = cart.CartId,
-                ProductId = request.ProductId,
+                ProductId = productId,
                 Quantity = cartItem.Quantity,
                 TotalPrice = product!.Price * cartItem.Quantity
             };
         }
 
-        public async Task<CartItemWithPaginationDto> GetCartItem(string accountEmail, int? page, int? size, string? keyword)
+        public async Task<CartItemResponseWithPaginationDto> GetCartItem(string accountEmail, int? page, int? size, string? keyword)
         {
             bool isPagination = false;
             int offset = 0;
@@ -73,12 +73,12 @@ namespace CleanAgricultureProductBE.Services.Cart
             }
 
 
-            List<GetCartItemResponseDto> cartItems = new List<GetCartItemResponseDto>();
+            List<CartItemResponseDto> cartItems = new List<CartItemResponseDto>();
 
             foreach (var item in cartItemList)
             {
                 var product = await productRepository.GetByIdAsync(item.ProductId);
-                cartItems.Add(new GetCartItemResponseDto
+                cartItems.Add(new CartItemResponseDto
                 {
                     ProductId = product!.ProductId,
                     ProductName = product!.Name,
@@ -96,13 +96,13 @@ namespace CleanAgricultureProductBE.Services.Cart
             }
 
 
-            var cartItemWithTotalPrice = new GetCartItemsResponseWithTotalPrice
+            var cartItemWithTotalPrice = new CartItemsResponseWithTotalPriceDto
             {
                 CartItemReponseList = cartItems,
                 TotalPriceOfAll = total
             };
 
-            var result = new CartItemWithPaginationDto
+            var result = new CartItemResponseWithPaginationDto
             {
                 CartItemsResponseWithTotalPrice = cartItemWithTotalPrice
             };
@@ -128,18 +128,18 @@ namespace CleanAgricultureProductBE.Services.Cart
             return result;
         }
 
-        public async Task<UpdateCartItemResponseDto> UpdateCartItem(string accountEmail, Guid productId, UpdateCartItemRequestDto request)
+        public async Task<UpdateCartResponseDto> UpdateCartItemQuantity(string accountEmail, Guid productId, CartRequestDto request)
         {
             var cart = await GetCartByAccoutEmail(accountEmail);
 
             var cartItem = await cartItemRepository.GetCartItemByCartIdAndProductId(cart!.CartId, productId);
             var product = await productRepository.GetByIdAsync(productId);
 
-            cartItem!.Quantity = request.Quanity;
+            cartItem!.Quantity = request.Quantity;
 
             await cartItemRepository.UpdateCartItem(cartItem);
 
-            var cartItemRespsonse = new GetCartItemResponseDto
+            var cartItemRespsonse = new CartItemResponseDto
             {
                 ProductId = cartItem.ProductId,
                 ProductName = cartItem.Product.Name,
@@ -150,7 +150,7 @@ namespace CleanAgricultureProductBE.Services.Cart
 
             var totalPrice = await TotalPriceOfCartByCartId(cart!.CartId);
 
-            var result = new UpdateCartItemResponseDto
+            var result = new UpdateCartResponseDto
             {
                 CartItemReponse = cartItemRespsonse,
                 TotalPriceOfAll = totalPrice
@@ -184,6 +184,20 @@ namespace CleanAgricultureProductBE.Services.Cart
             };
         }
 
+        public async Task<string> DeleteAllCartItems(string accountEmail)
+        {
+            var cart = await GetCartByAccoutEmail(accountEmail);
+
+            if (cart == null)
+            {
+                return "404 Cart";
+            }
+
+            await cartItemRepository.DeleteAllCartItems(cart.CartId);
+
+            return "OK";
+        }
+
         private async Task<Models.Cart> GetCartByAccoutEmail(string accountEmail)
         {
             var account = await accountRepository.GetByEmailAsync(accountEmail);
@@ -196,11 +210,11 @@ namespace CleanAgricultureProductBE.Services.Cart
         private async Task<decimal> TotalPriceOfCartByCartId(Guid cartId)
         {
             var cartItemList = await cartItemRepository.GetCartItemsByCartId(cartId);
-            var cartDtoList = new List<GetCartItemResponseDto>();
+            var cartDtoList = new List<CartItemResponseDto>();
             foreach (var item in cartItemList)
             {
                 var productTemp = await productRepository.GetByIdAsync(item.ProductId);
-                cartDtoList.Add(new GetCartItemResponseDto
+                cartDtoList.Add(new CartItemResponseDto
                 {
                     ProductId = item.ProductId,
                     ProductName = item.Product.Name,

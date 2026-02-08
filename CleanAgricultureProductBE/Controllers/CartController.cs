@@ -15,15 +15,15 @@ namespace CleanAgricultureProductBE.Controllers
     [ApiController]
     public class CartController(ICartService cartService) : ControllerBase
     {
-        [HttpPost("me/items")]
-        public async Task<IActionResult> AddToCart([FromBody] AddToCartRequestDto request)
+        [HttpPost("me/items/{productId}")]
+        public async Task<IActionResult> AddToCart([FromRoute] Guid productId, [FromBody] CartRequestDto request)
         {
             var success = "";
             var message = "";
 
             var accountEmail = User.FindFirstValue(ClaimTypes.Email);
 
-            var result = await cartService.AddToCart(accountEmail!, request);
+            var result = await cartService.AddToCart(accountEmail!, productId, request);
 
             if(result == null)
             {
@@ -55,7 +55,7 @@ namespace CleanAgricultureProductBE.Controllers
 
             var result = await cartService.GetCartItem(accountEmail!, page, size, keyword);
 
-            var cartItems = new GetCartItemsResponseWithTotalPrice
+            var cartItems = new CartItemsResponseWithTotalPriceDto
             {
                 CartItemReponseList = result.CartItemsResponseWithTotalPrice?.CartItemReponseList,
                 TotalPriceOfAll = result.CartItemsResponseWithTotalPrice?.TotalPriceOfAll
@@ -74,7 +74,7 @@ namespace CleanAgricultureProductBE.Controllers
 
             var pagination = result.Pagination == null ? null : result.Pagination;
 
-            var response = new ResponseObject<GetCartItemsResponseWithTotalPrice>()
+            var response = new ResponseObject<CartItemsResponseWithTotalPriceDto>()
             {
                 Success = success,
                 Message = message,
@@ -86,14 +86,14 @@ namespace CleanAgricultureProductBE.Controllers
             return Ok(response);
         }
 
-        [HttpPut("me/items/{id}")]
-        public async Task<IActionResult> UpdateCartItems(Guid id, [FromBody] UpdateCartItemRequestDto request)
+        [HttpPatch("me/items/{productId}")]
+        public async Task<IActionResult> UpdateCartItems([FromRoute] Guid productId, [FromBody] CartRequestDto request)
         {
             var accountEmail = User.FindFirstValue(ClaimTypes.Email);
 
-            var result = await cartService.UpdateCartItem(accountEmail!, id, request);
+            var result = await cartService.UpdateCartItemQuantity(accountEmail!, productId, request);
 
-            var response = new ResponseObject<UpdateCartItemResponseDto>
+            var response = new ResponseObject<UpdateCartResponseDto>
             {
                 Success = "true",
                 Message = "Updated",
@@ -103,12 +103,12 @@ namespace CleanAgricultureProductBE.Controllers
             return Ok(response);
         }
 
-        [HttpDelete("me/items/{id}")]
-        public async Task<IActionResult> DeleteCartItems(Guid id)
+        [HttpDelete("me/items/{productId}")]
+        public async Task<IActionResult> DeleteCartItems([FromRoute] Guid productId)
         {
             var accountEmail = User.FindFirstValue(ClaimTypes.Email);
 
-            var result = await cartService.DeleteCartItem(accountEmail!, id);
+            var result = await cartService.DeleteCartItem(accountEmail!, productId);
 
             if (result.Status == "ID 404")
             {
@@ -124,8 +124,34 @@ namespace CleanAgricultureProductBE.Controllers
             var response = new ResponseObject<decimal>
             {
                 Success = "true",
-                Message = "Remove Product From Cart And Return New Total Price Of Cart",
-                Data = result.Data,
+                Message = "Remove Item From Cart And Return New Total Price Of Cart",
+                Data = result.Data
+            };
+
+            return Ok(response);
+        }
+
+        [HttpDelete("me/items")]
+        public async Task<IActionResult> DeleteAllCartItems()
+        {
+            var accountEmail = User.FindFirstValue(ClaimTypes.Email);
+
+            var result = await cartService.DeleteAllCartItems(accountEmail!);
+
+            if (result == "404 Cart")
+            {
+                return NotFound(new ResponseObject<string>
+                {
+                    Success = "fail",
+                    Message = "Invalid User ID"
+                });
+            }
+
+            var response = new ResponseObject<decimal>
+            {
+                Success = "true",
+                Message = "Remove All Items From Cart Successful",
+                Data = 0
             };
 
             return Ok(response);
