@@ -15,32 +15,52 @@ namespace CleanAgricultureProductBE.Data
             {
                 var hasher = new PasswordHasher<Account>();
 
-                var adminAccount = new Account
+                var accountList = new List<Account>
                 {
-                    AccountId = Guid.NewGuid(),
-                    RoleId = 1,
-                    Email = "admin@gmail.com",
-                    PasswordHash = "12345",
-                    Status = "Active",
-                    PhoneNumber = "0123456789"
+                    new Account
+                    {
+                        AccountId = Guid.NewGuid(),
+                        RoleId = 1,
+                        Email = "admin@gmail.com",
+                        PasswordHash = "12345",
+                        Status = "Active",
+                        PhoneNumber = "0123456789"
+                    },
+
+                    new Account
+                    {
+                        AccountId = Guid.NewGuid(),
+                        RoleId = 2,
+                        Email = "user@gmail.com",
+                        PasswordHash = "12345",
+                        Status = "Active",
+                    },
+
+                    new Account
+                    {
+                        AccountId = Guid.NewGuid(),
+                        RoleId = 3,
+                        Email = "staff@gmail.com",
+                        PasswordHash = "12345",
+                        Status = "Active",
+                    },
+
+                    new Account
+                    {
+                        AccountId = Guid.NewGuid(),
+                        RoleId = 4,
+                        Email = "delivery@gmail.com",
+                        PasswordHash = "12345",
+                        Status = "Active",
+                    }
                 };
 
-                var userAccount = new Account
+                foreach (var account in accountList)
                 {
-                    AccountId = Guid.NewGuid(),
-                    RoleId = 2,
-                    Email = "user@gmail.com",
-                    PasswordHash = "12345",
-                    Status = "Active",
-                    PhoneNumber = "0123456789"
-                };
+                    account.PasswordHash = hasher.HashPassword(account, account.PasswordHash);
+                }
 
-
-                adminAccount.PasswordHash = hasher.HashPassword(adminAccount, adminAccount.PasswordHash);
-                userAccount.PasswordHash = hasher.HashPassword(userAccount, userAccount.PasswordHash);
-
-                context.Set<Account>().Add(adminAccount);
-                context.Set<Account>().Add(userAccount);
+                context.Accounts.AddRange(accountList);
                 await context.SaveChangesAsync();
 
             }
@@ -60,6 +80,29 @@ namespace CleanAgricultureProductBE.Data
                 };
 
                 context.Set<UserProfile>().Add(userProfile);
+                await context.SaveChangesAsync();
+            }
+
+            //Address Seeding
+            if (!await context.Set<Address>().AnyAsync())
+            {
+                var useraddress = new Address
+                {
+                    AddressId = Guid.NewGuid(),
+                    UserProfileId = context.UserProfiles.Include(uf => uf.Account)
+                                                        .Where(a => a.Account.Email == "user@gmail.com")
+                                                        .Select(a => a.UserProfileId)
+                                                        .FirstOrDefault(),
+                    RecipientName = "John Doe",
+                    RecipientPhone = "1023456789",
+                    Ward = "A",
+                    District = "A",
+                    City = "A",
+                    AddressDetail = "AAA",
+                    IsDefault = true
+                };
+
+                context.Addresses.Add(useraddress);
                 await context.SaveChangesAsync();
             }
 
@@ -170,10 +213,55 @@ namespace CleanAgricultureProductBE.Data
             {
                 var paymentMethods = new List<PaymentMethod>
                 {
-                    new PaymentMethod {MethodName = "Cash On Delivery" }
+                    new PaymentMethod 
+                    {
+                        MethodName = "Cash On Delivery" 
+                    }
                 };
 
                 context.Set<PaymentMethod>().AddRange(paymentMethods);
+                await context.SaveChangesAsync();
+            }
+
+            //DeliveryFee Seeding
+            if (!await context.Set<DeliveryFee>().AnyAsync())
+            {
+                var deliveryFees = new List<DeliveryFee>
+                {
+                    new DeliveryFee
+                    {
+                        DeliveryFeeId = Guid.NewGuid(),
+                        District = "A",
+                        City = "A",
+                        FeeAmount = 25,
+                        EffectiveDay = DateTime.UtcNow,
+                        EstimatedDay = DateTime.UtcNow.AddYears(5)
+                    }
+                };
+
+                context.DeliveryFees.AddRange(deliveryFees);
+                await context.SaveChangesAsync();
+            }
+
+            //Schedule Seeding
+            if(!await context.Set<Schedule>().AnyAsync())
+            {
+                var schedules = new List<Schedule>
+                {
+                    new Schedule
+                    {
+                        ScheduleId = Guid.NewGuid(),
+                        DeliveryPersonId = context.Accounts.Where(a => a.Email == "delivery@gmail.com")
+                                                           .Select(a => a.AccountId)
+                                                           .FirstOrDefault(),
+                        ScheduledDate = DateTime.UtcNow.AddDays(7),
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow,
+                        Status = "Active"
+                    }
+                };
+
+                context.Schedules.AddRange(schedules);
                 await context.SaveChangesAsync();
             }
         }
