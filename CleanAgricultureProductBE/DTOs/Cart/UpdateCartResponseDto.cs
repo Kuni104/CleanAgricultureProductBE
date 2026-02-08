@@ -2,9 +2,9 @@
 
 namespace CleanAgricultureProductBE.DTOs.Cart
 {
-    public class UpdateCartItemResponseDto
+    public class UpdateCartResponseDto
     {
-        public GetCartItemResponseDto? CartItemReponse { get; set; }
+        public CartItemResponseDto? CartItemReponse { get; set; }
         public decimal? TotalPriceOfAll { get; set; }
     }
 }

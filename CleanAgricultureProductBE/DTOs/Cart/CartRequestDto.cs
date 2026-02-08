@@ -1,9 +1,7 @@
 ﻿namespace CleanAgricultureProductBE.DTOs.Cart
 {
-    public class AddToCartRequestDto
+    public class CartRequestDto
     {
-        public Guid ProductId { get; set; }
         public int Quantity { get; set; }
-
     }
 }

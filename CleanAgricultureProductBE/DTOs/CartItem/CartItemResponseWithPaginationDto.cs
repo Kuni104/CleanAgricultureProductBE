@@ -2,9 +2,9 @@
 
 namespace CleanAgricultureProductBE.DTOs.CartItem
 {
-    public class CartItemWithPaginationDto
+    public class CartItemResponseWithPaginationDto
     {
-        public GetCartItemsResponseWithTotalPrice? CartItemsResponseWithTotalPrice { get; set; }
+        public CartItemsResponseWithTotalPriceDto? CartItemsResponseWithTotalPrice { get; set; }
         public Pagination? Pagination { get; set; }
     }
 }

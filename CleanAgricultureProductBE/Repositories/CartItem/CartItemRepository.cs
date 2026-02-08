@@ -50,5 +50,10 @@ namespace CleanAgricultureProductBE.Repositories.CartItem
             await context.SaveChangesAsync();
         }
 
+        public async Task DeleteAllCartItems(Guid cartId)
+        {
+            await context.CartItems.Where(ci => ci.CartId == cartId)
+                             .ExecuteDeleteAsync();
+        }
     }
 }
