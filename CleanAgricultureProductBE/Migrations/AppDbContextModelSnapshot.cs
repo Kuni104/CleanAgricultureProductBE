@@ -159,6 +159,10 @@ namespace CleanAgricultureProductBE.Migrations
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
+                    b.Property<decimal>("TotalPrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
                     b.HasKey("CartItemId");
 
                     b.HasIndex("ProductId");
@@ -318,10 +322,10 @@ namespace CleanAgricultureProductBE.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("PaymentId")
+                    b.Property<Guid?>("PaymentId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("ScheduleId")
+                    b.Property<Guid?>("ScheduleId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("OrderId");
@@ -395,7 +399,6 @@ namespace CleanAgricultureProductBE.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("TransactionCode")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("PaymentId");
@@ -712,14 +715,12 @@ namespace CleanAgricultureProductBE.Migrations
                     b.HasOne("CleanAgricultureProductBE.Models.Payment", "Payment")
                         .WithMany("Orders")
                         .HasForeignKey("PaymentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("CleanAgricultureProductBE.Models.Schedule", "Schedule")
                         .WithMany("Orders")
                         .HasForeignKey("ScheduleId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Address");
 

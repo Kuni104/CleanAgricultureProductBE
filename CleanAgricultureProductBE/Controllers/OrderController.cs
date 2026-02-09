@@ -1,4 +1,5 @@
-﻿using CleanAgricultureProductBE.Services.Order;
+﻿using CleanAgricultureProductBE.DTOs.Order;
+using CleanAgricultureProductBE.Services.Order;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -11,21 +12,21 @@ namespace CleanAgricultureProductBE.Controllers
     public class OrderController(IOrderService orderService) : ControllerBase
     {
         [Authorize(Roles = "Customer")]
-        [HttpGet("/me")]
+        [HttpGet("me")]
         public async Task<IActionResult> GetAllOrders()
         {
             return Ok();
         }
 
         [Authorize(Roles = "Customer")]
-        [HttpPost("/me")]
-        public async Task<IActionResult> PlaceOrder()
+        [HttpPost("me")]
+        public async Task<IActionResult> PlaceOrder([FromBody] OrderRequestDto request)
         {
-            var accountId = User.FindFirstValue(ClaimTypes.Email);
+            var accountEmail = User.FindFirstValue(ClaimTypes.Email);
 
-            var result = await orderService.PlaceOrder(accountId!);
+            var result = await orderService.PlaceOrder(accountEmail!, request);
 
-            return Ok();
+            return Ok(result);
         }
 
         [HttpPut]

@@ -163,6 +163,9 @@ namespace CleanAgricultureProductBE.Data
 
                 entity.HasIndex(e => new { e.CartId, e.ProductId })
                       .IsUnique();
+
+                entity.Property(ci => ci.TotalPrice)
+                      .HasPrecision(18, 2);
             });
 
             modelBuilder.Entity<OrderDetail>(entity =>
