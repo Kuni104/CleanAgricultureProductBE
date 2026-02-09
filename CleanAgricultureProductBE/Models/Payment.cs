@@ -6,7 +6,7 @@
         public int PaymentMethodId { get; set; }
         public string PaymentStatus { get; set; } = string.Empty;
         public decimal TotalAmount { get; set; }
-        public string TransactionCode { get; set; } = string.Empty;
+        public string? TransactionCode { get; set; }
         public DateTime CreatedAt { get; set; }
         /*------------------------------------------------------------------------------------------------------------------------*/
         public PaymentMethod PaymentMethod { get; set; } = null!;

@@ -29,6 +29,7 @@ namespace CleanAgricultureProductBE.Services.Cart
                     CartId = cart!.CartId,
                     ProductId = productId,
                     Quantity = request.Quantity,
+                    TotalPrice = product.Price * request.Quantity,
                     CreatedAt = DateTime.UtcNow
                 };
 
@@ -37,6 +38,7 @@ namespace CleanAgricultureProductBE.Services.Cart
             else
             {
                 cartItem.Quantity += request.Quantity;
+                cartItem.TotalPrice = product.Price * request.Quantity;
                 await cartItemRepository.UpdateCartItem(cartItem);
             }
 
@@ -46,7 +48,7 @@ namespace CleanAgricultureProductBE.Services.Cart
                 CartId = cart.CartId,
                 ProductId = productId,
                 Quantity = cartItem.Quantity,
-                TotalPrice = product!.Price * cartItem.Quantity
+                TotalPrice = cartItem.TotalPrice
             };
         }
 
@@ -84,7 +86,7 @@ namespace CleanAgricultureProductBE.Services.Cart
                     ProductName = product!.Name,
                     Price = product.Price,
                     Quantity = item.Quantity,
-                    TotalPrice = product.Price * item.Quantity
+                    TotalPrice = item.TotalPrice
                 });
             }
 
@@ -198,7 +200,7 @@ namespace CleanAgricultureProductBE.Services.Cart
             return "OK";
         }
 
-        private async Task<Models.Cart> GetCartByAccoutEmail(string accountEmail)
+        public async Task<Models.Cart> GetCartByAccoutEmail(string accountEmail)
         {
             var account = await accountRepository.GetByEmailAsync(accountEmail);
             var customerId = account!.UserProfile.UserProfileId;
@@ -207,7 +209,7 @@ namespace CleanAgricultureProductBE.Services.Cart
             return cart!;
         }
 
-        private async Task<decimal> TotalPriceOfCartByCartId(Guid cartId)
+        public async Task<decimal> TotalPriceOfCartByCartId(Guid cartId)
         {
             var cartItemList = await cartItemRepository.GetCartItemsByCartId(cartId);
             var cartDtoList = new List<CartItemResponseDto>();

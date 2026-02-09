@@ -12,5 +12,7 @@ namespace CleanAgricultureProductBE.Services.Cart
         public Task<UpdateCartResponseDto> UpdateCartItemQuantity(string accountEmail, Guid productId, CartRequestDto request);
         public Task<ResultStatusWithData<decimal>> DeleteCartItem(string accountEmail, Guid productId);
         public Task<string> DeleteAllCartItems(string accountEmail);
+        public Task<Models.Cart> GetCartByAccoutEmail(string accountEmail);
+        public Task<decimal> TotalPriceOfCartByCartId(Guid cartId);
     }
 }

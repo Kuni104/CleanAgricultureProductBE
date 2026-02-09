@@ -1,7 +1,9 @@
-﻿namespace CleanAgricultureProductBE.Services.Order
+﻿using CleanAgricultureProductBE.DTOs.Order;
+
+namespace CleanAgricultureProductBE.Services.Order
 {
     public interface IOrderService
     {
-        public Task<string> PlaceOrder(string accountId);
+        public Task<string> PlaceOrder(string accountEmail, OrderRequestDto request);
     }
 }

@@ -21,6 +21,8 @@ using CleanAgricultureProductBE.Services.Order;
 using CleanAgricultureProductBE.Repositories.Order;
 using CleanAgricultureProductBE.Services.Payment;
 using CleanAgricultureProductBE.Repositories.Payment;
+using CleanAgricultureProductBE.Services.OrderDetail;
+using CleanAgricultureProductBE.Repositories.OrderDetail;
 
 
 namespace CleanAgricultureProductBE
@@ -99,6 +101,10 @@ namespace CleanAgricultureProductBE
             //Order DI
             builder.Services.AddScoped<IOrderService, OrderService>();
             builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+
+            //Order Detaill DI
+            builder.Services.AddScoped<IOrderDetailService, OrderDetailService>();
+            builder.Services.AddScoped<IOrderDetailRepository, OrderDetailRepository>();
 
             //Payment DI
             builder.Services.AddScoped<IPaymentService, PaymentService>();

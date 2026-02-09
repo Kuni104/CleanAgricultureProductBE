@@ -6,11 +6,8 @@
 
         public Task<List<Models.CartItem>> GetCartItemsByCartId(Guid cartId);
         public Task<List<Models.CartItem>> GetCartItemsByCartIdWithPagination(Guid cartId, int offset, int pageSize);
-
         public Task<bool> CheckCartItemByCartIdAndProductId(Guid cartId, Guid productId);
-
         public Task<Models.CartItem?> GetCartItemByCartIdAndProductId(Guid cartId, Guid productId);
-
         public Task UpdateCartItem(Models.CartItem cartItem);
         public Task DeleteCartItem(Models.CartItem cartItem);
         public Task DeleteAllCartItems(Guid cartId);
