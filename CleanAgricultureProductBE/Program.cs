@@ -19,6 +19,8 @@ using CleanAgricultureProductBE.Repositories.PaymentMethod;
 using CleanAgricultureProductBE.Services.PaymentMethod;
 using CleanAgricultureProductBE.Services.Order;
 using CleanAgricultureProductBE.Repositories.Order;
+using CleanAgricultureProductBE.Services.Payment;
+using CleanAgricultureProductBE.Repositories.Payment;
 
 
 namespace CleanAgricultureProductBE
@@ -98,6 +100,10 @@ namespace CleanAgricultureProductBE
             builder.Services.AddScoped<IOrderService, OrderService>();
             builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 
+            //Payment DI
+            builder.Services.AddScoped<IPaymentService, PaymentService>();
+            builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
+
             // JWT Authentication
             builder.Services
                 .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -119,30 +125,30 @@ namespace CleanAgricultureProductBE
 
                     // Reject blacklisted tokens on validation
                     // Comment from here for temporary fix the JWT error
-                    options.Events = new JwtBearerEvents
-                    {
-                        OnTokenValidated = async context =>
-                        {
-                            var token = context.SecurityToken as JwtSecurityToken;
-                            if (token == null)
-                            {
-                                context.Fail("Invalid token");
-                                return;
-                            }
+                    //options.Events = new JwtBearerEvents
+                    //{
+                    //    OnTokenValidated = async context =>
+                    //    {
+                    //        var token = context.SecurityToken as JwtSecurityToken;
+                    //        if (token == null)
+                    //        {
+                    //            context.Fail("Invalid token");
+                    //            return;
+                    //        }
 
-                            var tokenString = token.RawData;
-                            // Resolve repository from DI
-                            var repo = context.HttpContext.RequestServices.GetService<ITokenBlacklistRepository>();
-                            if (repo != null)
-                            {
-                                var isBlacklisted = await repo.IsBlacklistedAsync(tokenString);
-                                if (isBlacklisted)
-                                {
-                                    context.Fail("Token revoked");
-                                }
-                            }
-                        }
-                    };
+                    //        var tokenString = token.RawData;
+                    //        // Resolve repository from DI
+                    //        var repo = context.HttpContext.RequestServices.GetService<ITokenBlacklistRepository>();
+                    //        if (repo != null)
+                    //        {
+                    //            var isBlacklisted = await repo.IsBlacklistedAsync(tokenString);
+                    //            if (isBlacklisted)
+                    //            {
+                    //                context.Fail("Token revoked");
+                    //            }
+                    //        }
+                    //    }
+                    //};
                     // Comment End Here
                 });
 
