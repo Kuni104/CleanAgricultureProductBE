@@ -11,5 +11,6 @@
         public Task UpdateCartItem(Models.CartItem cartItem);
         public Task DeleteCartItem(Models.CartItem cartItem);
         public Task DeleteAllCartItems(Guid cartId);
+        public Task<decimal> TotalPriceOfCartByCartId(Guid cartId);
     }
 }

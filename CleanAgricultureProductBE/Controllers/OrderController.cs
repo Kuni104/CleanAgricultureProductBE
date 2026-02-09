@@ -12,21 +12,21 @@ namespace CleanAgricultureProductBE.Controllers
     public class OrderController(IOrderService orderService) : ControllerBase
     {
         [Authorize(Roles = "Customer")]
-        [HttpGet("/me")]
+        [HttpGet("me")]
         public async Task<IActionResult> GetAllOrders()
         {
             return Ok();
         }
 
         [Authorize(Roles = "Customer")]
-        [HttpPost("/me")]
+        [HttpPost("me")]
         public async Task<IActionResult> PlaceOrder([FromBody] OrderRequestDto request)
         {
             var accountEmail = User.FindFirstValue(ClaimTypes.Email);
 
             var result = await orderService.PlaceOrder(accountEmail!, request);
 
-            return Ok();
+            return Ok(result);
         }
 
         [HttpPut]

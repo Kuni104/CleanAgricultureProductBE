@@ -4,6 +4,6 @@ namespace CleanAgricultureProductBE.Services.Order
 {
     public interface IOrderService
     {
-        public Task<string> PlaceOrder(string accountEmail, OrderRequestDto request);
+        public Task<OrderResponseDto> PlaceOrder(string accountEmail, OrderRequestDto request);
     }
 }

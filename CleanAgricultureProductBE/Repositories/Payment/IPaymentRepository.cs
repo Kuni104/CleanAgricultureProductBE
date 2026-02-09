@@ -2,5 +2,6 @@
 {
     public interface IPaymentRepository
     {
+        public Task AddPayment(Models.Payment payment);
     }
 }

@@ -55,5 +55,11 @@ namespace CleanAgricultureProductBE.Repositories.CartItem
             await context.CartItems.Where(ci => ci.CartId == cartId)
                              .ExecuteDeleteAsync();
         }
+
+        public async Task<decimal> TotalPriceOfCartByCartId(Guid cartId)
+        {
+            return await context.CartItems.Where(ci => ci.CartId == cartId)
+                                          .SumAsync(ci => ci.TotalPrice);
+        }
     }
 }
