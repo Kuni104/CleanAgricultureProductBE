@@ -5,11 +5,11 @@ namespace CleanAgricultureProductBE.Services.DeliveryFee
 {
     public class DeliveryFeeService(IDeliveryFeeRepository deliveryFeeRepository) : IDeliveryFeeService
     {
-        public async Task<List<GetDeliveryFeeResponseDto>> GetDeliveryFeeList()
+        public async Task<List<DeliveryFeeResponseDto>> GetDeliveryFeeList()
         {
             var deliveryFees = await deliveryFeeRepository.GetDeliveryFeeList();
 
-            var deliveryFeeList = deliveryFees.Select(df => new GetDeliveryFeeResponseDto
+            var deliveryFeeList = deliveryFees.Select(df => new DeliveryFeeResponseDto
             {
                 DeliveryFeeId = df.DeliveryFeeId,
                 District = df.District,
@@ -22,7 +22,7 @@ namespace CleanAgricultureProductBE.Services.DeliveryFee
             return deliveryFeeList;
         }
 
-        public async Task<GetDeliveryFeeResponseDto> AddDeliveryFee(CreateDeliveryFeeRequestDto request)
+        public async Task<DeliveryFeeResponseDto> AddDeliveryFee(CreateDeliveryFeeRequestDto request)
         {
             var newDeliveryFee = new Models.DeliveryFee
             {
@@ -36,7 +36,7 @@ namespace CleanAgricultureProductBE.Services.DeliveryFee
 
             await deliveryFeeRepository.AddDeliveryFee(newDeliveryFee);
 
-            var deliveryFeeDto = new GetDeliveryFeeResponseDto
+            var deliveryFeeDto = new DeliveryFeeResponseDto
             {
                 DeliveryFeeId = newDeliveryFee.DeliveryFeeId,
                 District = newDeliveryFee.District,
@@ -49,7 +49,7 @@ namespace CleanAgricultureProductBE.Services.DeliveryFee
             return deliveryFeeDto;
         }
 
-        public async Task<GetDeliveryFeeResponseDto> UpdateDeliveryFee(Guid deliveryFeeId, UpdateDeliveryFeeRequestDto request)
+        public async Task<DeliveryFeeResponseDto> UpdateDeliveryFee(Guid deliveryFeeId, UpdateDeliveryFeeRequestDto request)
         {
             var existingDeliveryFee = await deliveryFeeRepository.GetDeliveryFeeById(deliveryFeeId);
 
@@ -66,7 +66,7 @@ namespace CleanAgricultureProductBE.Services.DeliveryFee
 
             await deliveryFeeRepository.UpdateDeliveryFee(existingDeliveryFee);
 
-            var updatedDeliveryFeeDto = new GetDeliveryFeeResponseDto
+            var updatedDeliveryFeeDto = new DeliveryFeeResponseDto
             {
                 DeliveryFeeId = existingDeliveryFee.DeliveryFeeId,
                 District = existingDeliveryFee.District,

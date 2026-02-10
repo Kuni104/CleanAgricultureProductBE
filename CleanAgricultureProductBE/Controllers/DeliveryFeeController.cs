@@ -31,7 +31,7 @@ namespace CleanAgricultureProductBE.Controllers
                 message = "Delivery fee data retrieved successfully";
             }
 
-            var response = new ResponseObject<List<GetDeliveryFeeResponseDto>>
+            var response = new ResponseObject<List<DeliveryFeeResponseDto>>
             {
                 Success = success,
                 Message = message,
@@ -60,7 +60,7 @@ namespace CleanAgricultureProductBE.Controllers
                 message = "Delivery fee data added successfully";
             }
 
-            var response = new ResponseObject<GetDeliveryFeeResponseDto>
+            var response = new ResponseObject<DeliveryFeeResponseDto>
             {
                 Success = success,
                 Message = message,
@@ -79,7 +79,7 @@ namespace CleanAgricultureProductBE.Controllers
                 return BadRequest("No Existed Delivery Fee With This ID");
             }
 
-            var response = new ResponseObject<GetDeliveryFeeResponseDto>
+            var response = new ResponseObject<DeliveryFeeResponseDto>
             {
                 Success = "true",
                 Message = "Delivery Fee Updated Successfully",

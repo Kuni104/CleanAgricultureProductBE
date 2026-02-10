@@ -1,6 +1,6 @@
 ﻿namespace CleanAgricultureProductBE.DTOs.DeliveryFee
 {
-    public class GetDeliveryFeeResponseDto
+    public class DeliveryFeeResponseDto
     {
         public Guid DeliveryFeeId { get; set;}
         public string District { get; set; } = string.Empty;
