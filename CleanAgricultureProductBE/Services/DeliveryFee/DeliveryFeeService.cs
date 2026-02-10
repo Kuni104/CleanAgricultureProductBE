@@ -22,6 +22,21 @@ namespace CleanAgricultureProductBE.Services.DeliveryFee
             return deliveryFeeList;
         }
 
+        public async Task<DeliveryFeeResponseDto> GetDeliveryFeeById(Guid deliveryFeeId)
+        {
+            var deliveryFee = await deliveryFeeRepository.GetDeliveryFeeById(deliveryFeeId);
+
+            return new DeliveryFeeResponseDto
+            {
+                DeliveryFeeId = deliveryFee!.DeliveryFeeId,
+                District = deliveryFee.District,
+                City = deliveryFee.City,
+                FeeAmount = deliveryFee.FeeAmount,
+                EstimatedDay = deliveryFee.EstimatedDay,
+                EffectiveDay = deliveryFee.EffectiveDay
+            };
+        }
+
         public async Task<DeliveryFeeResponseDto> AddDeliveryFee(CreateDeliveryFeeRequestDto request)
         {
             var newDeliveryFee = new Models.DeliveryFee
