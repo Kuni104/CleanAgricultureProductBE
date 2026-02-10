@@ -7,19 +7,19 @@ using System.Security.Claims;
 
 namespace CleanAgricultureProductBE.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api")]
     [ApiController]
     public class OrderController(IOrderService orderService) : ControllerBase
     {
         [Authorize(Roles = "Customer")]
-        [HttpGet("me")]
+        [HttpGet("me/orders")]
         public async Task<IActionResult> GetAllOrders()
         {
             return Ok();
         }
 
         [Authorize(Roles = "Customer")]
-        [HttpPost("me")]
+        [HttpPost("me/orders")]
         public async Task<IActionResult> PlaceOrder([FromBody] OrderRequestDto request)
         {
             var accountEmail = User.FindFirstValue(ClaimTypes.Email);
@@ -29,13 +29,13 @@ namespace CleanAgricultureProductBE.Controllers
             return Ok(result);
         }
 
-        [HttpPut]
+        [HttpPut("me/orders")]
         public async Task<IActionResult> UpdateOrder()
         {
             return Ok(); 
         }
 
-        [HttpDelete]
+        [HttpDelete("me/orders")]
         public async Task<IActionResult> CancelOrder()
         {
             return Ok();

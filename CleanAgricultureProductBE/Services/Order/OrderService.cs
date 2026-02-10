@@ -1,16 +1,18 @@
 ﻿
 using CleanAgricultureProductBE.DTOs.Order;
 using CleanAgricultureProductBE.Models;
+using CleanAgricultureProductBE.Repositories.Cart;
 using CleanAgricultureProductBE.Repositories.CartItem;
 using CleanAgricultureProductBE.Repositories.DeliveryFee;
 using CleanAgricultureProductBE.Repositories.Order;
 using CleanAgricultureProductBE.Repositories.OrderDetail;
 using CleanAgricultureProductBE.Repositories.Payment;
 using CleanAgricultureProductBE.Services.Cart;
+using CleanAgricultureProductBE.Services.DeliveryFee;
 
 namespace CleanAgricultureProductBE.Services.Order
 {
-    public class OrderService(IOrderRepository orderRepository, IOrderDetailRepository orderDetailRepository, ICartService cartService, ICartItemRepository cartItemRepository, IDeliveryFeeRepository deliveryFeeRepository, IPaymentRepository paymentRepository ) : IOrderService
+    public class OrderService(IOrderRepository orderRepository, IOrderDetailRepository orderDetailRepository, ICartService cartService, ICartRepository cartRepository, IDeliveryFeeService deliveryFeeService, IPaymentRepository paymentRepository ) : IOrderService
     {
         public async Task<OrderResponseDto> PlaceOrder(string accountEmail, OrderRequestDto request)
         {
@@ -18,8 +20,8 @@ namespace CleanAgricultureProductBE.Services.Order
 
             var cart = await cartService.GetCartByAccoutEmail(accountEmail);
 
-            var cartItems = await cartItemRepository.GetCartItemsByCartId(cart!.CartId);
-            var deliveryFee = await deliveryFeeRepository.GetDeliveryFeeById(request.DeliveryFeeId);
+            var cartItems = await cartRepository.GetCartItemsByCartId(cart!.CartId);
+            var deliveryFee = await deliveryFeeService.GetDeliveryFeeById(request.DeliveryFeeId);
 
             decimal totalCartPrice = await cartService.TotalPriceOfCartByCartId(cart.CartId);
             var totalOrderPrice = totalCartPrice + deliveryFee!.FeeAmount;
@@ -68,7 +70,7 @@ namespace CleanAgricultureProductBE.Services.Order
             }
 
             await orderDetailRepository.AddOrderDetails(orderDetails);
-            await cartItemRepository.DeleteAllCartItems(cart.CartId);
+            await cartRepository.DeleteAllCartItems(cart.CartId);
 
             var orderReponse = new OrderResponseDto
             {

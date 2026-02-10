@@ -10,16 +10,17 @@ using CleanAgricultureProductBE.DTOs.ApiResponse;
 
 namespace CleanAgricultureProductBE.Services.Cart
 {
-    public class CartService(IAccountRepository accountRepository, IProductRepository productRepository, ICartRepository cartRepository, ICartItemRepository cartItemRepository) : ICartService
+    public class CartService(IAccountRepository accountRepository,IProductService productService, ICartRepository cartRepository) : ICartService
     {
 
         public async Task<AddToCartResponseDto> AddToCart(string accountEmail, Guid productId, CartRequestDto request)
         {
             var cart = await GetCartByAccoutEmail(accountEmail);
 
-            var product = await productRepository.GetByIdAsync(productId);
+            //var product = await productRepository.GetByIdAsync(productId);
+            var product = await productService.GetProductByIdAsync(productId);
 
-            var cartItem = await cartItemRepository.GetCartItemByCartIdAndProductId(cart!.CartId, product!.ProductId);
+            var cartItem = await cartRepository.GetCartItemByCartIdAndProductId(cart!.CartId, product!.ProductId);
 
             if (cartItem is null)
             {
@@ -28,18 +29,19 @@ namespace CleanAgricultureProductBE.Services.Cart
                     CartItemId = Guid.NewGuid(),
                     CartId = cart!.CartId,
                     ProductId = productId,
+                    UnitPrice = product.Price,
                     Quantity = request.Quantity,
                     TotalPrice = product.Price * request.Quantity,
                     CreatedAt = DateTime.UtcNow
                 };
 
-                await cartItemRepository.AddCartItem(cartItem);
+                await cartRepository.AddCartItem(cartItem);
             }
             else
             {
                 cartItem.Quantity += request.Quantity;
-                cartItem.TotalPrice = product.Price * request.Quantity;
-                await cartItemRepository.UpdateCartItem(cartItem);
+                cartItem.TotalPrice = cartItem.UnitPrice * request.Quantity;
+                await cartRepository.UpdateCartItem(cartItem);
             }
 
             return new AddToCartResponseDto
@@ -47,6 +49,7 @@ namespace CleanAgricultureProductBE.Services.Cart
                 CartItemId = cartItem.CartItemId,
                 CartId = cart.CartId,
                 ProductId = productId,
+                UnitPrice = cartItem.UnitPrice,
                 Quantity = cartItem.Quantity,
                 TotalPrice = cartItem.TotalPrice
             };
@@ -66,12 +69,12 @@ namespace CleanAgricultureProductBE.Services.Cart
 
             var cart = await GetCartByAccoutEmail(accountEmail);
 
-            var cartItemList = await cartItemRepository.GetCartItemsByCartId(cart!.CartId);
+            var cartItemList = await cartRepository.GetCartItemsByCartIdIncludeProduct(cart!.CartId);
 
             int totalItems = cartItemList.Count;
 
             if (isPagination) {
-                cartItemList = await cartItemRepository.GetCartItemsByCartIdWithPagination(cart!.CartId, offset, pageSize);
+                cartItemList = await cartRepository.GetCartItemsByCartIdWithPagination(cart!.CartId, offset, pageSize);
             }
 
 
@@ -79,12 +82,11 @@ namespace CleanAgricultureProductBE.Services.Cart
 
             foreach (var item in cartItemList)
             {
-                var product = await productRepository.GetByIdAsync(item.ProductId);
                 cartItems.Add(new CartItemResponseDto
                 {
-                    ProductId = product!.ProductId,
-                    ProductName = product!.Name,
-                    Price = product.Price,
+                    ProductId = item.ProductId,
+                    ProductName = item.Product.Name,
+                    Price = item.UnitPrice,
                     Quantity = item.Quantity,
                     TotalPrice = item.TotalPrice
                 });
@@ -134,20 +136,21 @@ namespace CleanAgricultureProductBE.Services.Cart
         {
             var cart = await GetCartByAccoutEmail(accountEmail);
 
-            var cartItem = await cartItemRepository.GetCartItemByCartIdAndProductId(cart!.CartId, productId);
-            var product = await productRepository.GetByIdAsync(productId);
+            var cartItem = await cartRepository.GetCartItemByCartIdAndProductIdIncludeProduct(cart!.CartId, productId);
+            //var product = await productService.GetProductByIdAsync(productId);
 
             cartItem!.Quantity = request.Quantity;
+            cartItem!.TotalPrice = cartItem.UnitPrice * request.Quantity;
 
-            await cartItemRepository.UpdateCartItem(cartItem);
+            await cartRepository.UpdateCartItem(cartItem);
 
             var cartItemRespsonse = new CartItemResponseDto
             {
                 ProductId = cartItem.ProductId,
                 ProductName = cartItem.Product.Name,
-                Price = product!.Price,
+                Price = cartItem.UnitPrice,
                 Quantity = cartItem.Quantity,
-                TotalPrice = product.Price * cartItem.Quantity
+                TotalPrice = cartItem.TotalPrice
             };
 
             var totalPrice = await TotalPriceOfCartByCartId(cart!.CartId);
@@ -165,7 +168,7 @@ namespace CleanAgricultureProductBE.Services.Cart
         public async Task<ResultStatusWithData<decimal>> DeleteCartItem(string accountEmail, Guid productId)
         {
             var cart = await GetCartByAccoutEmail(accountEmail);
-            var cartItem = await cartItemRepository.GetCartItemByCartIdAndProductId(cart!.CartId, productId);
+            var cartItem = await cartRepository.GetCartItemByCartIdAndProductId(cart!.CartId, productId);
 
             if (cartItem == null)
             {
@@ -175,7 +178,7 @@ namespace CleanAgricultureProductBE.Services.Cart
                 };
             }
 
-            await cartItemRepository.DeleteCartItem(cartItem!);
+            await cartRepository.DeleteCartItem(cartItem!);
 
             var totalPrice = await TotalPriceOfCartByCartId(cart!.CartId);
 
@@ -195,7 +198,7 @@ namespace CleanAgricultureProductBE.Services.Cart
                 return "404 Cart";
             }
 
-            await cartItemRepository.DeleteAllCartItems(cart.CartId);
+            await cartRepository.DeleteAllCartItems(cart.CartId);
 
             return "OK";
         }
@@ -211,28 +214,7 @@ namespace CleanAgricultureProductBE.Services.Cart
 
         public async Task<decimal> TotalPriceOfCartByCartId(Guid cartId)
         {
-            var cartItemList = await cartItemRepository.GetCartItemsByCartId(cartId);
-            var cartDtoList = new List<CartItemResponseDto>();
-            foreach (var item in cartItemList)
-            {
-                var productTemp = await productRepository.GetByIdAsync(item.ProductId);
-                cartDtoList.Add(new CartItemResponseDto
-                {
-                    ProductId = item.ProductId,
-                    ProductName = item.Product.Name,
-                    Price = productTemp!.Price,
-                    Quantity = item.Quantity,
-                    TotalPrice = productTemp.Price * item.Quantity
-                });
-            }
-
-            decimal totalPrice = 0;
-            foreach (var item in cartDtoList)
-            {
-                totalPrice += item.TotalPrice;
-            }
-
-            return totalPrice;
+            return await cartRepository.TotalPriceOfCartByCartId(cartId);
         }
     }
 }

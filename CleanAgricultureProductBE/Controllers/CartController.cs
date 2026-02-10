@@ -11,11 +11,11 @@ using System.Security.Claims;
 namespace CleanAgricultureProductBE.Controllers
 {
     [Authorize(Roles = "Customer")]
-    [Route("api/[controller]")]
+    [Route("api")]
     [ApiController]
     public class CartController(ICartService cartService) : ControllerBase
     {
-        [HttpPost("me/items/{productId}")]
+        [HttpPost("me/cart/items/{productId}")]
         public async Task<IActionResult> AddToCart([FromRoute] Guid productId, [FromBody] CartRequestDto request)
         {
             var success = "";
@@ -45,7 +45,7 @@ namespace CleanAgricultureProductBE.Controllers
             return Ok(response);
         }
 
-        [HttpGet("me")]
+        [HttpGet("me/cart")]
         public async Task<IActionResult> GetCartItems([FromQuery] int? page, [FromQuery] int? size, [FromQuery] string? keyword)
         {
             var success = "";
@@ -86,7 +86,7 @@ namespace CleanAgricultureProductBE.Controllers
             return Ok(response);
         }
 
-        [HttpPatch("me/items/{productId}")]
+        [HttpPatch("me/cart/items/{productId}")]
         public async Task<IActionResult> UpdateCartItems([FromRoute] Guid productId, [FromBody] CartRequestDto request)
         {
             var accountEmail = User.FindFirstValue(ClaimTypes.Email);
@@ -103,7 +103,7 @@ namespace CleanAgricultureProductBE.Controllers
             return Ok(response);
         }
 
-        [HttpDelete("me/items/{productId}")]
+        [HttpDelete("me/cart/items/{productId}")]
         public async Task<IActionResult> DeleteCartItems([FromRoute] Guid productId)
         {
             var accountEmail = User.FindFirstValue(ClaimTypes.Email);
@@ -131,7 +131,7 @@ namespace CleanAgricultureProductBE.Controllers
             return Ok(response);
         }
 
-        [HttpDelete("me/items")]
+        [HttpDelete("me/cart/items")]
         public async Task<IActionResult> DeleteAllCartItems()
         {
             var accountEmail = User.FindFirstValue(ClaimTypes.Email);

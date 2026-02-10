@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace CleanAgricultureProductBE.Controllers
 {
     [Authorize(Roles = "Admin,Staff")]
-    [Route("api/[controller]")]
+    [Route("api/delivery-fee")]
     [ApiController]
     public class DeliveryFeeController(IDeliveryFeeService deliveryFeeService) : ControllerBase
     {
@@ -31,7 +31,7 @@ namespace CleanAgricultureProductBE.Controllers
                 message = "Delivery fee data retrieved successfully";
             }
 
-            var response = new ResponseObject<List<GetDeliveryFeeResponseDto>>
+            var response = new ResponseObject<List<DeliveryFeeResponseDto>>
             {
                 Success = success,
                 Message = message,
@@ -60,7 +60,7 @@ namespace CleanAgricultureProductBE.Controllers
                 message = "Delivery fee data added successfully";
             }
 
-            var response = new ResponseObject<GetDeliveryFeeResponseDto>
+            var response = new ResponseObject<DeliveryFeeResponseDto>
             {
                 Success = success,
                 Message = message,
@@ -70,16 +70,16 @@ namespace CleanAgricultureProductBE.Controllers
             return Ok(response);
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateDeliveryFee([FromRoute]Guid id, [FromBody]UpdateDeliveryFeeRequestDto resquest)
+        [HttpPut("{deliveryFeeId}")]
+        public async Task<IActionResult> UpdateDeliveryFee([FromRoute]Guid deliveryFeeId, [FromBody]UpdateDeliveryFeeRequestDto resquest)
         {
-            var result = await deliveryFeeService.UpdateDeliveryFee(id, resquest);
+            var result = await deliveryFeeService.UpdateDeliveryFee(deliveryFeeId, resquest);
             if (result == null)
             {
                 return BadRequest("No Existed Delivery Fee With This ID");
             }
 
-            var response = new ResponseObject<GetDeliveryFeeResponseDto>
+            var response = new ResponseObject<DeliveryFeeResponseDto>
             {
                 Success = "true",
                 Message = "Delivery Fee Updated Successfully",
@@ -89,10 +89,10 @@ namespace CleanAgricultureProductBE.Controllers
             return Ok(response);
         }
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteDeliveryFeeById([FromRoute]Guid id)
+        [HttpDelete("{deliveryFeeId}")]
+        public async Task<IActionResult> DeleteDeliveryFeeById([FromRoute]Guid deliveryFeeId)
         {
-            var result = await deliveryFeeService.DeleteDeliveryFeeById(id);
+            var result = await deliveryFeeService.DeleteDeliveryFeeById(deliveryFeeId);
             if (!result)
             {
                 return BadRequest("No Existed Delivery Fee With This ID");
