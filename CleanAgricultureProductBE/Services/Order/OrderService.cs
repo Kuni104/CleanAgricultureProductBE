@@ -1,6 +1,9 @@
 ﻿
+using CleanAgricultureProductBE.DTOs.ApiResponse;
 using CleanAgricultureProductBE.DTOs.Order;
+using CleanAgricultureProductBE.DTOs.Response;
 using CleanAgricultureProductBE.Models;
+using CleanAgricultureProductBE.Repositories;
 using CleanAgricultureProductBE.Repositories.Cart;
 using CleanAgricultureProductBE.Repositories.CartItem;
 using CleanAgricultureProductBE.Repositories.DeliveryFee;
@@ -12,18 +15,20 @@ using CleanAgricultureProductBE.Services.DeliveryFee;
 
 namespace CleanAgricultureProductBE.Services.Order
 {
-    public class OrderService(IOrderRepository orderRepository, IOrderDetailRepository orderDetailRepository, ICartService cartService, ICartRepository cartRepository, IDeliveryFeeService deliveryFeeService, IPaymentRepository paymentRepository ) : IOrderService
+    public class OrderService(IAccountRepository accountRepository, IOrderRepository orderRepository, IOrderDetailRepository orderDetailRepository, ICartRepository cartRepository,IDeliveryFeeRepository deliveryFeeRepository, IPaymentRepository paymentRepository ) : IOrderService
     {
+        //Place order
+        private readonly TimeZoneInfo timeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
         public async Task<OrderResponseDto> PlaceOrder(string accountEmail, OrderRequestDto request)
         {
-            var timeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+            //var timeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
 
-            var cart = await cartService.GetCartByAccoutEmail(accountEmail);
+            var cart = await GetCartByAccoutEmail(accountEmail);
 
             var cartItems = await cartRepository.GetCartItemsByCartId(cart!.CartId);
-            var deliveryFee = await deliveryFeeService.GetDeliveryFeeById(request.DeliveryFeeId);
+            var deliveryFee = await deliveryFeeRepository.GetDeliveryFeeById(request.DeliveryFeeId);
 
-            decimal totalCartPrice = await cartService.TotalPriceOfCartByCartId(cart.CartId);
+            decimal totalCartPrice = await cartRepository.TotalPriceOfCartByCartId(cart.CartId);
             var totalOrderPrice = totalCartPrice + deliveryFee!.FeeAmount;
 
             var payment = new Models.Payment();
@@ -85,6 +90,80 @@ namespace CleanAgricultureProductBE.Services.Order
             };
 
             return orderReponse;
+        }
+
+        //Get all orders
+        public async Task<ResponseDtoWithPagination<List<OrderResponseDto>>> GetAllOrders(string accountEmail, int? page, int? size, string? keyword)
+        {
+            bool isPagination = false;
+            int offset = 0;
+            int pageSize = 0;
+            if (page != null && size != null)
+            {
+                pageSize = (int)size;
+                offset = (int)((page - 1) * size);
+                isPagination = true;
+            }
+
+            var account = await accountRepository.GetByEmailAsync(accountEmail);
+            var customerId = account!.UserProfile.UserProfileId;
+
+            var orders = await orderRepository.GetOrdersByCustomerId(customerId);
+
+            if (isPagination) {
+                orders = await orderRepository.GetOrdersByCustomerIdWithPagination(customerId, offset, pageSize);
+            }
+
+            int totalItems = orders.Count;
+
+            var orderResponseList = new List<OrderResponseDto>();
+            foreach (var order in orders)
+            {
+                orderResponseList.Add(new OrderResponseDto
+                {
+                    OrderId = order.OrderId,
+                    CustomerId = order.CustomerId,
+                    AddressId = order.AddressId,
+                    PaymentId = (Guid)order.PaymentId!,
+                    ScheduleId = order.ScheduleId,
+                    TotalPrice = order.Payment!.TotalAmount,
+                    OrderDate = TimeZoneInfo.ConvertTimeFromUtc(order.OrderDate, timeZone),
+                    OrderStatus = order.OrderStatus
+                });
+            }
+
+            var result = new ResponseDtoWithPagination<List<OrderResponseDto>>
+            {
+                ResultObject = orderResponseList
+            };
+
+            if (isPagination)
+            {
+                int totalPage = totalItems / pageSize + (totalItems % pageSize == 0 ? 1 : 0);
+                if (totalItems < pageSize)
+                {
+                    totalPage = 1;
+                }
+
+                result.Pagination = new Pagination
+                {
+                    PageNumber = (int)page!,
+                    PageSize = pageSize,
+                    TotalItems = totalItems,
+                    TotalPages = totalPage
+                };
+            }
+
+            return result;
+        }
+
+        private async Task<Models.Cart> GetCartByAccoutEmail(string accountEmail)
+        {
+            var account = await accountRepository.GetByEmailAsync(accountEmail);
+            var customerId = account!.UserProfile.UserProfileId;
+            var cart = await cartRepository.GetCartByCustomerId(customerId);
+
+            return cart!;
         }
     }
 }

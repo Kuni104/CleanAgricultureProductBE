@@ -203,7 +203,7 @@ namespace CleanAgricultureProductBE.Services.Cart
             return "OK";
         }
 
-        public async Task<Models.Cart> GetCartByAccoutEmail(string accountEmail)
+        private async Task<Models.Cart> GetCartByAccoutEmail(string accountEmail)
         {
             var account = await accountRepository.GetByEmailAsync(accountEmail);
             var customerId = account!.UserProfile.UserProfileId;

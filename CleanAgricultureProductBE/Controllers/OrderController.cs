@@ -1,4 +1,6 @@
 ﻿using CleanAgricultureProductBE.DTOs.Order;
+using CleanAgricultureProductBE.DTOs.Response;
+using CleanAgricultureProductBE.Models;
 using CleanAgricultureProductBE.Services.Order;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -13,9 +15,35 @@ namespace CleanAgricultureProductBE.Controllers
     {
         [Authorize(Roles = "Customer")]
         [HttpGet("me/orders")]
-        public async Task<IActionResult> GetAllOrders()
+        public async Task<IActionResult> GetAllOrders([FromQuery] int? page, [FromQuery] int? size, [FromQuery] string? keyword)
         {
-            return Ok();
+            var success = "";
+            var message = "";
+
+            var accountEmail = User.FindFirstValue(ClaimTypes.Email);
+
+            var orders = await orderService.GetAllOrders(accountEmail!, page, size, keyword);
+
+            if (orders.ResultObject == null || orders.ResultObject.Count == 0)
+            {
+                success = "true";
+                message = "No items in cart";
+            }
+            else
+            {
+                success = "true";
+                message = "Cart items retrieved successfully";
+            }
+
+            var response = new ResponseObject<List<OrderResponseDto>>
+            {
+                Success = success,
+                Message = message,
+                Data = orders.ResultObject,
+                Pagination = orders.Pagination
+            };
+
+            return Ok(response);
         }
 
         [Authorize(Roles = "Customer")]
