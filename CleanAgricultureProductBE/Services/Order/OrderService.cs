@@ -17,8 +17,10 @@ namespace CleanAgricultureProductBE.Services.Order
 {
     public class OrderService(IAccountRepository accountRepository, IOrderRepository orderRepository, IOrderDetailRepository orderDetailRepository, ICartRepository cartRepository,IDeliveryFeeRepository deliveryFeeRepository, IPaymentRepository paymentRepository ) : IOrderService
     {
-        //Place order
+        //UTC+7 timezone
         private readonly TimeZoneInfo timeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+
+        //Place order
         public async Task<OrderResponseDto> PlaceOrder(string accountEmail, OrderRequestDto request)
         {
             //var timeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
@@ -77,13 +79,15 @@ namespace CleanAgricultureProductBE.Services.Order
             await orderDetailRepository.AddOrderDetails(orderDetails);
             await cartRepository.DeleteAllCartItems(cart.CartId);
 
+            order = await orderRepository.GetOrderByOrderId(order.OrderId);
+
             var orderReponse = new OrderResponseDto
             {
-                OrderId = order.OrderId,
-                CustomerId = order.CustomerId,
-                AddressId = order.AddressId,
-                PaymentId = (Guid)order.PaymentId,
-                ScheduleId = order.ScheduleId,
+                OrderId = order!.OrderId,
+                CustomerName = order.Address.RecipientName,
+                Address = order.Address.AddressDetail,
+                //Payment = (Guid)order.PaymentId,
+                Schedule = TimeZoneInfo.ConvertTimeFromUtc(order.Schedule.ScheduledDate, timeZone),
                 TotalPrice = totalOrderPrice,
                 OrderDate = TimeZoneInfo.ConvertTimeFromUtc(order.OrderDate, timeZone),
                 OrderStatus = order.OrderStatus,            
@@ -122,11 +126,11 @@ namespace CleanAgricultureProductBE.Services.Order
                 orderResponseList.Add(new OrderResponseDto
                 {
                     OrderId = order.OrderId,
-                    CustomerId = order.CustomerId,
-                    AddressId = order.AddressId,
-                    PaymentId = (Guid)order.PaymentId!,
-                    ScheduleId = order.ScheduleId,
-                    TotalPrice = order.Payment!.TotalAmount,
+                    CustomerName = order.Address.RecipientName,
+                    Address = order.Address.AddressDetail,
+                    //Payment = (Guid)order.PaymentId,
+                    Schedule = TimeZoneInfo.ConvertTimeFromUtc(order.Schedule.ScheduledDate, timeZone),
+                    TotalPrice = order.Payment.TotalAmount,
                     OrderDate = TimeZoneInfo.ConvertTimeFromUtc(order.OrderDate, timeZone),
                     OrderStatus = order.OrderStatus
                 });
