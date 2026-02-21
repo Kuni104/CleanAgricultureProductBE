@@ -1,4 +1,5 @@
 ﻿using CleanAgricultureProductBE.DTOs.Order;
+using CleanAgricultureProductBE.DTOs.OrderDetail;
 using CleanAgricultureProductBE.DTOs.Response;
 using CleanAgricultureProductBE.Models;
 using CleanAgricultureProductBE.Services.Order;
@@ -32,7 +33,7 @@ namespace CleanAgricultureProductBE.Controllers
             else
             {
                 success = "true";
-                message = "Cart items retrieved successfully";
+                message = "Orders retrieved successfully";
             }
 
             var response = new ResponseObject<List<OrderResponseDto>>
@@ -41,6 +42,30 @@ namespace CleanAgricultureProductBE.Controllers
                 Message = message,
                 Data = orders.ResultObject,
                 Pagination = orders.Pagination
+            };
+
+            return Ok(response);
+        }
+
+        [Authorize(Roles = "Customer")]
+        [HttpGet("me/orders/{orderId}")]
+        public async Task<IActionResult> GetOrderDetail([FromRoute] Guid orderId, [FromQuery] int? page, [FromQuery] int? size, [FromQuery] string? keyword)
+        {
+            var accountEmail = User.FindFirstValue(ClaimTypes.Email);
+
+            var result = await orderService.GetOrderDetails(accountEmail!, orderId, page, size, keyword);
+
+            if (result.ResultObject == null)
+            {
+                return Forbid("Not The Order Of This Customer");
+            }
+
+            var response = new ResponseObject<OrderDetailListResponseDto>
+            {
+                Success = "success",
+                Message = "Get order details successfully",
+                Data = result.ResultObject,
+                Pagination = result.Pagination
             };
 
             return Ok(response);

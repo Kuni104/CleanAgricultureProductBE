@@ -115,7 +115,7 @@ namespace CleanAgricultureProductBE.Services.Cart
             if (isPagination)
             {
                 int totalPage = totalItems / pageSize + (totalItems % pageSize == 0 ? 1 : 0);
-                if (totalItems < pageSize)
+                if (totalItems < pageSize || page <= size)
                 {
                     totalPage = 1;
                 }
