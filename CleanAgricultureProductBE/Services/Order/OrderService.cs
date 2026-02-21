@@ -1,6 +1,7 @@
 ﻿
 using CleanAgricultureProductBE.DTOs.ApiResponse;
 using CleanAgricultureProductBE.DTOs.Order;
+using CleanAgricultureProductBE.DTOs.OrderDetail;
 using CleanAgricultureProductBE.DTOs.Response;
 using CleanAgricultureProductBE.Models;
 using CleanAgricultureProductBE.Repositories;
@@ -114,11 +115,11 @@ namespace CleanAgricultureProductBE.Services.Order
 
             var orders = await orderRepository.GetOrdersByCustomerId(customerId);
 
+            int totalItems = orders.Count;
+
             if (isPagination) {
                 orders = await orderRepository.GetOrdersByCustomerIdWithPagination(customerId, offset, pageSize);
             }
-
-            int totalItems = orders.Count;
 
             var orderResponseList = new List<OrderResponseDto>();
             foreach (var order in orders)
@@ -144,7 +145,82 @@ namespace CleanAgricultureProductBE.Services.Order
             if (isPagination)
             {
                 int totalPage = totalItems / pageSize + (totalItems % pageSize == 0 ? 1 : 0);
-                if (totalItems < pageSize)
+                if (totalItems < pageSize || page <= size)
+                {
+                    totalPage = 1;
+                }
+
+                result.Pagination = new Pagination
+                {
+                    PageNumber = (int)page!,
+                    PageSize = pageSize,
+                    TotalItems = totalItems,
+                    TotalPages = totalPage
+                };
+            }
+
+            return result;
+        }
+
+        //Get order detail
+        public async Task<ResponseDtoWithPagination<OrderDetailListResponseDto>> GetOrderDetails(string accountEmail, Guid orderId, int? page, int? size, string? keyword)
+        {
+            var order = await orderRepository.GetOrderByOrderId(orderId);
+            if(order!.Customer.Account.Email != accountEmail)
+            {
+                return null!;
+            }
+
+            bool isPagination = false;
+            int offset = 0;
+            int pageSize = 0;
+            if (page != null && size != null)
+            {
+                pageSize = (int)size;
+                offset = (int)((page - 1) * size);
+                isPagination = true;
+            }
+
+            var orderDetailList = await orderDetailRepository.GetOrderDetailsByOrderId(orderId);
+
+            int totalItems = orderDetailList.Count;
+
+            if (isPagination)
+            {
+                orderDetailList = await orderDetailRepository.GetOrderDetailsByOrderIdWithPagination(orderId, offset, pageSize, keyword);
+            }
+
+            var orderDetailResponseList = new List<OrderDetailResponseDto>();
+            foreach (var orderDetail in orderDetailList)
+            {
+                orderDetailResponseList.Add(new OrderDetailResponseDto
+                {
+                    OrderDetailId = orderDetail.OrderDetailId,
+                    ProductId = orderDetail.ProductId,
+                    ProductName = orderDetail.Product.Name,
+                    Quantity = orderDetail.Quantity,
+                    TotalPrice = orderDetail.TotalPrice,
+                    CreatedAt = TimeZoneInfo.ConvertTimeFromUtc(orderDetail.CreatedAt, timeZone),
+                    ExpiryDate = TimeZoneInfo.ConvertTimeFromUtc(orderDetail.ExpiryDate, timeZone)
+                });
+            }
+
+            var orderDetailsResponse = new OrderDetailListResponseDto
+            {
+                OrderId = order.OrderId,
+                OrderDetails = orderDetailResponseList,
+                TotalPrice = order.Payment.TotalAmount
+            };
+
+            var result = new ResponseDtoWithPagination<OrderDetailListResponseDto>
+            {
+                ResultObject = orderDetailsResponse
+            };
+
+            if (isPagination)
+            {
+                int totalPage = totalItems / pageSize + (totalItems % pageSize == 0 ? 1 : 0);
+                if (totalItems < pageSize || page <= size)
                 {
                     totalPage = 1;
                 }
