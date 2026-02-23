@@ -39,8 +39,9 @@ namespace CleanAgricultureProductBE.Services.Cart
             }
             else
             {
-                cartItem.Quantity += request.Quantity;
-                cartItem.TotalPrice = cartItem.UnitPrice * request.Quantity;
+                int updatedQuantity = request.Quantity + cartItem.Quantity;
+                cartItem.Quantity += updatedQuantity;
+                cartItem.TotalPrice = cartItem.UnitPrice * updatedQuantity;
                 await cartRepository.UpdateCartItem(cartItem);
             }
 
