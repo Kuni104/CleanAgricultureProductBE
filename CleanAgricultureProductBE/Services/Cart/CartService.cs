@@ -40,7 +40,7 @@ namespace CleanAgricultureProductBE.Services.Cart
             else
             {
                 int updatedQuantity = request.Quantity + cartItem.Quantity;
-                cartItem.Quantity += updatedQuantity;
+                cartItem.Quantity = updatedQuantity;
                 cartItem.TotalPrice = cartItem.UnitPrice * updatedQuantity;
                 await cartRepository.UpdateCartItem(cartItem);
             }
