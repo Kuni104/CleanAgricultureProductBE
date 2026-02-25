@@ -6,6 +6,35 @@ namespace CleanAgricultureProductBE.Repositories.Order
 {
     public class OrderRepository(AppDbContext context) : IOrderRepository
     {
+        public async Task<List<Models.Order>> GetAllOrders()
+        {
+            return await context.Orders.Include(o => o.Address)
+                                       .Include(o => o.Payment)
+                                       .Include(o => o.Schedule)
+                                       .Include(o => o.Customer)
+                                       .ThenInclude(c => c.Account)
+                                       .ToListAsync();
+        }
+
+        public async Task UpdateOrder(Models.Order order)
+        {
+            context.Orders.Update(order);
+            await context.SaveChangesAsync();
+        }
+
+        public async Task<List<Models.Order>> GetAllOrdersWithPagination(int offset, int pageSize)
+        {
+            return await context.Orders.Include(o => o.Address)
+                                       .Include(o => o.Payment)
+                                       .Include(o => o.Schedule)
+                                       .Include(o => o.Customer)
+                                       .ThenInclude(c => c.Account)
+                                       .OrderByDescending(o => o.OrderDate)
+                                       .Skip(offset)
+                                       .Take(pageSize)
+                                       .ToListAsync();
+        }
+
         public async Task<Models.Order?> GetOrderByOrderId(Guid orderId)
         {
             return await context.Orders.Where(o => o.OrderId == orderId)
