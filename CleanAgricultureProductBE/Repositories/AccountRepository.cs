@@ -13,6 +13,23 @@ namespace CleanAgricultureProductBE.Repositories
             _context = context;
         }
 
+        public async Task<List<Account>> GetAllAccountsAsync()
+        {
+            return await _context.Accounts.Include(a => a.UserProfile)
+                                          .Include(a => a.Role)
+                                          .ToListAsync();
+        }
+
+        public async Task<List<Account>> GetAllAccountsWithPaginationAsync(int offset, int pageSize)
+        {
+            return await _context.Accounts.Include(a => a.UserProfile)
+                                          .Include(a => a.Role)
+                                          .OrderBy(a => a.RoleId)
+                                          .Skip(offset)
+                                          .Take(pageSize)
+                                          .ToListAsync();
+        }
+
         public async Task<Account> CreateAsync(Account account)
         {
             _context.Accounts.Add(account);

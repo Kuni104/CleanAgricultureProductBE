@@ -29,7 +29,7 @@ namespace CleanAgricultureProductBE.Services
             if (account == null || account.Status != "Active")
                 throw new Exception("Invalid credentials");
 
-            var hasher = new PasswordHasher<Account>();
+            var hasher = new PasswordHasher<Models.Account>();
 
             var result = hasher.VerifyHashedPassword(
                 account,
@@ -88,7 +88,7 @@ namespace CleanAgricultureProductBE.Services
             var existing = await _accountRepo.GetByEmailAsync(dto.Email);
             if(existing != null)    throw new Exception("Email already in use");
 
-            var account = new Account
+            var account = new Models.Account
             {
                 AccountId = Guid.NewGuid(),
                 RoleId = 2,
@@ -103,7 +103,7 @@ namespace CleanAgricultureProductBE.Services
                 }
             };
 
-            var hasher = new PasswordHasher<Account>();
+            var hasher = new PasswordHasher<Models.Account>();
             account.PasswordHash = hasher.HashPassword(account, dto.Password);
             var created = await _accountRepo.CreateAsync(account);
             var token = GenerateJwt(created);
@@ -123,7 +123,7 @@ namespace CleanAgricultureProductBE.Services
             };
         }
 
-        private string GenerateJwt(Account account)
+        private string GenerateJwt(Models.Account account)
         {
             var claims = new[]
             {
