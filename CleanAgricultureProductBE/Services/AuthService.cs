@@ -1,6 +1,7 @@
 ﻿using CleanAgricultureProductBE.DTOs;
 using CleanAgricultureProductBE.Models;
 using CleanAgricultureProductBE.Repositories;
+using CleanAgricultureProductBE.Repositories.Cart;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -12,12 +13,14 @@ namespace CleanAgricultureProductBE.Services
     public class AuthService : IAuthService
     {
         private readonly IAccountRepository _accountRepo;
+        private readonly ICartRepository _cartRepo;
         private readonly IConfiguration _config;
         private readonly ITokenBlacklistRepository _tokenBlacklistRepo;
 
-        public AuthService(IAccountRepository accountRepo, IConfiguration config, ITokenBlacklistRepository tokenBlacklistRepo)
+        public AuthService(IAccountRepository accountRepo, ICartRepository cartRepo, IConfiguration config, ITokenBlacklistRepository tokenBlacklistRepo)
         {
             _accountRepo = accountRepo;
+            _cartRepo = cartRepo;
             _config = config;
             _tokenBlacklistRepo = tokenBlacklistRepo;
         }
@@ -100,12 +103,23 @@ namespace CleanAgricultureProductBE.Services
                     UserProfileId = Guid.NewGuid(),
                     FirstName = dto.FirstName,
                     LastName = dto.LastName,
-                }
+                },
             };
 
             var hasher = new PasswordHasher<Models.Account>();
             account.PasswordHash = hasher.HashPassword(account, dto.Password);
             var created = await _accountRepo.CreateAsync(account);
+
+            var newCart = new Models.Cart
+            {
+                CartId = Guid.NewGuid(),
+                Customer = created.UserProfile,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow,
+            };
+
+            await _cartRepo.CreateCart(newCart);
+
             var token = GenerateJwt(created);
 
             var loginUser = new LoginResponseUserDto

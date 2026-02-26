@@ -3,11 +3,12 @@ using CleanAgricultureProductBE.DTOs.Response;
 using CleanAgricultureProductBE.Services.Account;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CleanAgricultureProductBE.Controllers
 {
-    [Route("api/v1/admin/[controller]")]
+    [Route("api/v1/admin/account")]
     [ApiController]
     public class AccountController(IAccountService accountService) : ControllerBase
     {
@@ -44,9 +45,26 @@ namespace CleanAgricultureProductBE.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateAccount()
+        public async Task<IActionResult> CreateAccount([FromBody] CreateAccountRequestDto request)
         {
-            return Ok();
+
+            var result = await accountService.CreateAccount(request);
+
+            if (result == null)
+            {
+                return BadRequest(new ResponseObject<string>
+                {
+                    Success = "false",
+                    Message = "Email đã được sử dụng!"
+                });
+            }
+
+            return Ok(new ResponseObject<AccountResponseDto>
+            {
+                Success = "true",
+                Message = "Tạo tài khoản thành công",
+                Data = result
+            });
         }
 
         [HttpPatch]

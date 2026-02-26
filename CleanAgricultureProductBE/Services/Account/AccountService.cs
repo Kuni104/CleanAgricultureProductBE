@@ -2,8 +2,10 @@
 using CleanAgricultureProductBE.DTOs.ApiResponse;
 using CleanAgricultureProductBE.DTOs.Order;
 using CleanAgricultureProductBE.DTOs.Response;
+using CleanAgricultureProductBE.Models;
 using CleanAgricultureProductBE.Repositories;
 using CleanAgricultureProductBE.Repositories.Order;
+using Microsoft.AspNetCore.Identity;
 
 namespace CleanAgricultureProductBE.Services.Account
 {
@@ -66,6 +68,44 @@ namespace CleanAgricultureProductBE.Services.Account
             }
 
             return result;
+        }
+
+        public async Task<AccountResponseDto> CreateAccount(CreateAccountRequestDto request)
+        {
+            var existAccount = await accountRepository.GetByEmailAsync(request.Email);
+            if (existAccount != null)
+            {
+                return null!;
+            }
+
+            var account = new Models.Account
+            {
+                AccountId = Guid.NewGuid(),
+                Email = request.Email,
+                PhoneNumber = request.PhoneNumber,
+                RoleId = request.RoleId,
+                Status = "Active",
+                UserProfile = new UserProfile
+                {
+                    UserProfileId = Guid.NewGuid(),
+                    FirstName = request.FirstName,
+                    LastName = request.LastName
+                }
+                
+            };
+
+            var hasher = new PasswordHasher<Models.Account>();
+            account.PasswordHash = hasher.HashPassword(account, request.Password);
+            var created = await accountRepository.CreateAsync(account);
+
+            return new AccountResponseDto
+            {
+                AccountId = account.AccountId,
+                Email = request.Email,
+                Name = account.UserProfile.FirstName + " " + account.UserProfile.LastName,
+                Role = account.Role.RoleName,
+                Status = account.Status,
+            };
         }
     }
 }

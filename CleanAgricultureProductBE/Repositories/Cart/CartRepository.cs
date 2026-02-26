@@ -6,7 +6,12 @@ namespace CleanAgricultureProductBE.Repositories.Cart
 {
     public class CartRepository(AppDbContext context) : ICartRepository
     {
-        //Cart
+        public async Task CreateCart(Models.Cart cart)
+        {
+            context.Carts.Add(cart);
+            await context.SaveChangesAsync();
+        }
+
         public async Task<Models.Cart?> GetCartByCustomerId(Guid customerId)
         {
             return await context.Carts
@@ -14,7 +19,6 @@ namespace CleanAgricultureProductBE.Repositories.Cart
                                  .FirstOrDefaultAsync();
         }
 
-        //Cart Items
         public async Task AddCartItem(Models.CartItem cartItem)
         {
             context.CartItems.Add(cartItem);
