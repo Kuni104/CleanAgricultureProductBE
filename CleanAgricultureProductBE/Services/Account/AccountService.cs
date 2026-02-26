@@ -107,5 +107,25 @@ namespace CleanAgricultureProductBE.Services.Account
                 Status = account.Status,
             };
         }
+
+        public async Task<AccountResponseDto> ChangeAccountStatus(Guid accountId, ChangeAccountStatusRequestDto request)
+        {
+            var account = await accountRepository.GetByIdAsync(accountId);
+            if (account == null) {
+                return null!;
+            }
+
+            account.Status = request.Status;
+            await accountRepository.UpdateAsync(account);
+
+            return new AccountResponseDto
+            {
+                AccountId = account.AccountId,
+                Email = account.Email,
+                Name = account.UserProfile.FirstName + " " + account.UserProfile.LastName,
+                Role = account.Role.RoleName,
+                Status = account.Status,
+            };
+        }
     }
 }

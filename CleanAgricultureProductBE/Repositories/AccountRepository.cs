@@ -43,11 +43,24 @@ namespace CleanAgricultureProductBE.Repositories
             return created ?? account;
         }
 
+        public async Task<Account?> GetByIdAsync(Guid accountId)
+        {
+            return await _context.Accounts.Include(a => a.UserProfile)
+                                          .Include(a => a.Role)
+                                          .FirstOrDefaultAsync(a => a.AccountId == accountId);
+        }
+
         public Task<Account?> GetByEmailAsync(string email)
         {
             return _context.Accounts.Include(a => a.UserProfile)
                                     .Include(a => a.Role)
                                     .FirstOrDefaultAsync(a => a.Email == email);
+        }
+
+        public async Task UpdateAsync(Models.Account account)
+        {
+            _context.Accounts.Update(account);
+            await _context.SaveChangesAsync();
         }
     }
 }

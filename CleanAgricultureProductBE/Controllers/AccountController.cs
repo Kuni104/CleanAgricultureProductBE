@@ -67,10 +67,35 @@ namespace CleanAgricultureProductBE.Controllers
             });
         }
 
-        [HttpPatch]
-        public async Task<IActionResult> ChangeAccountStatus()
+        [Authorize(Roles = "Admin")]
+        [HttpPatch("{accountId}")]
+        public async Task<IActionResult> ChangeAccountStatus([FromRoute] Guid accountId, [FromBody] ChangeAccountStatusRequestDto request)
         {
-            return Ok();
+            if (request == null || request.Status.Trim() == "")
+            {
+                return BadRequest(new ResponseObject<string>
+                {
+                    Success = "false",
+                    Message = "Trạng thái không được để trống!"
+                });
+            }
+
+            var result = await accountService.ChangeAccountStatus(accountId, request);
+            if (result == null)
+            {
+                return NotFound(new ResponseObject<string>
+                {
+                    Success = "false",
+                    Message = "Không tìm thấy tài khoản!"
+                });
+            }
+            
+            return Ok(new ResponseObject<AccountResponseDto>
+            {
+                Success = "true",
+                Message = "Thay đổi trạng thái tài khoản thành công!",
+                Data = result
+            });
         }
     }
 }
