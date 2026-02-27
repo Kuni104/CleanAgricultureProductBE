@@ -5,5 +5,7 @@ namespace CleanAgricultureProductBE.Repositories.Order
     public interface IOrderRepository
     {
         public Task AddOrder(Models.Order order);
+        public Task<Models.Order> GetOrderById(Guid orderId);
+        Task UpdateAsync(Models.Order order);
     }
 }
