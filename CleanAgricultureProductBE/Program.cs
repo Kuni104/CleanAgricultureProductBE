@@ -6,25 +6,41 @@ using CleanAgricultureProductBE.Repositories.CartItem;
 using CleanAgricultureProductBE.Repositories.DeliveryFee;
 using CleanAgricultureProductBE.Repositories.Order;
 using CleanAgricultureProductBE.Repositories.OrderDetail;
+using CleanAgricultureProductBE.Repositories.OTP;
 using CleanAgricultureProductBE.Repositories.Payment;
 using CleanAgricultureProductBE.Repositories.PaymentMethod;
+using CleanAgricultureProductBE.Repositories.Schedule;
 using CleanAgricultureProductBE.Services;
 using CleanAgricultureProductBE.Services.Cart;
 using CleanAgricultureProductBE.Services.DeliveryFee;
+using CleanAgricultureProductBE.Services.Email;
 using CleanAgricultureProductBE.Services.Order;
 using CleanAgricultureProductBE.Services.OrderDetail;
 using CleanAgricultureProductBE.Services.Payment;
 using CleanAgricultureProductBE.Services.PaymentMethod;
 using CleanAgricultureProductBE.Services.VnPay;
+using CleanAgricultureProductBE.Services.Schedule;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Identity.Client.Extensibility;
 using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using System.Threading.Tasks;
 using VNPAY.Extensions;
+using CleanAgricultureProductBE.Repositories.DeliveryFee;
+using CleanAgricultureProductBE.Services.DeliveryFee;
+using CleanAgricultureProductBE.Repositories.PaymentMethod;
+using CleanAgricultureProductBE.Services.PaymentMethod;
+using CleanAgricultureProductBE.Services.Order;
+using CleanAgricultureProductBE.Repositories.Order;
+using CleanAgricultureProductBE.Services.Payment;
+using CleanAgricultureProductBE.Repositories.Payment;
+using CleanAgricultureProductBE.Services.OrderDetail;
+using CleanAgricultureProductBE.Repositories.OrderDetail;
+using CleanAgricultureProductBE.Services.Account;
 
 
 namespace CleanAgricultureProductBE
@@ -88,6 +104,9 @@ namespace CleanAgricultureProductBE
             // register token blacklist repo
             builder.Services.AddScoped<ITokenBlacklistRepository, TokenBlacklistRepository>();
 
+            //Account DI
+            builder.Services.AddScoped<IAccountService, AccountService>();
+
             // Product DI
             builder.Services.AddScoped<IProductService, ProductService>();
             builder.Services.AddScoped<IProductRepository, ProductRepository>();
@@ -126,6 +145,15 @@ namespace CleanAgricultureProductBE
             //VNPay DI
             builder.Services.AddScoped<IVnPayService, VnPayService>();
 
+            //Email DI
+            builder.Services.AddScoped<IEmailService, EmailService>();
+
+            // OTP DI
+            builder.Services.AddScoped<IPasswordResetOtpRepository, PasswordResetOtpRepository>();
+
+            //Schedule DI
+            builder.Services.AddScoped<IDeliveryScheduleRepository, DeliveryScheduleRepository>();
+            builder.Services.AddScoped<IDeliveryScheduleService, DeliveryScheduleService>();
 
             // JWT Authentication
             builder.Services

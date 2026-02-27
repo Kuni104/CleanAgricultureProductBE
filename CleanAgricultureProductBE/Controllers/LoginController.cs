@@ -1,7 +1,10 @@
 ﻿using CleanAgricultureProductBE.Data;
 using CleanAgricultureProductBE.DTOs;
+using CleanAgricultureProductBE.DTOs.OTP;
 using CleanAgricultureProductBE.DTOs.Response;
 using CleanAgricultureProductBE.Services;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CleanAgricultureProductBE.Controllers
@@ -62,33 +65,32 @@ namespace CleanAgricultureProductBE.Controllers
             }
         }
 
+        [Authorize]
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()
         {
-            var authHeader = Request.Headers["Authorization"].ToString();
-            if (string.IsNullOrWhiteSpace(authHeader))
-                return BadRequest(new { message = "Authorization header missing" });
-
-            var token = authHeader.StartsWith("Bearer", StringComparison.OrdinalIgnoreCase)
-                ? authHeader.Substring("Bearer".Length).Trim()
-                : authHeader.Trim();
+            var token = await HttpContext.GetTokenAsync("access_token");
 
             if (string.IsNullOrWhiteSpace(token))
-                return BadRequest(new { message = "Bearer token missing" });
+                return BadRequest(new { message = "Token not found" });
 
-            try
-            {
-                await _authService.LogoutAsync(token);
-                return NoContent();
-            }
-            catch(ArgumentException ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            catch (Exception)
-            {
-                return StatusCode(500, new { message = "Unable to logout at this time" });
-            }
+            await _authService.LogoutAsync(token);
+
+            return NoContent();
+        }
+
+        [HttpPost("request-reset-password")]
+        public async Task<IActionResult> RequestResetPassword(RequestResetPasswordDto dto)
+        {
+            await _authService.RequestResetPasswordAsync(dto.Email);
+            return Ok("OTP sent to email");
+        }
+
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword(ConfirmResetPasswordDto dto)
+        {
+            await _authService.ResetPasswordAsync(dto);
+            return Ok("Password reset successfully");
         }
     }
 }

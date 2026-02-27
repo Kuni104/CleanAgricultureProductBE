@@ -28,7 +28,7 @@ namespace CleanAgricultureProductBE.Controllers
             if (orders.ResultObject == null || orders.ResultObject.Count == 0)
             {
                 success = "true";
-                message = "No items in cart";
+                message = "Không có đơn hàng nào";
             }
             else
             {

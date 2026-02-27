@@ -4,9 +4,8 @@ namespace CleanAgricultureProductBE.Repositories.Cart
 {
     public interface ICartRepository
     {
-        //Cart
+        public Task CreateCart(Models.Cart cart);
         public Task<Models.Cart?> GetCartByCustomerId(Guid customerId);
-        //Cart Items
         public Task AddCartItem(Models.CartItem cartItem);
         public Task<List<Models.CartItem>> GetCartItemsByCartId(Guid cartId);
         public Task<List<Models.CartItem>> GetCartItemsByCartIdIncludeProduct(Guid cartId);

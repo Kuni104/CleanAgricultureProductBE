@@ -247,6 +247,167 @@ namespace CleanAgricultureProductBE.Services.Order
             return result;
         }
 
+        public async Task<ResponseDtoWithPagination<List<OrderResponseDto>>> GetAllOrdersAdmin(int? page, int? size, string? keyword)
+        {
+            bool isPagination = false;
+            int offset = 0;
+            int pageSize = 0;
+            if (page != null && size != null)
+            {
+                pageSize = (int)size;
+                offset = (int)((page - 1) * size);
+                isPagination = true;
+            }
+
+            var orders = await orderRepository.GetAllOrders();
+
+            int totalItems = orders.Count;
+
+            if (isPagination)
+            {
+                orders = await orderRepository.GetAllOrdersWithPagination(offset, pageSize);
+            }
+
+            var orderResponseList = new List<OrderResponseDto>();
+            foreach (var order in orders)
+            {
+                orderResponseList.Add(new OrderResponseDto
+                {
+                    OrderId = order.OrderId,
+                    CustomerName = order.Address.RecipientName,
+                    Address = order.Address.AddressDetail,
+                    //Payment = (Guid)order.PaymentId,
+                    Schedule = TimeZoneInfo.ConvertTimeFromUtc(order.Schedule.ScheduledDate, timeZone),
+                    TotalPrice = order.Payment.TotalAmount,
+                    OrderDate = TimeZoneInfo.ConvertTimeFromUtc(order.OrderDate, timeZone),
+                    OrderStatus = order.OrderStatus
+                });
+            }
+
+            var result = new ResponseDtoWithPagination<List<OrderResponseDto>>
+            {
+                ResultObject = orderResponseList
+            };
+
+            if (isPagination)
+            {
+                int totalPage = totalItems / pageSize + (totalItems % pageSize == 0 ? 1 : 0);
+                if (totalItems < pageSize || page <= size)
+                {
+                    totalPage = 1;
+                }
+
+                result.Pagination = new Pagination
+                {
+                    PageNumber = (int)page!,
+                    PageSize = pageSize,
+                    TotalItems = totalItems,
+                    TotalPages = totalPage
+                };
+            }
+
+            return result;
+
+        }
+
+        public async Task<ResponseDtoWithPagination<OrderDetailListResponseDto>> GetOrderDetailsAdmin(Guid orderId, int? page, int? size, string? keyword)
+        {
+            var order = await orderRepository.GetOrderByOrderId(orderId);
+            if (order == null)
+            {
+                return null!;
+            }
+
+            bool isPagination = false;
+            int offset = 0;
+            int pageSize = 0;
+            if (page != null && size != null)
+            {
+                pageSize = (int)size;
+                offset = (int)((page - 1) * size);
+                isPagination = true;
+            }
+
+            var orderDetailList = await orderDetailRepository.GetOrderDetailsByOrderId(orderId);
+
+            int totalItems = orderDetailList.Count;
+
+            if (isPagination)
+            {
+                orderDetailList = await orderDetailRepository.GetOrderDetailsByOrderIdWithPagination(orderId, offset, pageSize, keyword);
+            }
+
+            var orderDetailResponseList = new List<OrderDetailResponseDto>();
+            foreach (var orderDetail in orderDetailList)
+            {
+                orderDetailResponseList.Add(new OrderDetailResponseDto
+                {
+                    OrderDetailId = orderDetail.OrderDetailId,
+                    ProductId = orderDetail.ProductId,
+                    ProductName = orderDetail.Product.Name,
+                    Quantity = orderDetail.Quantity,
+                    TotalPrice = orderDetail.TotalPrice,
+                    CreatedAt = TimeZoneInfo.ConvertTimeFromUtc(orderDetail.CreatedAt, timeZone),
+                    ExpiryDate = TimeZoneInfo.ConvertTimeFromUtc(orderDetail.ExpiryDate, timeZone)
+                });
+            }
+
+            var orderDetailsResponse = new OrderDetailListResponseDto
+            {
+                OrderId = order.OrderId,
+                OrderDetails = orderDetailResponseList,
+                TotalPrice = order.Payment.TotalAmount
+            };
+
+            var result = new ResponseDtoWithPagination<OrderDetailListResponseDto>
+            {
+                ResultObject = orderDetailsResponse
+            };
+
+            if (isPagination)
+            {
+                int totalPage = totalItems / pageSize + (totalItems % pageSize == 0 ? 1 : 0);
+                if (totalItems < pageSize || page <= size)
+                {
+                    totalPage = 1;
+                }
+
+                result.Pagination = new Pagination
+                {
+                    PageNumber = (int)page!,
+                    PageSize = pageSize,
+                    TotalItems = totalItems,
+                    TotalPages = totalPage
+                };
+            }
+
+            return result;
+        }
+
+        public async Task<OrderResponseDto> UpdateOrderStatus(Guid orderId, UpdateOrderStatusRequestDto request)
+        {
+            var order = await orderRepository.GetOrderByOrderId(orderId);
+            if (order == null)
+            {
+                return null!;
+            }
+
+            order.OrderStatus = request.Status;
+            await orderRepository.UpdateOrder(order);
+
+            return new OrderResponseDto
+            {
+                OrderId = order.OrderId,
+                CustomerName = order.Address.RecipientName,
+                Address = order.Address.AddressDetail,
+                //Payment = (Guid)order.PaymentId,
+                Schedule = TimeZoneInfo.ConvertTimeFromUtc(order.Schedule.ScheduledDate, timeZone),
+                TotalPrice = order.Payment.TotalAmount,
+                OrderDate = TimeZoneInfo.ConvertTimeFromUtc(order.OrderDate, timeZone),
+                OrderStatus = order.OrderStatus
+            };
+        }
+
         private async Task<Models.Cart> GetCartByAccoutEmail(string accountEmail)
         {
             var account = await accountRepository.GetByEmailAsync(accountEmail);

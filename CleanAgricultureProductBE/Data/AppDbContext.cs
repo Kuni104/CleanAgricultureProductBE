@@ -24,6 +24,8 @@ namespace CleanAgricultureProductBE.Data
         public DbSet<DeliveryFee> DeliveryFees => Set<DeliveryFee>();
         public DbSet<PaymentMethod> PaymentMethods => Set<PaymentMethod>();
         public DbSet<Payment> Payments => Set<Payment>();
+        public DbSet<PasswordResetOtp> PasswordResetOtps => Set<PasswordResetOtp>();
+        public DbSet<DeliverySchedule> DeliverySchedules => Set<DeliverySchedule>();
         // Blacklisted tokens for logout/revocation
         public DbSet<BlackListedToken> BlacklistedTokens => Set<BlackListedToken>();
 
