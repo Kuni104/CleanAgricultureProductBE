@@ -1,7 +1,10 @@
 ﻿using CleanAgricultureProductBE.DTOs;
+using CleanAgricultureProductBE.DTOs.OTP;
 using CleanAgricultureProductBE.Models;
 using CleanAgricultureProductBE.Repositories;
 using CleanAgricultureProductBE.Repositories.Cart;
+using CleanAgricultureProductBE.Repositories.OTP;
+using CleanAgricultureProductBE.Services.Email;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -16,13 +19,23 @@ namespace CleanAgricultureProductBE.Services
         private readonly ICartRepository _cartRepo;
         private readonly IConfiguration _config;
         private readonly ITokenBlacklistRepository _tokenBlacklistRepo;
+        private readonly IPasswordResetOtpRepository _otpRepo;
+        private readonly IEmailService _emailService;
 
-        public AuthService(IAccountRepository accountRepo, ICartRepository cartRepo, IConfiguration config, ITokenBlacklistRepository tokenBlacklistRepo)
+        public AuthService(
+            IAccountRepository accountRepo,
+            ICartRepository cartRepo,
+            IConfiguration config,
+            ITokenBlacklistRepository tokenBlacklistRepo,
+            IPasswordResetOtpRepository otpRepo,
+            IEmailService emailService)
         {
             _accountRepo = accountRepo;
             _cartRepo = cartRepo;
             _config = config;
             _tokenBlacklistRepo = tokenBlacklistRepo;
+            _otpRepo = otpRepo;
+            _emailService = emailService;
         }
 
         public async Task<object> LoginAsync(LoginRequestDto dto)
@@ -141,10 +154,10 @@ namespace CleanAgricultureProductBE.Services
         {
             var claims = new[]
             {
-                new Claim(ClaimTypes.NameIdentifier, account.AccountId.ToString()),
-                new Claim(ClaimTypes.Email, account.Email),
-                new Claim(ClaimTypes.Role, account.Role.RoleName)
-            };
+        new Claim(ClaimTypes.NameIdentifier, account.AccountId.ToString()),
+        new Claim(ClaimTypes.Email, account.Email),
+        new Claim(ClaimTypes.Role, account.Role.RoleName)
+    };
 
             var key = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(_config["Jwt:Key"]!)
@@ -154,11 +167,55 @@ namespace CleanAgricultureProductBE.Services
                 issuer: _config["Jwt:Issuer"],
                 audience: _config["Jwt:Audience"],
                 claims: claims,
-                expires: DateTime.Now.AddHours(2),
+                notBefore: DateTime.UtcNow,
+                expires: DateTime.UtcNow.AddHours(2),
                 signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256)
             );
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
+        public async Task RequestResetPasswordAsync(string email)
+        {
+            var user = await _accountRepo.GetByEmailAsync(email);
+            if (user == null)
+                throw new Exception("Email not found");
+
+            var otpCode = new Random().Next(100000, 999999).ToString();
+
+            var otp = new PasswordResetOtp
+            {
+                Email = email,
+                OtpCode = otpCode,
+                ExpiredAt = DateTime.UtcNow.AddMinutes(5),
+                IsUsed = false
+            };
+
+            await _otpRepo.AddAsync(otp);
+            await _otpRepo.SaveChangesAsync();
+
+            await _emailService.SendEmailAsync(email, "Reset Password OTP", $"Your OTP is: {otpCode}");
+        }
+
+        public async Task ResetPasswordAsync(ConfirmResetPasswordDto dto)
+        {
+            var otp = await _otpRepo.GetValidOtpAsync(dto.Email, dto.Otp);
+
+            if (otp == null)
+                throw new Exception("Invalid or expired OTP");
+
+            var user = await _accountRepo.GetByEmailAsync(dto.Email);
+            if (user == null)
+                throw new Exception("User not found");
+
+            var hasher = new PasswordHasher<Account>();
+            user.PasswordHash = hasher.HashPassword(user, dto.NewPassword);
+
+            otp.IsUsed = true;
+
+            await _accountRepo.UpdateAsync(user);
+            await _otpRepo.SaveChangesAsync();
+        }
+
     }
 }

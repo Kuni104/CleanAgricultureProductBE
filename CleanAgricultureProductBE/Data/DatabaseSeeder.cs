@@ -8,7 +8,7 @@ namespace CleanAgricultureProductBE.Data
     {
         public static async Task SeedAsync(AppDbContext context)
         {
-            await context.Database.MigrateAsync();
+            
 
             //Account seeding
             if (!await context.Set<Account>().AnyAsync())
@@ -66,20 +66,62 @@ namespace CleanAgricultureProductBE.Data
             }
 
             //UserProfile seeding
-            if (!await context.Set<UserProfile>().AnyAsync())
+            //if (!await context.Set<UserProfile>().AnyAsync())
+            if(true)
             {
-                var userProfile = new UserProfile
+                var userProfileList = new List<UserProfile>
                 {
-                    UserProfileId = Guid.NewGuid(),
-                    AccountId = context.Set<Account>()
+                    new UserProfile
+                    {
+                        UserProfileId = Guid.NewGuid(),
+                        AccountId = context.Set<Account>()
+                                        .Where(a => a.Email == "admin@gmail.com")
+                                        .Select(a => a.AccountId)
+                                        .FirstOrDefault(),
+                        FirstName = "John",
+                        LastName = "Admin"
+                    },
+                    new UserProfile
+                    {
+                        UserProfileId = Guid.NewGuid(),
+                        AccountId = context.Set<Account>()
                                         .Where(a => a.Email == "user@gmail.com")
                                         .Select(a => a.AccountId)
                                         .FirstOrDefault(),
-                    FirstName = "John",
-                    LastName = "Doe"
+                        FirstName = "John",
+                        LastName = "Doe"
+                    },
+                    new UserProfile
+                    {
+                        UserProfileId = Guid.NewGuid(),
+                        AccountId = context.Set<Account>()
+                                        .Where(a => a.Email == "staff@gmail.com")
+                                        .Select(a => a.AccountId)
+                                        .FirstOrDefault(),
+                        FirstName = "John",
+                        LastName = "Staff"
+                    },
+                    new UserProfile
+                    {
+                        UserProfileId = Guid.NewGuid(),
+                        AccountId = context.Set<Account>()
+                                        .Where(a => a.Email == "delivery@gmail.com")
+                                        .Select(a => a.AccountId)
+                                        .FirstOrDefault(),
+                        FirstName = "John",
+                        LastName = "Deliverer"
+                    }
                 };
+                
+                var existUserProfiles = await context.Set<UserProfile>()
+                                            .Where(up => userProfileList.Select(u => u.AccountId).Contains(up.AccountId))
+                                            .ToListAsync();
 
-                context.Set<UserProfile>().Add(userProfile);
+                var newUserProfiles = userProfileList
+                                    .Where(up => !existUserProfiles.Any(eup => eup.AccountId == up.AccountId))
+                                    .ToList();
+
+                context.Set<UserProfile>().AddRange(newUserProfiles);
                 await context.SaveChangesAsync();
             }
 
