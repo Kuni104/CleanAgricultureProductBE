@@ -304,6 +304,36 @@ namespace CleanAgricultureProductBE.Migrations
                     b.ToTable("DeliveryFees");
                 });
 
+            modelBuilder.Entity("CleanAgricultureProductBE.Models.DeliverySchedule", b =>
+                {
+                    b.Property<Guid>("DeliveryScheduleId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("AssignedStaffId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("OrderId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("ScheduledDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.HasKey("DeliveryScheduleId");
+
+                    b.HasIndex("AssignedStaffId");
+
+                    b.HasIndex("OrderId");
+
+                    b.ToTable("DeliverySchedules");
+                });
+
             modelBuilder.Entity("CleanAgricultureProductBE.Models.Order", b =>
                 {
                     b.Property<Guid>("OrderId")
@@ -380,6 +410,33 @@ namespace CleanAgricultureProductBE.Migrations
                         .IsUnique();
 
                     b.ToTable("OrderDetails");
+                });
+
+            modelBuilder.Entity("CleanAgricultureProductBE.Models.PasswordResetOtp", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("ExpiredAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsUsed")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("OtpCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PasswordResetOtps");
                 });
 
             modelBuilder.Entity("CleanAgricultureProductBE.Models.Payment", b =>
@@ -692,6 +749,23 @@ namespace CleanAgricultureProductBE.Migrations
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Order");
+                });
+
+            modelBuilder.Entity("CleanAgricultureProductBE.Models.DeliverySchedule", b =>
+                {
+                    b.HasOne("CleanAgricultureProductBE.Models.Account", "AssignedStaff")
+                        .WithMany()
+                        .HasForeignKey("AssignedStaffId");
+
+                    b.HasOne("CleanAgricultureProductBE.Models.Order", "Order")
+                        .WithMany()
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AssignedStaff");
 
                     b.Navigation("Order");
                 });
