@@ -2,6 +2,7 @@
 using CleanAgricultureProductBE.DTOs.OTP;
 using CleanAgricultureProductBE.Models;
 using CleanAgricultureProductBE.Repositories;
+using CleanAgricultureProductBE.Repositories.Cart;
 using CleanAgricultureProductBE.Repositories.OTP;
 using CleanAgricultureProductBE.Services.Email;
 using Microsoft.AspNetCore.Identity;
@@ -15,6 +16,7 @@ namespace CleanAgricultureProductBE.Services
     public class AuthService : IAuthService
     {
         private readonly IAccountRepository _accountRepo;
+        private readonly ICartRepository _cartRepo;
         private readonly IConfiguration _config;
         private readonly ITokenBlacklistRepository _tokenBlacklistRepo;
         private readonly IPasswordResetOtpRepository _otpRepo;
@@ -22,12 +24,14 @@ namespace CleanAgricultureProductBE.Services
 
         public AuthService(
             IAccountRepository accountRepo,
+            ICartRepository cartRepo,
             IConfiguration config,
             ITokenBlacklistRepository tokenBlacklistRepo,
             IPasswordResetOtpRepository otpRepo,
             IEmailService emailService)
         {
             _accountRepo = accountRepo;
+            _cartRepo = cartRepo;
             _config = config;
             _tokenBlacklistRepo = tokenBlacklistRepo;
             _otpRepo = otpRepo;
@@ -41,7 +45,7 @@ namespace CleanAgricultureProductBE.Services
             if (account == null || account.Status != "Active")
                 throw new Exception("Invalid credentials");
 
-            var hasher = new PasswordHasher<Account>();
+            var hasher = new PasswordHasher<Models.Account>();
 
             var result = hasher.VerifyHashedPassword(
                 account,
@@ -100,7 +104,7 @@ namespace CleanAgricultureProductBE.Services
             var existing = await _accountRepo.GetByEmailAsync(dto.Email);
             if(existing != null)    throw new Exception("Email already in use");
 
-            var account = new Account
+            var account = new Models.Account
             {
                 AccountId = Guid.NewGuid(),
                 RoleId = 2,
@@ -112,12 +116,23 @@ namespace CleanAgricultureProductBE.Services
                     UserProfileId = Guid.NewGuid(),
                     FirstName = dto.FirstName,
                     LastName = dto.LastName,
-                }
+                },
             };
 
-            var hasher = new PasswordHasher<Account>();
+            var hasher = new PasswordHasher<Models.Account>();
             account.PasswordHash = hasher.HashPassword(account, dto.Password);
             var created = await _accountRepo.CreateAsync(account);
+
+            var newCart = new Models.Cart
+            {
+                CartId = Guid.NewGuid(),
+                Customer = created.UserProfile,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow,
+            };
+
+            await _cartRepo.CreateCart(newCart);
+
             var token = GenerateJwt(created);
 
             var loginUser = new LoginResponseUserDto
@@ -135,7 +150,7 @@ namespace CleanAgricultureProductBE.Services
             };
         }
 
-        private string GenerateJwt(Account account)
+        private string GenerateJwt(Models.Account account)
         {
             var claims = new[]
             {

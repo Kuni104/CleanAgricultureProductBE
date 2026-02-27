@@ -28,6 +28,17 @@ using Scalar.AspNetCore;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using System.Threading.Tasks;
+using CleanAgricultureProductBE.Repositories.DeliveryFee;
+using CleanAgricultureProductBE.Services.DeliveryFee;
+using CleanAgricultureProductBE.Repositories.PaymentMethod;
+using CleanAgricultureProductBE.Services.PaymentMethod;
+using CleanAgricultureProductBE.Services.Order;
+using CleanAgricultureProductBE.Repositories.Order;
+using CleanAgricultureProductBE.Services.Payment;
+using CleanAgricultureProductBE.Repositories.Payment;
+using CleanAgricultureProductBE.Services.OrderDetail;
+using CleanAgricultureProductBE.Repositories.OrderDetail;
+using CleanAgricultureProductBE.Services.Account;
 
 
 namespace CleanAgricultureProductBE
@@ -79,6 +90,9 @@ namespace CleanAgricultureProductBE
             builder.Services.AddScoped<IAccountRepository, AccountRepository>();
             // register token blacklist repo
             builder.Services.AddScoped<ITokenBlacklistRepository, TokenBlacklistRepository>();
+
+            //Account DI
+            builder.Services.AddScoped<IAccountService, AccountService>();
 
             // Product DI
             builder.Services.AddScoped<IProductService, ProductService>();
