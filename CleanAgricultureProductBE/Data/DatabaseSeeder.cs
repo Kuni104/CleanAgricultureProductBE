@@ -8,7 +8,7 @@ namespace CleanAgricultureProductBE.Data
     {
         public static async Task SeedAsync(AppDbContext context)
         {
-            await context.Database.MigrateAsync();
+            
 
             //Account seeding
             if (!await context.Set<Account>().AnyAsync())

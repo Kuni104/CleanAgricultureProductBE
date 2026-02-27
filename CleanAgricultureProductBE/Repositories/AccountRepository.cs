@@ -32,5 +32,11 @@ namespace CleanAgricultureProductBE.Repositories
                                     .Include(a => a.Role)
                                     .FirstOrDefaultAsync(a => a.Email == email);
         }
+
+        public async Task UpdateAsync(Account account)
+        {
+            _context.Accounts.Update(account);
+            await _context.SaveChangesAsync();
+        }
     }
 }

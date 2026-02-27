@@ -1,28 +1,33 @@
 using CleanAgricultureProductBE.Data;
-using CleanAgricultureProductBE.Repositories;
-using CleanAgricultureProductBE.Services;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using CleanAgricultureProductBE.Models;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using Scalar.AspNetCore;
-using System.Text;
-using CleanAgricultureProductBE.Services.Cart;
+using CleanAgricultureProductBE.Repositories;
 using CleanAgricultureProductBE.Repositories.Cart;
 using CleanAgricultureProductBE.Repositories.CartItem;
-using System.IdentityModel.Tokens.Jwt;
-using System.Threading.Tasks;
 using CleanAgricultureProductBE.Repositories.DeliveryFee;
-using CleanAgricultureProductBE.Services.DeliveryFee;
-using CleanAgricultureProductBE.Repositories.PaymentMethod;
-using CleanAgricultureProductBE.Services.PaymentMethod;
-using CleanAgricultureProductBE.Services.Order;
 using CleanAgricultureProductBE.Repositories.Order;
-using CleanAgricultureProductBE.Services.Payment;
-using CleanAgricultureProductBE.Repositories.Payment;
-using CleanAgricultureProductBE.Services.OrderDetail;
 using CleanAgricultureProductBE.Repositories.OrderDetail;
+using CleanAgricultureProductBE.Repositories.OTP;
+using CleanAgricultureProductBE.Repositories.Payment;
+using CleanAgricultureProductBE.Repositories.PaymentMethod;
+using CleanAgricultureProductBE.Repositories.Schedule;
+using CleanAgricultureProductBE.Services;
+using CleanAgricultureProductBE.Services.Cart;
+using CleanAgricultureProductBE.Services.DeliveryFee;
+using CleanAgricultureProductBE.Services.Email;
+using CleanAgricultureProductBE.Services.Order;
+using CleanAgricultureProductBE.Services.OrderDetail;
+using CleanAgricultureProductBE.Services.Payment;
+using CleanAgricultureProductBE.Services.PaymentMethod;
+using CleanAgricultureProductBE.Services.Schedule;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Identity.Client.Extensibility;
+using Microsoft.IdentityModel.Tokens;
+using Scalar.AspNetCore;
+using System.IdentityModel.Tokens.Jwt;
+using System.Text;
+using System.Threading.Tasks;
 
 
 namespace CleanAgricultureProductBE
@@ -109,6 +114,16 @@ namespace CleanAgricultureProductBE
             //Payment DI
             builder.Services.AddScoped<IPaymentService, PaymentService>();
             builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
+
+            //Email DI
+            builder.Services.AddScoped<IEmailService, EmailService>();
+
+            // OTP DI
+            builder.Services.AddScoped<IPasswordResetOtpRepository, PasswordResetOtpRepository>();
+
+            //Schedule DI
+            builder.Services.AddScoped<IDeliveryScheduleRepository, DeliveryScheduleRepository>();
+            builder.Services.AddScoped<IDeliveryScheduleService, DeliveryScheduleService>();
 
             // JWT Authentication
             builder.Services
