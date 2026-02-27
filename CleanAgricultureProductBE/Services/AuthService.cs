@@ -208,7 +208,7 @@ namespace CleanAgricultureProductBE.Services
             if (user == null)
                 throw new Exception("User not found");
 
-            var hasher = new PasswordHasher<Account>();
+            var hasher = new PasswordHasher<Models.Account>();
             user.PasswordHash = hasher.HashPassword(user, dto.NewPassword);
 
             otp.IsUsed = true;

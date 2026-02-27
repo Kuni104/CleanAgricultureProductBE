@@ -30,18 +30,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using System.Threading.Tasks;
 using VNPAY.Extensions;
-using CleanAgricultureProductBE.Repositories.DeliveryFee;
-using CleanAgricultureProductBE.Services.DeliveryFee;
-using CleanAgricultureProductBE.Repositories.PaymentMethod;
-using CleanAgricultureProductBE.Services.PaymentMethod;
-using CleanAgricultureProductBE.Services.Order;
-using CleanAgricultureProductBE.Repositories.Order;
-using CleanAgricultureProductBE.Services.Payment;
-using CleanAgricultureProductBE.Repositories.Payment;
-using CleanAgricultureProductBE.Services.OrderDetail;
-using CleanAgricultureProductBE.Repositories.OrderDetail;
 using CleanAgricultureProductBE.Services.Account;
-
 
 namespace CleanAgricultureProductBE
 {
