@@ -1,4 +1,5 @@
-﻿
+using System;
+using System.Threading.Tasks;
 using CleanAgricultureProductBE.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -51,6 +52,16 @@ namespace CleanAgricultureProductBE.Repositories.Order
             await context.SaveChangesAsync();
         }
 
+        public async Task<Models.Order> GetOrderById(Guid orderId)
+        {
+            return await context.Orders.FindAsync(orderId);
+        }
+
+        public Task UpdateAsync(Models.Order order)
+        {
+            context.Orders.Update(order);
+            return context.SaveChangesAsync();
+        }
         public async Task<List<Models.Order>> GetOrdersByCustomerId(Guid customerId)
         {
             return await context.Orders.Where(o => o.CustomerId == customerId)
