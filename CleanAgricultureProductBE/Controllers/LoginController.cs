@@ -1,6 +1,7 @@
 ﻿using CleanAgricultureProductBE.Data;
 using CleanAgricultureProductBE.DTOs;
 using CleanAgricultureProductBE.DTOs.OTP;
+using CleanAgricultureProductBE.DTOs.Response;
 using CleanAgricultureProductBE.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
@@ -29,7 +30,14 @@ namespace CleanAgricultureProductBE.Controllers
             try
             {
                 var result = await _authService.LoginAsync(dto);
-                return Ok(result);
+                var apiResponse = new ResponseObject<LoginResponseDto>
+                {
+                    Success = "success",
+                    Message = "Login successful",
+                    Data = (LoginResponseDto) result
+                };
+
+                return Ok(apiResponse);
             }
             catch (Exception ex)
             {

@@ -1,12 +1,14 @@
 ﻿using CleanAgricultureProductBE.DTOs.PaymentMethod;
 using CleanAgricultureProductBE.DTOs.Response;
 using CleanAgricultureProductBE.Services.PaymentMethod;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CleanAgricultureProductBE.Controllers
 {
-    [Route("api/[controller]")]
+    [Authorize(Roles = "Admin,Staff")]
+    [Route("api/payment-method")]
     [ApiController]
     public class PaymentMethodController(IPaymentMethodService paymentMethodService) : ControllerBase
     {
@@ -65,13 +67,13 @@ namespace CleanAgricultureProductBE.Controllers
             return result != null ? Ok(response) : BadRequest(response);
         }
 
-        [HttpPut("{id}")] 
-        public async Task<IActionResult> UpdatePaymentMethod(int id, [FromBody]PaymentMethodRequestDto request)
+        [HttpPut("{paymentMethodId}")] 
+        public async Task<IActionResult> UpdatePaymentMethod(int paymentMethodId, [FromBody]PaymentMethodRequestDto request)
         {
             var success = "";
             var message = "";
 
-            var result = await paymentMethodService.UpdatePaymentMethod(id, request);
+            var result = await paymentMethodService.UpdatePaymentMethod(paymentMethodId, request);
             if (result != null)
             {
                 success = "true";
@@ -93,13 +95,13 @@ namespace CleanAgricultureProductBE.Controllers
             return Ok(response);
         }
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeletePaymentMethod(int id)
+        [HttpDelete("{paymentMethodId}")]
+        public async Task<IActionResult> DeletePaymentMethod(int paymentMethodId)
         {
             var success = "";
             var message = "";
 
-            var result = await paymentMethodService.DeletePaymentMethod(id);
+            var result = await paymentMethodService.DeletePaymentMethod(paymentMethodId);
             if (result)
             {
                 success = "true";

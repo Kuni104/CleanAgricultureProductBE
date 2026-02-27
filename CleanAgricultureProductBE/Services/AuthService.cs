@@ -54,12 +54,18 @@ namespace CleanAgricultureProductBE.Services
 
             var token = GenerateJwt(account);
 
-            return new LoginResponseDto
+            var loginUser = new LoginResponseUserDto
             {
-                Token = token,
                 AccountId = account.AccountId,
                 Email = account.Email,
+                Name = account.UserProfile.FirstName + " " + account.UserProfile.LastName,
                 Role = account.Role.RoleName
+            };
+
+            return new LoginResponseDto
+            {
+                AccessToken = token,
+                User = loginUser
             };
         }
 
@@ -113,12 +119,19 @@ namespace CleanAgricultureProductBE.Services
             account.PasswordHash = hasher.HashPassword(account, dto.Password);
             var created = await _accountRepo.CreateAsync(account);
             var token = GenerateJwt(created);
-            return new LoginResponseDto
+
+            var loginUser = new LoginResponseUserDto
             {
-                Token = token,
                 AccountId = created.AccountId,
                 Email = created.Email,
+                Name = account.UserProfile.FirstName + " " + account.UserProfile.LastName,
                 Role = created.Role.RoleName ?? "Customer"
+            };
+
+            return new LoginResponseDto
+            {
+                AccessToken = token,
+                User = loginUser
             };
         }
 

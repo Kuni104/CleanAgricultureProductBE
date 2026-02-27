@@ -146,32 +146,30 @@ namespace CleanAgricultureProductBE
 
                     // Reject blacklisted tokens on validation
                     // Comment from here for temporary fix the JWT error
-                    options.Events = new JwtBearerEvents
-                    {
-                       OnTokenValidated = async context =>
-                       {
-                           var path = context.HttpContext.Request.Path.Value;
-                           if (path != null && path.Contains("/api/login/logout"))
-                               return;
-                           var token = context.SecurityToken as JwtSecurityToken;
-                           if(token == null)
-                           {
-                               context.Fail("Invalid token");
-                               return;
-                           }
+                    //options.Events = new JwtBearerEvents
+                    //{
+                    //   OnTokenValidated = async context =>
+                    //   {
+                    //       var token = context.SecurityToken as JwtSecurityToken;
+                    //       if (token == null)
+                    //       {
+                    //           context.Fail("Invalid token");
+                    //           return;
+                    //       }
 
-                           var tokenString = token.RawData;
-
-                           var repo = context.HttpContext.RequestServices.GetRequiredService<ITokenBlacklistRepository>();
-
-                           var isBlacklisted = await repo.IsBlacklistedAsync(tokenString);
-
-                           if (isBlacklisted)
-                           {
-                               context.Fail("token revoked");
-                           }
-                       }
-                    };
+                    //       var tokenString = token.RawData;
+                    //       // Resolve repository from DI
+                    //       var repo = context.HttpContext.RequestServices.GetService<ITokenBlacklistRepository>();
+                    //       if (repo != null)
+                    //       {
+                    //           var isBlacklisted = await repo.IsBlacklistedAsync(tokenString);
+                    //           if (isBlacklisted)
+                    //           {
+                    //               context.Fail("Token revoked");
+                    //           }
+                    //       }
+                    //   }
+                    //};
                     // Comment End Here
                 });
 
