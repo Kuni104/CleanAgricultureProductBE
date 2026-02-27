@@ -111,7 +111,7 @@ namespace CleanAgricultureProductBE.Services
                 Email = dto.Email,
                 Status = "Active",
                 PhoneNumber = dto.PhoneNumber ?? string.Empty,
-                UserProfile = new UserProfile
+                UserProfile = new Models.UserProfile
                 {
                     UserProfileId = Guid.NewGuid(),
                     FirstName = dto.FirstName,

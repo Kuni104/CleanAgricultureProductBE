@@ -85,7 +85,7 @@ namespace CleanAgricultureProductBE.Services.Account
                 PhoneNumber = request.PhoneNumber,
                 RoleId = request.RoleId,
                 Status = "Active",
-                UserProfile = new UserProfile
+                UserProfile = new Models.UserProfile
                 {
                     UserProfileId = Guid.NewGuid(),
                     FirstName = request.FirstName,

@@ -31,6 +31,8 @@ using System.Text;
 using System.Threading.Tasks;
 using VNPAY.Extensions;
 using CleanAgricultureProductBE.Services.Account;
+using CleanAgricultureProductBE.Repositories.UserProfile;
+using CleanAgricultureProductBE.Services.UserProfile;
 
 namespace CleanAgricultureProductBE
 {
@@ -95,6 +97,10 @@ namespace CleanAgricultureProductBE
 
             //Account DI
             builder.Services.AddScoped<IAccountService, AccountService>();
+
+            //User Profile DI
+            builder.Services.AddScoped<IUserProfileRepository, UserProfileRepository>();
+            builder.Services.AddScoped<IUserProfileService, UserProfileService>();
 
             // Product DI
             builder.Services.AddScoped<IProductService, ProductService>();
