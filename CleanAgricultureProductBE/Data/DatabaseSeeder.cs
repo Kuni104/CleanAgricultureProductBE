@@ -251,7 +251,7 @@ namespace CleanAgricultureProductBE.Data
             }
 
             //PaymentMethod seeding
-            if (!await context.Set<PaymentMethod>().AnyAsync())
+            if (true)
             {
                 var paymentMethods = new List<PaymentMethod>
                 {
@@ -265,7 +265,15 @@ namespace CleanAgricultureProductBE.Data
                     },
                 };
 
-                context.Set<PaymentMethod>().AddRange(paymentMethods);
+                var existPaymentMethods = await context.Set<PaymentMethod>()
+                                            .Where(pm => paymentMethods.Select(p => p.MethodName).Contains(pm.MethodName))
+                                            .ToListAsync();
+
+                var newPaymentMethods = paymentMethods
+                                    .Where(pm => !existPaymentMethods.Any(epm => epm.MethodName == pm.MethodName))
+                                    .ToList();
+
+                context.Set<PaymentMethod>().AddRange(newPaymentMethods);
                 await context.SaveChangesAsync();
             }
 
