@@ -13,16 +13,17 @@ using CleanAgricultureProductBE.Repositories.OrderDetail;
 using CleanAgricultureProductBE.Repositories.Payment;
 using CleanAgricultureProductBE.Services.Cart;
 using CleanAgricultureProductBE.Services.DeliveryFee;
+using CleanAgricultureProductBE.Services.VnPay;
 
 namespace CleanAgricultureProductBE.Services.Order
 {
-    public class OrderService(IAccountRepository accountRepository, IOrderRepository orderRepository, IOrderDetailRepository orderDetailRepository, ICartRepository cartRepository,IDeliveryFeeRepository deliveryFeeRepository, IPaymentRepository paymentRepository ) : IOrderService
+    public class OrderService(IAccountRepository accountRepository, IOrderRepository orderRepository, IOrderDetailRepository orderDetailRepository, ICartRepository cartRepository,IDeliveryFeeRepository deliveryFeeRepository, IPaymentRepository paymentRepository, IVnPayService vnPayService ) : IOrderService
     {
         //UTC+7 timezone
         private readonly TimeZoneInfo timeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
 
         //Place order
-        public async Task<OrderResponseDto> PlaceOrder(string accountEmail, OrderRequestDto request)
+        public async Task<PlaceOrderResponseDto> PlaceOrder(string accountEmail, OrderRequestDto request)
         {
             //var timeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
 
@@ -36,14 +37,11 @@ namespace CleanAgricultureProductBE.Services.Order
 
             var payment = new Models.Payment();
 
-            if (request.PaymentMethodId == 1)
-            {
-                payment.PaymentId = Guid.NewGuid();
-                payment.PaymentMethodId = request.PaymentMethodId;
-                payment.PaymentStatus = "Waiting";
-                payment.TotalAmount = totalOrderPrice;
-                payment.CreatedAt = DateTime.UtcNow;
-            }
+            payment.PaymentId = Guid.NewGuid();
+            payment.PaymentMethodId = request.PaymentMethodId;
+            payment.PaymentStatus = "Waiting";
+            payment.TotalAmount = totalOrderPrice;
+            payment.CreatedAt = DateTime.UtcNow;
 
             await paymentRepository.AddPayment(payment);
 
@@ -82,19 +80,31 @@ namespace CleanAgricultureProductBE.Services.Order
 
             order = await orderRepository.GetOrderByOrderId(order.OrderId);
 
-            var orderReponse = new OrderResponseDto
+            string paymentUrl = string.Empty;
+
+            if (true) {
+                paymentUrl = vnPayService.CreatePaymentUrl(new VNPAY.Models.VnpayPaymentRequest
+                {
+                    Money = (double)totalOrderPrice,
+                    BankCode = 0,
+                    Description = order.PaymentId.ToString(),
+                    Language = 0
+                });
+            }
+
+            var orderResponse = new PlaceOrderResponseDto
             {
                 OrderId = order!.OrderId,
                 CustomerName = order.Address.RecipientName,
                 Address = order.Address.AddressDetail,
-                //Payment = (Guid)order.PaymentId,
                 Schedule = TimeZoneInfo.ConvertTimeFromUtc(order.Schedule.ScheduledDate, timeZone),
                 TotalPrice = totalOrderPrice,
                 OrderDate = TimeZoneInfo.ConvertTimeFromUtc(order.OrderDate, timeZone),
-                OrderStatus = order.OrderStatus,            
+                OrderStatus = order.OrderStatus,    
+                PaymentUrl = paymentUrl
             };
 
-            return orderReponse;
+            return orderResponse;
         }
 
         //Get all orders

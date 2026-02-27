@@ -13,5 +13,6 @@ namespace CleanAgricultureProductBE.Repositories.Order
         Task UpdateAsync(Models.Order order);
         public Task<List<Models.Order>> GetOrdersByCustomerId(Guid customerId);
         public Task<List<Models.Order>> GetOrdersByCustomerIdWithPagination(Guid customerId, int offset, int pageSize);
+        public Task TestUpdateOrderWithPayment(Models.Order order);
     }
 }

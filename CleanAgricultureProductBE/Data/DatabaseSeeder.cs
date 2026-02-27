@@ -258,7 +258,11 @@ namespace CleanAgricultureProductBE.Data
                     new PaymentMethod 
                     {
                         MethodName = "Cash On Delivery" 
-                    }
+                    },
+                    new PaymentMethod 
+                    {
+                        MethodName = "VNPay" 
+                    },
                 };
 
                 context.Set<PaymentMethod>().AddRange(paymentMethods);

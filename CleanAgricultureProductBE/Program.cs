@@ -18,6 +18,7 @@ using CleanAgricultureProductBE.Services.Order;
 using CleanAgricultureProductBE.Services.OrderDetail;
 using CleanAgricultureProductBE.Services.Payment;
 using CleanAgricultureProductBE.Services.PaymentMethod;
+using CleanAgricultureProductBE.Services.VnPay;
 using CleanAgricultureProductBE.Services.Schedule;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -28,6 +29,7 @@ using Scalar.AspNetCore;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using System.Threading.Tasks;
+using VNPAY.Extensions;
 using CleanAgricultureProductBE.Repositories.DeliveryFee;
 using CleanAgricultureProductBE.Services.DeliveryFee;
 using CleanAgricultureProductBE.Repositories.PaymentMethod;
@@ -80,6 +82,17 @@ namespace CleanAgricultureProductBE
                 });
             });
 
+            var vnpayConfig = builder.Configuration.GetSection("VNPAY");
+
+            builder.Services.AddVnpayClient(config =>
+            {
+                config.TmnCode = vnpayConfig["TmnCode"]!;
+                config.HashSecret = vnpayConfig["HashSecret"]!;
+                config.CallbackUrl = vnpayConfig["CallbackUrl"]!;
+                // config.BaseUrl = vnpayConfig["BaseUrl"]!; // Tùy chọn. Nếu không thiết lập, giá trị mặc định là URL thanh toán môi trường TEST
+                // config.Version = vnpayConfig["Version"]!; // Tùy chọn. Nếu không thiết lập, giá trị mặc định là "2.1.0"
+                // config.OrderType = vnpayConfig["OrderType"]!; // Tùy chọn. Nếu không thiết lập, giá trị mặc định là "other"
+            });
 
             builder.Services.AddOpenApi();
 
@@ -128,6 +141,9 @@ namespace CleanAgricultureProductBE
             //Payment DI
             builder.Services.AddScoped<IPaymentService, PaymentService>();
             builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
+
+            //VNPay DI
+            builder.Services.AddScoped<IVnPayService, VnPayService>();
 
             //Email DI
             builder.Services.AddScoped<IEmailService, EmailService>();

@@ -84,5 +84,11 @@ namespace CleanAgricultureProductBE.Repositories.Order
                                        .ToListAsync();
         }
 
+        public async Task TestUpdateOrderWithPayment(Models.Order order)
+        {
+            context.Orders.Update(order);
+            await context.SaveChangesAsync();
+        }
+
     }
 }
