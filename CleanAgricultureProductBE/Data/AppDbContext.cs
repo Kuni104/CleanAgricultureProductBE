@@ -68,7 +68,8 @@ namespace CleanAgricultureProductBE.Data
                 entity.HasOne(a => a.Staff)
                       .WithMany(r => r.Complaints)
                       .HasForeignKey(a => a.StaffId)
-                      .OnDelete(DeleteBehavior.Cascade);
+                      .OnDelete(DeleteBehavior.SetNull)
+                      .IsRequired(false);
 
             });
 
