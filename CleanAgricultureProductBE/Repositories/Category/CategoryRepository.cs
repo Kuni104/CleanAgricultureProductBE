@@ -1,8 +1,8 @@
 using CleanAgricultureProductBE.Data;
-using CleanAgricultureProductBE.Models;
 using Microsoft.EntityFrameworkCore;
+using CategoryModel = CleanAgricultureProductBE.Models.Category;
 
-namespace CleanAgricultureProductBE.Repositories
+namespace CleanAgricultureProductBE.Repositories.Category
 {
     public class CategoryRepository : ICategoryRepository
     {
@@ -13,24 +13,24 @@ namespace CleanAgricultureProductBE.Repositories
             _context = context;
         }
 
-        public async Task<Category> CreateAsync(Category category)
+        public async Task<CategoryModel> CreateAsync(CategoryModel category)
         {
             _context.Categories.Add(category);
             await _context.SaveChangesAsync();
             return category;
         }
 
-        public async Task<List<Category>> GetAllAsync()
+        public async Task<List<CategoryModel>> GetAllAsync()
         {
             return await _context.Categories.ToListAsync();
         }
 
-        public async Task<Category?> GetByIdAsync(Guid id)
+        public async Task<CategoryModel?> GetByIdAsync(Guid id)
         {
             return await _context.Categories.FindAsync(id);
         }
 
-        public async Task<Category> UpdateAsync(Category category)
+        public async Task<CategoryModel> UpdateAsync(CategoryModel category)
         {
             _context.Categories.Update(category);
             await _context.SaveChangesAsync();

@@ -1,6 +1,6 @@
 using CleanAgricultureProductBE.DTOs;
 
-namespace CleanAgricultureProductBE.Services
+namespace CleanAgricultureProductBE.Services.Category
 {
     public interface ICategoryService
     {

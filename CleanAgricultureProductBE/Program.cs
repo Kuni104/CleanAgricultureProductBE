@@ -1,17 +1,22 @@
 using CleanAgricultureProductBE.Data;
 using CleanAgricultureProductBE.Models;
 using CleanAgricultureProductBE.Repositories;
+using CleanAgricultureProductBE.Repositories.Address;
 using CleanAgricultureProductBE.Repositories.Cart;
 using CleanAgricultureProductBE.Repositories.CartItem;
+using CleanAgricultureProductBE.Repositories.Category;
 using CleanAgricultureProductBE.Repositories.DeliveryFee;
 using CleanAgricultureProductBE.Repositories.Order;
 using CleanAgricultureProductBE.Repositories.OrderDetail;
 using CleanAgricultureProductBE.Repositories.OTP;
 using CleanAgricultureProductBE.Repositories.Payment;
 using CleanAgricultureProductBE.Repositories.PaymentMethod;
+using CleanAgricultureProductBE.Repositories.Product;
 using CleanAgricultureProductBE.Repositories.Schedule;
 using CleanAgricultureProductBE.Services;
+using CleanAgricultureProductBE.Services.Address;
 using CleanAgricultureProductBE.Services.Cart;
+using CleanAgricultureProductBE.Services.Category;
 using CleanAgricultureProductBE.Services.DeliveryFee;
 using CleanAgricultureProductBE.Services.Email;
 using CleanAgricultureProductBE.Services.Order;
@@ -19,6 +24,7 @@ using CleanAgricultureProductBE.Services.OrderDetail;
 using CleanAgricultureProductBE.Services.Payment;
 using CleanAgricultureProductBE.Services.PaymentMethod;
 using CleanAgricultureProductBE.Services.VnPay;
+using CleanAgricultureProductBE.Services.Product;
 using CleanAgricultureProductBE.Services.Schedule;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -109,6 +115,10 @@ namespace CleanAgricultureProductBE
             // Category DI
             builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
             builder.Services.AddScoped<ICategoryService, CategoryService>();
+
+            //Address DI
+            builder.Services.AddScoped<IAddressRepository, AddressRepository>();
+            builder.Services.AddScoped<IAddressService, AddressService>();
 
             //Cart DI
             builder.Services.AddScoped<ICartService, CartService>();
