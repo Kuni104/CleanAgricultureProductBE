@@ -4,6 +4,7 @@ using CleanAgricultureProductBE.Services.UserProfile;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 using System.Security.Claims;
 
 namespace CleanAgricultureProductBE.Controllers
@@ -14,6 +15,7 @@ namespace CleanAgricultureProductBE.Controllers
     {
         [Authorize(Roles = "Customer")]
         [HttpGet]
+        [SwaggerOperation(Summary = "Lấy thông tin hồ sơ của tôi (Customer)")]
         public async Task<IActionResult> GetUserProfile()
         {
             var accountEmail = User.FindFirstValue(ClaimTypes.Email);
@@ -42,6 +44,7 @@ namespace CleanAgricultureProductBE.Controllers
 
         [Authorize (Roles = "Customer")]
         [HttpPatch]
+        [SwaggerOperation(Summary = "Cập nhật thông tin hồ sơ của tôi (Customer)")]
         public async Task<IActionResult> UpdateUserProfile([FromBody] UserProfileRequestDto request)
         {
             var accountEmail = User.FindFirstValue(ClaimTypes.Email);

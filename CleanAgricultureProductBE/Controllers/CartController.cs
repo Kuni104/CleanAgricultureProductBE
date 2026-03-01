@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 using System.Security.Claims;
 
 namespace CleanAgricultureProductBE.Controllers
@@ -16,6 +17,7 @@ namespace CleanAgricultureProductBE.Controllers
     public class CartController(ICartService cartService) : ControllerBase
     {
         [HttpPost("me/cart/items/{productId}")]
+        [SwaggerOperation(Summary = "Thêm sản phẩm vào giỏ hàng")]
         public async Task<IActionResult> AddToCart([FromRoute] Guid productId, [FromBody] CartRequestDto request)
         {
             var success = "";
@@ -46,6 +48,7 @@ namespace CleanAgricultureProductBE.Controllers
         }
 
         [HttpGet("me/cart")]
+        [SwaggerOperation(Summary = "Lấy danh sách sản phẩm trong giỏ hàng")]
         public async Task<IActionResult> GetCartItems([FromQuery] int? page, [FromQuery] int? size, [FromQuery] string? keyword)
         {
             var success = "";
@@ -87,6 +90,7 @@ namespace CleanAgricultureProductBE.Controllers
         }
 
         [HttpPatch("me/cart/items/{productId}")]
+        [SwaggerOperation(Summary = "Cập nhật số lượng sản phẩm trong giỏ hàng")]
         public async Task<IActionResult> UpdateCartItems([FromRoute] Guid productId, [FromBody] CartRequestDto request)
         {
             var accountEmail = User.FindFirstValue(ClaimTypes.Email);
@@ -104,6 +108,7 @@ namespace CleanAgricultureProductBE.Controllers
         }
 
         [HttpDelete("me/cart/items/{productId}")]
+        [SwaggerOperation(Summary = "Xóa một sản phẩm khỏi giỏ hàng")]
         public async Task<IActionResult> DeleteCartItems([FromRoute] Guid productId)
         {
             var accountEmail = User.FindFirstValue(ClaimTypes.Email);
@@ -132,6 +137,7 @@ namespace CleanAgricultureProductBE.Controllers
         }
 
         [HttpDelete("me/cart/items")]
+        [SwaggerOperation(Summary = "Xóa tất cả sản phẩm trong giỏ hàng")]
         public async Task<IActionResult> DeleteAllCartItems()
         {
             var accountEmail = User.FindFirstValue(ClaimTypes.Email);

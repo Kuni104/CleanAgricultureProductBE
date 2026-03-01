@@ -3,6 +3,7 @@ using CleanAgricultureProductBE.DTOs.Response;
 using CleanAgricultureProductBE.Services.Complaint;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 using System.Security.Claims;
 
 namespace CleanAgricultureProductBE.Controllers
@@ -15,6 +16,7 @@ namespace CleanAgricultureProductBE.Controllers
         [Authorize(Roles = "Customer")]
         [HttpPost("me/complaints")]
         [Consumes("application/json")]
+        [SwaggerOperation(Summary = "Tạo khiếu nại cho đơn hàng (Customer)")]
         public async Task<IActionResult> CreateComplaint([FromBody] CreateComplaintRequestDto request)
         {
             var email = User.FindFirstValue(ClaimTypes.Email)!;
@@ -45,6 +47,7 @@ namespace CleanAgricultureProductBE.Controllers
         // Customer: xem danh sách complaint của mình
         [Authorize(Roles = "Customer")]
         [HttpGet("me/complaints")]
+        [SwaggerOperation(Summary = "Lấy danh sách khiếu nại của tôi (Customer)")]
         public async Task<IActionResult> GetMyComplaints([FromQuery] int? page, [FromQuery] int? size)
         {
             var email = User.FindFirstValue(ClaimTypes.Email)!;
@@ -61,6 +64,7 @@ namespace CleanAgricultureProductBE.Controllers
         // Staff: xem tất cả complaints
         [Authorize(Roles = "Staff,Admin")]
         [HttpGet("complaints")]
+        [SwaggerOperation(Summary = "Lấy tất cả khiếu nại (Staff/Admin)")]
         public async Task<IActionResult> GetAllComplaints([FromQuery] int? page, [FromQuery] int? size, [FromQuery] string? keyword)
         {
             var result = await complaintService.GetAllComplaintsAsync(page, size, keyword);
@@ -76,6 +80,7 @@ namespace CleanAgricultureProductBE.Controllers
         // Staff: xem chi tiết 1 complaint
         [Authorize(Roles = "Staff,Admin")]
         [HttpGet("complaints/{complaintId}")]
+        [SwaggerOperation(Summary = "Lấy chi tiết khiếu nại theo ID (Staff/Admin)")]
         public async Task<IActionResult> GetComplaintById([FromRoute] Guid complaintId)
         {
             var result = await complaintService.GetComplaintByIdAsync(complaintId);

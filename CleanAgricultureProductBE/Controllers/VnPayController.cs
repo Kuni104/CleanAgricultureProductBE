@@ -3,6 +3,7 @@ using CleanAgricultureProductBE.Services.Payment;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 using VNPAY;
 using VNPAY.Models.Exceptions;
 
@@ -24,7 +25,8 @@ namespace CleanAgricultureProductBE.Controllers
         }
 
         [AllowAnonymous]
-        [HttpGet("ProceedAfterPayment")]
+        [HttpGet("proceed-after-payment")]
+        [SwaggerOperation(Summary = "Callback xử lý kết quả thanh toán từ VNPay")]
         public async Task<IActionResult> ProceedAfterPayment()
         {
             if (User.Identity?.IsAuthenticated == true)

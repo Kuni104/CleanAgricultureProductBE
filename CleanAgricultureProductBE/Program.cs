@@ -79,6 +79,7 @@ namespace CleanAgricultureProductBE
                         new string[] {}
                     }
                 });
+                options.EnableAnnotations();
             });
 
             var vnpayConfig = builder.Configuration.GetSection("VNPAY");

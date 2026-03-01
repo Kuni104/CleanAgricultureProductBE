@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace CleanAgricultureProductBE.Controllers
 {
@@ -14,6 +15,7 @@ namespace CleanAgricultureProductBE.Controllers
     {
         //[Authorize(Roles = "Admin")]
         [HttpGet]
+        [SwaggerOperation(Summary = "Lấy danh sách tất cả tài khoản (Admin)")]
         public async Task<IActionResult> GetAllAccount([FromQuery] int? page, [FromQuery] int? size, [FromQuery] string? keyword)
         {
             var success = "";
@@ -45,6 +47,7 @@ namespace CleanAgricultureProductBE.Controllers
         }
 
         [HttpPost]
+        [SwaggerOperation(Summary = "Tạo tài khoản mới")]
         public async Task<IActionResult> CreateAccount([FromBody] CreateAccountRequestDto request)
         {
 
@@ -69,6 +72,7 @@ namespace CleanAgricultureProductBE.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPatch("{accountId}")]
+        [SwaggerOperation(Summary = "Thay đổi trạng thái tài khoản (Admin)")]
         public async Task<IActionResult> ChangeAccountStatus([FromRoute] Guid accountId, [FromBody] ChangeAccountStatusRequestDto request)
         {
             if (request == null || request.Status.Trim() == "")

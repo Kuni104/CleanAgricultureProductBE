@@ -4,6 +4,7 @@ using CleanAgricultureProductBE.Services.PaymentMethod;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace CleanAgricultureProductBE.Controllers
 {
@@ -13,6 +14,7 @@ namespace CleanAgricultureProductBE.Controllers
     public class PaymentMethodController(IPaymentMethodService paymentMethodService) : ControllerBase
     {
         [HttpGet] 
+        [SwaggerOperation(Summary = "Lấy danh sách phương thức thanh toán (Admin/Staff)")]
         public async Task<IActionResult> GetPaymentMethods()
         {
             var success = "true";
@@ -39,6 +41,7 @@ namespace CleanAgricultureProductBE.Controllers
         }
 
         [HttpPost] 
+        [SwaggerOperation(Summary = "Tạo phương thức thanh toán mới (Admin/Staff)")]
         public async Task<IActionResult> CreatePaymentMethod([FromBody]PaymentMethodRequestDto request)
         {
             var success = "";
@@ -68,6 +71,7 @@ namespace CleanAgricultureProductBE.Controllers
         }
 
         [HttpPut("{paymentMethodId}")] 
+        [SwaggerOperation(Summary = "Cập nhật phương thức thanh toán (Admin/Staff)")]
         public async Task<IActionResult> UpdatePaymentMethod(int paymentMethodId, [FromBody]PaymentMethodRequestDto request)
         {
             var success = "";
@@ -96,6 +100,7 @@ namespace CleanAgricultureProductBE.Controllers
         }
 
         [HttpDelete("{paymentMethodId}")]
+        [SwaggerOperation(Summary = "Xóa phương thức thanh toán (Admin/Staff)")]
         public async Task<IActionResult> DeletePaymentMethod(int paymentMethodId)
         {
             var success = "";
