@@ -34,7 +34,7 @@ namespace CleanAgricultureProductBE.Controllers
                 message = "Lấy các phí giao hàng thành công";
             }
 
-            var response = new DTOs.Response.ResponseObject<List<DeliveryFeeResponseDto>>
+            var response = new ResponseObjectWithPagination<List<DeliveryFeeResponseDto>>
             {
                 Success = success,
                 Message = message,
