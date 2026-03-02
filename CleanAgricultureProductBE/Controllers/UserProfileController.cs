@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Security.Claims;
+using System.Text.RegularExpressions;
 
 namespace CleanAgricultureProductBE.Controllers
 {
@@ -48,6 +49,20 @@ namespace CleanAgricultureProductBE.Controllers
         [SwaggerOperation(Summary = "Cập nhật thông tin hồ sơ của tôi (Customer)")]
         public async Task<IActionResult> UpdateUserProfile([FromBody] UserProfileRequestDto request)
         {
+            if (request.PhoneNumber != null || request.PhoneNumber.Trim() != "") {
+                var isValidPhoneNumber = Regex.IsMatch(request.PhoneNumber, @"^(?:\+84|0)\d{9}$");
+                if (!isValidPhoneNumber)
+                {
+                    var invalidPhoneResponse = new ResponseObject<UserProfileResponseDto>
+                    {
+                        Success = "false",
+                        Message = "Số điện thoại không hợp lệ! Số điện thoại phải bắt đầu bằng 0 và có 10 chữ số.",
+                        Data = null
+                    };
+                    return BadRequest(invalidPhoneResponse);
+                }
+            }
+
             var accountEmail = User.FindFirstValue(ClaimTypes.Email);
 
             var success = "";
