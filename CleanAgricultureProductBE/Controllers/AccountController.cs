@@ -1,12 +1,14 @@
 ﻿using CleanAgricultureProductBE.DTOs.Account;
 using CleanAgricultureProductBE.DTOs.ApiResponse;
 using CleanAgricultureProductBE.DTOs.Response;
+using CleanAgricultureProductBE.DTOs.UserProfile;
 using CleanAgricultureProductBE.Services.Account;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
+using System.Text.RegularExpressions;
 
 namespace CleanAgricultureProductBE.Controllers
 {
@@ -51,6 +53,20 @@ namespace CleanAgricultureProductBE.Controllers
         [SwaggerOperation(Summary = "Tạo tài khoản mới")]
         public async Task<IActionResult> CreateAccount([FromBody] CreateAccountRequestDto request)
         {
+            if (request.PhoneNumber != null || request.PhoneNumber.Trim() != "")
+            {
+                var isValidPhoneNumber = Regex.IsMatch(request.PhoneNumber, @"^(?:\+84|0)\d{9}$");
+                if (!isValidPhoneNumber)
+                {
+                    var invalidPhoneResponse = new ResponseObject<UserProfileResponseDto>
+                    {
+                        Success = "false",
+                        Message = "Số điện thoại không hợp lệ! Số điện thoại phải bắt đầu bằng 0 và có 10 chữ số.",
+                        Data = null
+                    };
+                    return BadRequest(invalidPhoneResponse);
+                }
+            }
 
             var result = await accountService.CreateAccount(request);
 

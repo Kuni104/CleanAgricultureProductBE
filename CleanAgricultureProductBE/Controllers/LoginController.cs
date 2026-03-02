@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
+using System.Text.RegularExpressions;
 
 namespace CleanAgricultureProductBE.Controllers
 {
@@ -59,6 +60,23 @@ namespace CleanAgricultureProductBE.Controllers
         {
             if(!ModelState.IsValid)
                 return BadRequest(ModelState);
+            if(dto.PhoneNumber == null || dto.PhoneNumber.Trim() == "")
+            {
+
+            }
+            else
+            {
+                var isValidPhoneNumber = Regex.IsMatch(dto.PhoneNumber, @"^(?:\+84|0)\d{9}$");
+                if (!isValidPhoneNumber)
+                {
+                    return BadRequest(new ResponseObject<string>
+                    {
+                        Success = "false",
+                        Message = "Số điện thoại không hợp lệ! Số điện thoại phải bắt đầu bằng 0 và có 10 chữ số.",
+                    });
+                }
+            }
+
             try
             {
                 var response = await _authService.RegisterAsync(dto);
