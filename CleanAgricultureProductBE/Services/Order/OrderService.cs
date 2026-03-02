@@ -30,6 +30,12 @@ namespace CleanAgricultureProductBE.Services.Order
             var cart = await GetCartByAccoutEmail(accountEmail);
 
             var cartItems = await cartRepository.GetCartItemsByCartId(cart!.CartId);
+
+            if (cartItems == null || cartItems.Count == 0)
+            {
+                return null!;
+            }
+
             var deliveryFee = await deliveryFeeRepository.GetDeliveryFeeById(request.DeliveryFeeId);
 
             decimal totalCartPrice = await cartRepository.TotalPriceOfCartByCartId(cart.CartId);

@@ -35,7 +35,7 @@ namespace CleanAgricultureProductBE.Controllers
             else
             {
                 success = "true";
-                message = "Orders retrieved successfully";
+                message = "Lấy thông tin các đơn hàng thành công";
             }
 
             var response = new ResponseObject<List<OrderResponseDto>>
@@ -60,13 +60,13 @@ namespace CleanAgricultureProductBE.Controllers
 
             if (result.ResultObject == null)
             {
-                return Forbid("Not The Order Of This Customer");
+                return Forbid("Không phải đơn hàng của bạn");
             }
 
             var response = new ResponseObject<OrderDetailListResponseDto>
             {
                 Success = "success",
-                Message = "Get order details successfully",
+                Message = "Lấy thông tin đơn hàng thành công",
                 Data = result.ResultObject,
                 Pagination = result.Pagination
             };
@@ -83,18 +83,23 @@ namespace CleanAgricultureProductBE.Controllers
 
             var result = await orderService.PlaceOrder(accountEmail!, request);
 
+            if (result == null)
+            {
+                return BadRequest("Không có hàng trong vỏ hàng");
+            }
+
             return Ok(result);
         }
 
         [HttpPut("me/orders")]
-        [SwaggerOperation(Summary = "Cập nhật đơn hàng")]
+        [SwaggerOperation(Summary = "Cập nhật đơn hàng (Nothing Here)")]
         public async Task<IActionResult> UpdateOrder()
         {
             return Ok(); 
         }
 
         [HttpDelete("me/orders")]
-        [SwaggerOperation(Summary = "Hủy đơn hàng")]
+        [SwaggerOperation(Summary = "Hủy đơn hàng (Nothing Here)")]
         public async Task<IActionResult> CancelOrder()
         {
             return Ok();
