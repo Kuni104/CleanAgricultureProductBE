@@ -1,5 +1,6 @@
 ﻿using CleanAgricultureProductBE.Data;
 using CleanAgricultureProductBE.DTOs;
+using CleanAgricultureProductBE.DTOs.ApiResponse;
 using CleanAgricultureProductBE.DTOs.OTP;
 using CleanAgricultureProductBE.DTOs.Response;
 using CleanAgricultureProductBE.Services;
@@ -25,7 +26,7 @@ namespace CleanAgricultureProductBE.Controllers
             _authService = authService;
         }
 
-        [HttpPost]
+        [HttpPost("login")]
         [SwaggerOperation(Summary = "Đăng nhập và nhận JWT token")]
         public async Task<IActionResult> Login(LoginRequestDto dto)
         {
@@ -61,12 +62,25 @@ namespace CleanAgricultureProductBE.Controllers
             try
             {
                 var response = await _authService.RegisterAsync(dto);
-                return Created(string.Empty, response);
+                return Created(string.Empty, new ResponseObject<LoginResponseDto>
+                {
+                    Success = "true",
+                    Message = "Đăng kí thành công",
+                    Data = response
+                });
             }   catch(Exception ex)
             {
                 if (ex.Message.Contains("Email already in use", StringComparison.OrdinalIgnoreCase))
-                    return Conflict(new { message = ex.Message });
-                return BadRequest(new { message = ex.Message });
+                    return Conflict(new ResponseObject<string>
+                    {
+                        Success = "false",
+                        Message = ex.Message,
+                    });
+                return BadRequest(new ResponseObject<string>
+                {
+                    Success = "false",
+                    Message = ex.Message,
+                });
             }
         }
 
@@ -78,7 +92,11 @@ namespace CleanAgricultureProductBE.Controllers
             var token = await HttpContext.GetTokenAsync("access_token");
 
             if (string.IsNullOrWhiteSpace(token))
-                return BadRequest(new { message = "Token not found" });
+                return BadRequest(new ResponseObject<string>
+                {
+                    Success = "false",
+                    Message = "Phải có token",
+                });
 
             await _authService.LogoutAsync(token);
 

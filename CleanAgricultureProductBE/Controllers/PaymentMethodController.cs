@@ -1,4 +1,5 @@
-﻿using CleanAgricultureProductBE.DTOs.PaymentMethod;
+﻿using CleanAgricultureProductBE.DTOs.ApiResponse;
+using CleanAgricultureProductBE.DTOs.PaymentMethod;
 using CleanAgricultureProductBE.DTOs.Response;
 using CleanAgricultureProductBE.Services.PaymentMethod;
 using Microsoft.AspNetCore.Authorization;
@@ -23,11 +24,11 @@ namespace CleanAgricultureProductBE.Controllers
             var result = await paymentMethodService.GetPaymentMethods();
 
             if (result != null) {
-                message = "Payment methods retrieved successfully";
+                message = "Lấy các hình thức thanh toán thành công";
             }
             else
             {
-                message = "No payment methods found";
+                message = "Không có hình thức thanh toán nào";
             }
 
             var response = new ResponseObject<List<PaymentMethodResponseDto>>
@@ -52,12 +53,12 @@ namespace CleanAgricultureProductBE.Controllers
             if (result != null)
             {
                 success = "true";
-                message = "Payment method created successfully";
+                message = "Tạo hình thức thanh toán thành công";
             }
             else
             {
                 success = "false";
-                message = "Failed to create payment method | Already existed payment method!";
+                message = "Hình thức thanh toán đã tồn tại";
             }
 
             var response = new ResponseObject<PaymentMethodResponseDto>()
@@ -81,12 +82,12 @@ namespace CleanAgricultureProductBE.Controllers
             if (result != null)
             {
                 success = "true";
-                message = "Payment method updated successfully";
+                message = "Cập nhật hình thức thánh toán thành công";
             }
             else
             {
                 success = "false";
-                message = "Failed to update payment method | Payment method not found or already existed payment method!";
+                message = "Không tìm thấy hình thức thanh toán hoặc hình thức thanh toán muốn cập nhật đã tồn tại";
             }
 
             var response = new ResponseObject<PaymentMethodResponseDto>()
@@ -110,19 +111,19 @@ namespace CleanAgricultureProductBE.Controllers
             if (result)
             {
                 success = "true";
-                message = "Payment method deleted successfully";
+                message = "Xóa hình thức thánh toán thành công";
             }
             else
             {
                 success = "false";
-                message = "Failed to delete payment method | Payment method not found!";
+                message = "Không có hình thức thanh toán";
             }
 
             var response = new ResponseObject<string>()
             {
                 Success = success,
                 Message = message,
-                Data = result ? "Deleted" : "Not Deleted"
+                Data = result ? "Đã xóa" : "Chưa Xóa"
             };
 
             return Ok(response);

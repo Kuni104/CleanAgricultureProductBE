@@ -1,4 +1,5 @@
 using CleanAgricultureProductBE.DTOs.Address;
+using CleanAgricultureProductBE.DTOs.ApiResponse;
 using CleanAgricultureProductBE.Services.Address;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -27,11 +28,18 @@ namespace CleanAgricultureProductBE.Controllers
             {
                 var email = User.FindFirstValue(ClaimTypes.Email)!;
                 var addresses = await _addressService.GetAllAddressesAsync(email);
-                return Ok(new { success = "true", message = "Get addresses successfully", data = addresses });
+                return Ok(new ResponseObject<List<AddressResponseDto>> { 
+                    Success = "true", 
+                    Message = "Lấy các địa chỉ thành công!", 
+                    Data = addresses });
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new ResponseObject<string>
+                {
+                    Success = "false",
+                    Message = ex.Message,
+                });
             }
         }
 
@@ -43,11 +51,20 @@ namespace CleanAgricultureProductBE.Controllers
             {
                 var email = User.FindFirstValue(ClaimTypes.Email)!;
                 var address = await _addressService.GetAddressByIdAsync(email, id);
-                return Ok(new { success = "true", message = "Get address successfully", data = address });
+                return Ok(new ResponseObject<AddressResponseDto>
+                {
+                    Success = "true",
+                    Message = "Lấy địa chỉ thành công!",
+                    Data = address
+                });
             }
             catch (Exception ex)
             {
-                return NotFound(new { message = ex.Message });
+                return NotFound(new ResponseObject<string>
+                {
+                    Success = "false",
+                    Message = ex.Message
+                });
             }
         }
 
@@ -59,11 +76,20 @@ namespace CleanAgricultureProductBE.Controllers
             {
                 var email = User.FindFirstValue(ClaimTypes.Email)!;
                 var address = await _addressService.CreateAddressAsync(email, dto);
-                return Ok(new { success = "true", message = "Address created successfully", data = address });
+                return Ok(new ResponseObject<AddressResponseDto>
+                {
+                    Success = "true",
+                    Message = "Địa chỉ được tạo thành công!",
+                    Data = address
+                });
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new ResponseObject<string> 
+                { 
+                    Success = "false",
+                    Message = ex.Message
+                });
             }
         }
 
@@ -75,11 +101,20 @@ namespace CleanAgricultureProductBE.Controllers
             {
                 var email = User.FindFirstValue(ClaimTypes.Email)!;
                 var address = await _addressService.UpdateAddressAsync(email, id, dto);
-                return Ok(new { success = "true", message = "Address updated successfully", data = address });
+                return Ok(new ResponseObject<AddressResponseDto>
+                {
+                    Success = "true",
+                    Message = "Địa chỉ được cập nhật thành công!",
+                    Data = address
+                });
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new ResponseObject<string>
+                {
+                    Success = "false",
+                    Message = ex.Message
+                });
             }
         }
 
@@ -91,11 +126,19 @@ namespace CleanAgricultureProductBE.Controllers
             {
                 var email = User.FindFirstValue(ClaimTypes.Email)!;
                 await _addressService.DeleteAddressAsync(email, id, confirm);
-                return Ok(new { success = "true", message = "Address deleted successfully" });
+                return Ok(new ResponseObject<string>
+                {
+                    Success = "true",
+                    Message = "Địa chỉ đã được xóa thành công!"
+                });
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new ResponseObject<string> 
+                { 
+                    Success = "false", 
+                    Message = ex.Message 
+                });
             }
         }
 
@@ -107,11 +150,20 @@ namespace CleanAgricultureProductBE.Controllers
             {
                 var email = User.FindFirstValue(ClaimTypes.Email)!;
                 var address = await _addressService.SetDefaultAddressAsync(email, id);
-                return Ok(new { success = "true", message = "Default address set successfully", data = address });
+                return Ok(new ResponseObject<AddressResponseDto>
+                {
+                    Success = "true",
+                    Message = "Địa chỉ đã được đặt làm mặc định thành công!",
+                    Data = address
+                });
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new ResponseObject<string> 
+                { 
+                    Success = "false",
+                    Message = ex.Message 
+                });
             }
         }
     }

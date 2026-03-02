@@ -1,4 +1,5 @@
-﻿using CleanAgricultureProductBE.DTOs.Order;
+﻿using CleanAgricultureProductBE.DTOs.ApiResponse;
+using CleanAgricultureProductBE.DTOs.Order;
 using CleanAgricultureProductBE.DTOs.OrderDetail;
 using CleanAgricultureProductBE.DTOs.Response;
 using CleanAgricultureProductBE.Services.Order;
@@ -36,7 +37,7 @@ namespace CleanAgricultureProductBE.Controllers
                 message = "Lấy tất cả đơn hàng thành công!";
             }
 
-            var response = new ResponseObject<List<OrderResponseDto>>
+            var response = new ResponseObjectWithPagination<List<OrderResponseDto>>
             {
                 Success = success,
                 Message = message,
@@ -57,7 +58,7 @@ namespace CleanAgricultureProductBE.Controllers
             var result = await orderService.GetOrderDetailsAdmin(orderId, page, size, keyword);
             if (result.ResultObject == null)
             {
-                var responseN = new ResponseObject<OrderDetailListResponseDto>
+                var responseN = new ResponseObjectWithPagination<OrderDetailListResponseDto>
                 {
                     Success = "true",
                     Message = "Lấy chi tiết đơn hàng thành công",
@@ -68,7 +69,7 @@ namespace CleanAgricultureProductBE.Controllers
                 return NotFound(responseN);
             }
 
-            var response = new ResponseObject<OrderDetailListResponseDto>
+            var response = new ResponseObjectWithPagination<OrderDetailListResponseDto>
             {
                 Success = "true",
                 Message = "Lấy chi tiết đơn hàng thành công",
@@ -100,7 +101,7 @@ namespace CleanAgricultureProductBE.Controllers
                 message = "Cập nhật trạng thái đơn hàng thành công!";
             }
 
-            var response = new ResponseObject<object>
+            var response = new ResponseObject<OrderResponseDto>
             {
                 Success = success,
                 Message = message,

@@ -1,3 +1,4 @@
+using CleanAgricultureProductBE.DTOs.ApiResponse;
 using CleanAgricultureProductBE.DTOs.Complaint;
 using CleanAgricultureProductBE.DTOs.Response;
 using CleanAgricultureProductBE.Services.Complaint;
@@ -23,10 +24,10 @@ namespace CleanAgricultureProductBE.Controllers
             try
             {
                 var result = await complaintService.CreateComplaintAsync(email, request);
-                return Ok(new ResponseObject<ComplaintResponseDto>
+                return base.Ok(new DTOs.ApiResponse.ResponseObject<ComplaintResponseDto>
                 {
                     Success = "true",
-                    Message = "Complaint submitted successfully",
+                    Message = "Gửi khiếu nại thành công",
                     Data = result
                 });
             }
@@ -36,11 +37,11 @@ namespace CleanAgricultureProductBE.Controllers
             }
             catch (InvalidOperationException ex)
             {
-                return Conflict(new ResponseObject<object> { Success = "false", Message = ex.Message });
+                return base.Conflict(new DTOs.ApiResponse.ResponseObject<object> { Success = "false", Message = ex.Message });
             }
             catch (Exception ex)
             {
-                return BadRequest(new ResponseObject<object> { Success = "false", Message = ex.Message });
+                return base.BadRequest(new DTOs.ApiResponse.ResponseObject<object> { Success = "false", Message = ex.Message });
             }
         }
 
@@ -52,10 +53,10 @@ namespace CleanAgricultureProductBE.Controllers
         {
             var email = User.FindFirstValue(ClaimTypes.Email)!;
             var result = await complaintService.GetMyComplaintsAsync(email, page, size);
-            return Ok(new ResponseObject<List<ComplaintResponseDto>>
+            return base.Ok(new DTOs.Response.ResponseObject<List<ComplaintResponseDto>>
             {
                 Success = "true",
-                Message = result.ResultObject?.Count == 0 ? "No complaints found" : "Complaints retrieved successfully",
+                Message = result.ResultObject?.Count == 0 ? "Không có khiếu nại nào" : "Lấy các khiếu nại thành công",
                 Data = result.ResultObject,
                 Pagination = result.Pagination
             });
@@ -68,10 +69,10 @@ namespace CleanAgricultureProductBE.Controllers
         public async Task<IActionResult> GetAllComplaints([FromQuery] int? page, [FromQuery] int? size, [FromQuery] string? keyword)
         {
             var result = await complaintService.GetAllComplaintsAsync(page, size, keyword);
-            return Ok(new ResponseObject<List<ComplaintResponseDto>>
+            return base.Ok(new DTOs.Response.ResponseObject<List<ComplaintResponseDto>>
             {
                 Success = "true",
-                Message = result.ResultObject?.Count == 0 ? "No complaints found" : "Complaints retrieved successfully",
+                Message = result.ResultObject?.Count == 0 ? "Không có khiếu nại nào" : "Lấy các khiếu nại thành công",
                 Data = result.ResultObject,
                 Pagination = result.Pagination
             });
@@ -85,9 +86,9 @@ namespace CleanAgricultureProductBE.Controllers
         {
             var result = await complaintService.GetComplaintByIdAsync(complaintId);
             if (result == null)
-                return NotFound(new ResponseObject<object> { Success = "false", Message = "Complaint not found" });
+                return base.NotFound(new DTOs.ApiResponse.ResponseObject<object> { Success = "false", Message = "Không tìm thấy khiếu nại" });
 
-            return Ok(new ResponseObject<ComplaintResponseDto>
+            return base.Ok(new DTOs.ApiResponse.ResponseObject<ComplaintResponseDto>
             {
                 Success = "true",
                 Message = "Complaint retrieved successfully",
