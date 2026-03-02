@@ -53,7 +53,7 @@ namespace CleanAgricultureProductBE.Controllers
         {
             var email = User.FindFirstValue(ClaimTypes.Email)!;
             var result = await complaintService.GetMyComplaintsAsync(email, page, size);
-            return base.Ok(new DTOs.Response.ResponseObject<List<ComplaintResponseDto>>
+            return base.Ok(new ResponseObjectWithPagination<List<ComplaintResponseDto>>
             {
                 Success = "true",
                 Message = result.ResultObject?.Count == 0 ? "Không có khiếu nại nào" : "Lấy các khiếu nại thành công",
@@ -69,7 +69,7 @@ namespace CleanAgricultureProductBE.Controllers
         public async Task<IActionResult> GetAllComplaints([FromQuery] int? page, [FromQuery] int? size, [FromQuery] string? keyword)
         {
             var result = await complaintService.GetAllComplaintsAsync(page, size, keyword);
-            return base.Ok(new DTOs.Response.ResponseObject<List<ComplaintResponseDto>>
+            return base.Ok(new ResponseObjectWithPagination<List<ComplaintResponseDto>>
             {
                 Success = "true",
                 Message = result.ResultObject?.Count == 0 ? "Không có khiếu nại nào" : "Lấy các khiếu nại thành công",

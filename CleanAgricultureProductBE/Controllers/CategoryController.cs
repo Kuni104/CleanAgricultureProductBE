@@ -28,7 +28,7 @@ namespace CleanAgricultureProductBE.Controllers
             try
             {
                 var categories = await _categoryService.GetAllCategoriesAsync();
-                return base.Ok(new DTOs.Response.ResponseObject<List<CategoryResponseDto>>
+                return base.Ok(new ResponseObjectWithPagination<List<CategoryResponseDto>>
                 {
                     Success = "true",
                     Message = "Lấy danh sách danh mục thành công!",
