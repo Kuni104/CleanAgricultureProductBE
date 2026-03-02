@@ -26,11 +26,13 @@ namespace CleanAgricultureProductBE.Data
         public DbSet<Payment> Payments => Set<Payment>();
         public DbSet<PasswordResetOtp> PasswordResetOtps => Set<PasswordResetOtp>();
         public DbSet<DeliverySchedule> DeliverySchedules => Set<DeliverySchedule>();
+        public DbSet<EmailOtp> EmailOtps => Set<EmailOtp>();
         // Blacklisted tokens for logout/revocation
         public DbSet<BlackListedToken> BlacklistedTokens => Set<BlackListedToken>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<Account>(entity =>
             {
                 entity.HasOne(a => a.Role)

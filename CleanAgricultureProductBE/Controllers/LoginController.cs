@@ -1,7 +1,6 @@
 ﻿using CleanAgricultureProductBE.Data;
 using CleanAgricultureProductBE.DTOs;
 using CleanAgricultureProductBE.DTOs.ApiResponse;
-using CleanAgricultureProductBE.DTOs.OTP;
 using CleanAgricultureProductBE.DTOs.Response;
 using CleanAgricultureProductBE.Services;
 using Microsoft.AspNetCore.Authentication;
@@ -20,7 +19,7 @@ namespace CleanAgricultureProductBE.Controllers
         private readonly IConfiguration _configuration;
         private readonly AppDbContext _context;
 
-        public LoginController(AppDbContext context,IConfiguration configuration ,IAuthService authService)
+        public LoginController(AppDbContext context, IConfiguration configuration, IAuthService authService)
         {
             _context = context;
             _configuration = configuration;
@@ -38,7 +37,7 @@ namespace CleanAgricultureProductBE.Controllers
                 {
                     Success = "success",
                     Message = "Login successful",
-                    Data = (LoginResponseDto) result
+                    Data = (LoginResponseDto)result
                 };
 
                 return Ok(apiResponse);
@@ -58,9 +57,9 @@ namespace CleanAgricultureProductBE.Controllers
         [SwaggerOperation(Summary = "Đăng ký tài khoản mới")]
         public async Task<IActionResult> Register(RegisterRequestDto dto)
         {
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-            if(dto.PhoneNumber == null || dto.PhoneNumber.Trim() == "")
+            if (dto.PhoneNumber == null || dto.PhoneNumber.Trim() == "")
             {
 
             }
@@ -86,7 +85,8 @@ namespace CleanAgricultureProductBE.Controllers
                     Message = "Đăng kí thành công",
                     Data = response
                 });
-            }   catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 if (ex.Message.Contains("Email already in use", StringComparison.OrdinalIgnoreCase))
                     return Conflict(new ResponseObject<string>
@@ -121,20 +121,21 @@ namespace CleanAgricultureProductBE.Controllers
             return NoContent();
         }
 
-        [HttpPost("request-reset-password")]
-        [SwaggerOperation(Summary = "Yêu cầu đặt lại mật khẩu - gửi OTP qua email")]
-        public async Task<IActionResult> RequestResetPassword(RequestResetPasswordDto dto)
-        {
-            await _authService.RequestResetPasswordAsync(dto.Email);
-            return Ok("OTP sent to email");
-        }
+        //    [HttpPost("request-reset-password")]
+        //    [SwaggerOperation(Summary = "Yêu cầu đặt lại mật khẩu - gửi OTP qua email")]
+        //    public async Task<IActionResult> RequestResetPassword(RequestResetPasswordDto dto)
+        //    {
+        //        await _authService.RequestResetPasswordAsync(dto.Email);
+        //        return Ok("OTP sent to email");
+        //    }
 
-        [HttpPost("reset-password")]
-        [SwaggerOperation(Summary = "Xác nhận OTP và đặt lại mật khẩu mới")]
-        public async Task<IActionResult> ResetPassword(ConfirmResetPasswordDto dto)
-        {
-            await _authService.ResetPasswordAsync(dto);
-            return Ok("Password reset successfully");
-        }
+        //    [HttpPost("reset-password")]
+        //    [SwaggerOperation(Summary = "Xác nhận OTP và đặt lại mật khẩu mới")]
+        //    public async Task<IActionResult> ResetPassword(ConfirmResetPasswordDto dto)
+        //    {
+        //        await _authService.ResetPasswordAsync(dto);
+        //        return Ok("Password reset successfully");
+        //    }
+        //}
     }
 }

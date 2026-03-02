@@ -1,4 +1,4 @@
-﻿namespace CleanAgricultureProductBE.DTOs.OTP
+﻿namespace CleanAgricultureProductBE.DTOs
 {
     public class ConfirmResetPasswordDto
     {
