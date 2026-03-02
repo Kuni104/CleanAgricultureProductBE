@@ -1,7 +1,8 @@
 using CleanAgricultureProductBE.DTOs;
-using CleanAgricultureProductBE.Models;
-using CleanAgricultureProductBE.Repositories;
-namespace CleanAgricultureProductBE.Services
+using CleanAgricultureProductBE.Repositories.Product;
+using ProductModel = CleanAgricultureProductBE.Models.Product;
+
+namespace CleanAgricultureProductBE.Services.Product
 {
     public class ProductService : IProductService
     {
@@ -24,7 +25,7 @@ namespace CleanAgricultureProductBE.Services
             if (dto.Stock < 0)
                 throw new Exception("Stock must be greater than or equal to 0");
 
-            var product = new Product
+            var product = new ProductModel
             {
                 ProductId = Guid.NewGuid(),
                 CategoryId = dto.CategoryId,

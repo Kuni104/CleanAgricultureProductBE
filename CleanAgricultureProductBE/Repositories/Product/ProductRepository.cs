@@ -1,8 +1,8 @@
 using CleanAgricultureProductBE.Data;
-using CleanAgricultureProductBE.Models;
 using Microsoft.EntityFrameworkCore;
+using ProductModel = CleanAgricultureProductBE.Models.Product;
 
-namespace CleanAgricultureProductBE.Repositories
+namespace CleanAgricultureProductBE.Repositories.Product
 {
     public class ProductRepository : IProductRepository
     {
@@ -13,28 +13,28 @@ namespace CleanAgricultureProductBE.Repositories
             _context = context;
         }
 
-        public async Task<Product> CreateAsync(Product product)
+        public async Task<ProductModel> CreateAsync(ProductModel product)
         {
             _context.Products.Add(product);
             await _context.SaveChangesAsync();
             return product;
         }
 
-        public async Task<List<Product>> GetAllAsync()
+        public async Task<List<ProductModel>> GetAllAsync()
         {
             return await _context.Products
                 .Include(p => p.Category)
                 .ToListAsync();
         }
 
-        public Task<Product?> GetByIdAsync(Guid id)
+        public Task<ProductModel?> GetByIdAsync(Guid id)
         {
             return _context.Products
                 .Include(p => p.Category)
                 .FirstOrDefaultAsync(p => p.ProductId == id);
         }
 
-        public async Task<Product> UpdateAsync(Product product)
+        public async Task<ProductModel> UpdateAsync(ProductModel product)
         {
             _context.Products.Update(product);
             await _context.SaveChangesAsync();

@@ -1,8 +1,8 @@
 using CleanAgricultureProductBE.DTOs;
-using CleanAgricultureProductBE.Models;
-using CleanAgricultureProductBE.Repositories;
+using CleanAgricultureProductBE.Repositories.Category;
+using CategoryModel = CleanAgricultureProductBE.Models.Category;
 
-namespace CleanAgricultureProductBE.Services
+namespace CleanAgricultureProductBE.Services.Category
 {
     public class CategoryService : ICategoryService
     {
@@ -15,7 +15,7 @@ namespace CleanAgricultureProductBE.Services
 
         public async Task<CategoryResponseDto> CreateCategoryAsync(CreateCategoryDto dto)
         {
-            var category = new Category
+            var category = new CategoryModel
             {
                 CategoryId = Guid.NewGuid(),
                 Name = dto.Name,
