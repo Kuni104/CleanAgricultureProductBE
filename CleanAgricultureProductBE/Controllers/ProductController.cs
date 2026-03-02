@@ -1,4 +1,6 @@
 using CleanAgricultureProductBE.DTOs;
+using CleanAgricultureProductBE.DTOs.ApiResponse;
+using CleanAgricultureProductBE.DTOs.Response;
 using CleanAgricultureProductBE.Services.Product;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -26,11 +28,21 @@ namespace CleanAgricultureProductBE.Controllers
             try
             {
                 var products = await _productService.GetAllProductsAsync();
-                return Ok(products);
+                return Ok(new ResponseObjectWithPagination<List<ProductResponseDto>>
+                {
+                    Success = "true",
+                    Message = "Lấy các sản phẩm thành công",
+                    Data = products,
+                    Pagination = null
+                });
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new ResponseObject<string>
+                {
+                    Success = "false",
+                    Message = ex.Message,
+                });
             }
         }
 
@@ -43,11 +55,20 @@ namespace CleanAgricultureProductBE.Controllers
             try
             {
                 var product = await _productService.GetProductByIdAsync(id);
-                return Ok(product);
+                return Ok(new ResponseObject<ProductResponseDto>
+                {
+                    Success = "true",
+                    Message = "Lấy chi tiết sản phẩm thành công",
+                    Data = product
+                });
             }
             catch (Exception ex)
             {
-                return NotFound(new { message = ex.Message });
+                return NotFound(new ResponseObject<ProductResponseDto>
+                {
+                    Success = "false",
+                    Message = ex.Message,
+                });
             }
         }
 
@@ -60,11 +81,20 @@ namespace CleanAgricultureProductBE.Controllers
             try
             {
                 var result = await _productService.CreateProductAsync(dto);
-                return Ok(result);
+                return Ok(new ResponseObject<ProductResponseDto>
+                {
+                    Success = "true",
+                    Message = "Tạo sản phẩm thành công",
+                    Data = result
+                });
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new ResponseObject<string>
+                {
+                    Success = "false",
+                    Message = ex.Message,
+                });
             }
         }
 
@@ -77,11 +107,20 @@ namespace CleanAgricultureProductBE.Controllers
             try
             {
                 var result = await _productService.UpdateProductAsync(id, dto);
-                return Ok(result);
+                return Ok(new ResponseObject<ProductResponseDto>
+                {
+                    Success = "true",
+                    Message = "Cập nhật sản phẩm thành công",
+                    Data = result
+                });
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new ResponseObject<string>
+                {
+                    Success = "false",
+                    Message = ex.Message,
+                });
             }
         }
 
@@ -94,11 +133,20 @@ namespace CleanAgricultureProductBE.Controllers
             try
             {
                 var result = await _productService.DeleteProductAsync(id, confirm);
-                return Ok(new { message = "Product deleted successfully" });
+                return Ok(new ResponseObject<bool>
+                {
+                    Success = "true",
+                    Message = result ? "Xóa sản phẩm thành công" : "Sản phẩm đã được xóa tạm thời. Hãy xác nhận xóa vĩnh viễn bằng cách thêm query parameter confirm=true",
+                    Data = result
+                });
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new ResponseObject<string> 
+                { 
+                    Success = "false", 
+                    Message = ex.Message 
+                });
             }
         }
 
@@ -110,22 +158,39 @@ namespace CleanAgricultureProductBE.Controllers
         {
             if (string.IsNullOrWhiteSpace(status))
             {
-                return BadRequest(new { message = "Status is required" });
+                return BadRequest(new ResponseObject<string>
+                {
+                    Success = "false",
+                    Message = "Cần có Status"
+                });
             }
 
             if (status != "Active" && status != "Inactive")
             {
-                return BadRequest(new { message = "Invalid status. Must be 'Active' or 'Inactive'" });
+                return BadRequest(new ResponseObject<string> 
+                { 
+                    Success = "false", 
+                    Message = "Status không hợp lệ. (Active hoặc Inactive)" 
+                });
             }
 
             var result = await _productService.UpdateProductStatusAsync(id, status);
 
             if (!result)
             {
-                return NotFound(new { message = "Product not found" });
+                return NotFound(new ResponseObject<string>
+                {
+                    Success = "false",
+                    Message = "Không tìm thấy sản phẩm hoặc cập nhật trạng thái thất bại"
+                });
             }
 
-            return Ok(new { message = $"Product status updated to {status} successfully" });
+            return Ok(new ResponseObject<bool>
+            {
+                Success = "true",
+                Message = $"Cập nhật trạng thái sản phẩm thành {status} thành công",
+                Data = true
+            });
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using CleanAgricultureProductBE.DTOs.Account;
+using CleanAgricultureProductBE.DTOs.ApiResponse;
 using CleanAgricultureProductBE.DTOs.Response;
 using CleanAgricultureProductBE.Services.Account;
 using Microsoft.AspNetCore.Authorization;
@@ -34,7 +35,7 @@ namespace CleanAgricultureProductBE.Controllers
                 message = "Lấy tất cả tài khoản thành công!";
             }
 
-            var response = new ResponseObject<List<AccountResponseDto>>
+            var response = new ResponseObjectWithPagination<List<AccountResponseDto>>
             {
                 Success = success,
                 Message = message,
@@ -55,14 +56,14 @@ namespace CleanAgricultureProductBE.Controllers
 
             if (result == null)
             {
-                return BadRequest(new ResponseObject<string>
+                return base.BadRequest(new DTOs.ApiResponse.ResponseObject<string>
                 {
                     Success = "false",
                     Message = "Email đã được sử dụng!"
                 });
             }
 
-            return Ok(new ResponseObject<AccountResponseDto>
+            return base.Ok(new DTOs.ApiResponse.ResponseObject<AccountResponseDto>
             {
                 Success = "true",
                 Message = "Tạo tài khoản thành công",
@@ -77,7 +78,7 @@ namespace CleanAgricultureProductBE.Controllers
         {
             if (request == null || request.Status.Trim() == "")
             {
-                return BadRequest(new ResponseObject<string>
+                return base.BadRequest(new DTOs.ApiResponse.ResponseObject<string>
                 {
                     Success = "false",
                     Message = "Trạng thái không được để trống!"
@@ -87,14 +88,14 @@ namespace CleanAgricultureProductBE.Controllers
             var result = await accountService.ChangeAccountStatus(accountId, request);
             if (result == null)
             {
-                return NotFound(new ResponseObject<string>
+                return base.NotFound(new DTOs.ApiResponse.ResponseObject<string>
                 {
                     Success = "false",
                     Message = "Không tìm thấy tài khoản!"
                 });
             }
             
-            return Ok(new ResponseObject<AccountResponseDto>
+            return base.Ok(new DTOs.ApiResponse.ResponseObject<AccountResponseDto>
             {
                 Success = "true",
                 Message = "Thay đổi trạng thái tài khoản thành công!",

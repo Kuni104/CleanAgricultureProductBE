@@ -1,4 +1,5 @@
-﻿using CleanAgricultureProductBE.DTOs.DeliveryFee;
+﻿using CleanAgricultureProductBE.DTOs.ApiResponse;
+using CleanAgricultureProductBE.DTOs.DeliveryFee;
 using CleanAgricultureProductBE.DTOs.Response;
 using CleanAgricultureProductBE.Services.DeliveryFee;
 using Microsoft.AspNetCore.Authorization;
@@ -25,19 +26,20 @@ namespace CleanAgricultureProductBE.Controllers
             if (result == null || result.Count == 0)
             {
                 success = "false";
-                message = "No delivery fee data found";
+                message = "Không có phí giao hàng nào";
             }
             else
             {
                 success = "true";
-                message = "Delivery fee data retrieved successfully";
+                message = "Lấy các phí giao hàng thành công";
             }
 
-            var response = new ResponseObject<List<DeliveryFeeResponseDto>>
+            var response = new DTOs.Response.ResponseObject<List<DeliveryFeeResponseDto>>
             {
                 Success = success,
                 Message = message,
-                Data = result
+                Data = result,
+                Pagination = null
             };
 
             return Ok(response);
@@ -55,15 +57,15 @@ namespace CleanAgricultureProductBE.Controllers
             if (result == null)
             {
                 success = "false";
-                message = "Failed to add delivery fee data";
+                message = "Thêm phí giao hàng không thành công";
             }
             else
             {
                 success = "true";
-                message = "Delivery fee data added successfully";
+                message = "Thêm phí giao hàng thành công";
             }
 
-            var response = new ResponseObject<DeliveryFeeResponseDto>
+            var response = new DTOs.ApiResponse.ResponseObject<DeliveryFeeResponseDto>
             {
                 Success = success,
                 Message = message,
@@ -80,13 +82,17 @@ namespace CleanAgricultureProductBE.Controllers
             var result = await deliveryFeeService.UpdateDeliveryFee(deliveryFeeId, resquest);
             if (result == null)
             {
-                return BadRequest("No Existed Delivery Fee With This ID");
+                return base.BadRequest(new DTOs.ApiResponse.ResponseObject<string>
+                {
+                    Success = "false",
+                    Message = $"Không có phí giao hàng nào với ID:{deliveryFeeId}"
+                });
             }
 
-            var response = new ResponseObject<DeliveryFeeResponseDto>
+            var response = new DTOs.ApiResponse.ResponseObject<DeliveryFeeResponseDto>
             {
                 Success = "true",
-                Message = "Delivery Fee Updated Successfully",
+                Message = "Cập nhật phí giao hàng thành công",
                 Data = result
             };
 
@@ -100,13 +106,17 @@ namespace CleanAgricultureProductBE.Controllers
             var result = await deliveryFeeService.DeleteDeliveryFeeById(deliveryFeeId);
             if (!result)
             {
-                return BadRequest("No Existed Delivery Fee With This ID");
+                return base.BadRequest(new DTOs.ApiResponse.ResponseObject<string>
+                {
+                    Success = "false",
+                    Message = $"Không có phí giao hàng nào với ID:{deliveryFeeId}"
+                });
             }
 
-            var response = new ResponseObject<bool>
+            var response = new DTOs.ApiResponse.ResponseObject<bool>
             {
                 Success = "true",
-                Message = "Delivery Fee Deleted Successfully",
+                Message = "Xóa phí giao hàng thành công",
                 Data = result
             };
             return Ok(response);

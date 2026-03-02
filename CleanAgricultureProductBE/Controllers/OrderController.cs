@@ -1,4 +1,5 @@
-﻿using CleanAgricultureProductBE.DTOs.Order;
+﻿using CleanAgricultureProductBE.DTOs.ApiResponse;
+using CleanAgricultureProductBE.DTOs.Order;
 using CleanAgricultureProductBE.DTOs.OrderDetail;
 using CleanAgricultureProductBE.DTOs.Response;
 using CleanAgricultureProductBE.Models;
@@ -38,7 +39,7 @@ namespace CleanAgricultureProductBE.Controllers
                 message = "Lấy thông tin các đơn hàng thành công";
             }
 
-            var response = new ResponseObject<List<OrderResponseDto>>
+            var response = new ResponseObjectWithPagination<List<OrderResponseDto>>
             {
                 Success = success,
                 Message = message,
@@ -63,7 +64,7 @@ namespace CleanAgricultureProductBE.Controllers
                 return Forbid("Không phải đơn hàng của bạn");
             }
 
-            var response = new ResponseObject<OrderDetailListResponseDto>
+            var response = new ResponseObjectWithPagination<OrderDetailListResponseDto>
             {
                 Success = "success",
                 Message = "Lấy thông tin đơn hàng thành công",
@@ -85,10 +86,19 @@ namespace CleanAgricultureProductBE.Controllers
 
             if (result == null)
             {
-                return BadRequest("Không có hàng trong vỏ hàng");
+                return BadRequest(new ResponseObject<string>
+                {
+                    Success = "false",
+                    Message = "Không có hàng nào trong vỏ hàng"
+                });
             }
 
-            return Ok(result);
+            return Ok(new ResponseObject<PlaceOrderResponseDto>
+            {
+                Success = "success",
+                Message = "Đặt hàng thành công",
+                Data = result
+            });
         }
 
         [HttpPut("me/orders")]

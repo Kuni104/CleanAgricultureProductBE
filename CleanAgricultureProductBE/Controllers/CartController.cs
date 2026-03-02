@@ -1,4 +1,5 @@
-﻿using CleanAgricultureProductBE.DTOs.Cart;
+﻿using CleanAgricultureProductBE.DTOs.ApiResponse;
+using CleanAgricultureProductBE.DTOs.Cart;
 using CleanAgricultureProductBE.DTOs.CartItem;
 using CleanAgricultureProductBE.DTOs.Response;
 using CleanAgricultureProductBE.Services.Cart;
@@ -30,14 +31,14 @@ namespace CleanAgricultureProductBE.Controllers
             if(result == null)
             {
                 success = "false";
-                message = "Failed to add product to cart";
+                message = "Thêm vào giỏ hàng không thành công";
             }else
             {
                 success = "true";
                 message = "Product added to cart successfully";
             }
 
-            var response = new ResponseObject<AddToCartResponseDto>()
+            var response = new DTOs.ApiResponse.ResponseObject<AddToCartResponseDto>()
             {
                 Success = success,
                 Message = message,
@@ -77,7 +78,7 @@ namespace CleanAgricultureProductBE.Controllers
 
             var pagination = result.Pagination == null ? null : result.Pagination;
 
-            var response = new ResponseObject<CartItemsResponseWithTotalPriceDto>()
+            var response = new ResponseObjectWithPagination<CartItemsResponseWithTotalPriceDto>()
             {
                 Success = success,
                 Message = message,
@@ -97,7 +98,7 @@ namespace CleanAgricultureProductBE.Controllers
 
             var result = await cartService.UpdateCartItemQuantity(accountEmail!, productId, request);
 
-            var response = new ResponseObject<UpdateCartResponseDto>
+            var response = new DTOs.ApiResponse.ResponseObject<UpdateCartResponseDto>
             {
                 Success = "true",
                 Message = "Updated",
@@ -118,7 +119,7 @@ namespace CleanAgricultureProductBE.Controllers
             if (result.Status == "ID 404")
             {
 
-                return NotFound(new ResponseObject<string>
+                return base.NotFound(new DTOs.ApiResponse.ResponseObject<string>
                 {
                     Success = "fail",
                     Message = "Product Not Found",
@@ -126,7 +127,7 @@ namespace CleanAgricultureProductBE.Controllers
                 });
             }
 
-            var response = new ResponseObject<decimal>
+            var response = new DTOs.ApiResponse.ResponseObject<decimal>
             {
                 Success = "true",
                 Message = "Remove Item From Cart And Return New Total Price Of Cart",
@@ -146,14 +147,14 @@ namespace CleanAgricultureProductBE.Controllers
 
             if (result == "404 Cart")
             {
-                return NotFound(new ResponseObject<string>
+                return base.NotFound(new DTOs.ApiResponse.ResponseObject<string>
                 {
                     Success = "fail",
                     Message = "Invalid User ID"
                 });
             }
 
-            var response = new ResponseObject<decimal>
+            var response = new DTOs.ApiResponse.ResponseObject<decimal>
             {
                 Success = "true",
                 Message = "Remove All Items From Cart Successful",

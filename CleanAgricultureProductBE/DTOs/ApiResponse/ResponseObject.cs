@@ -1,13 +1,10 @@
-﻿namespace CleanAgricultureProductBE.DTOs.Response
+﻿namespace CleanAgricultureProductBE.DTOs.ApiResponse
 {
     public class ResponseObject<T>
     {
         public string? Success { get; set; }
         public string? Message { get; set; }
         public T? Data { get; set; }
-        public Pagination? Pagination { get; set; }
-        public ResponseObject()
-        {
-        }
+        public ResponseObject() { }
     }
 }

@@ -1,4 +1,6 @@
 using CleanAgricultureProductBE.DTOs;
+using CleanAgricultureProductBE.DTOs.ApiResponse;
+using CleanAgricultureProductBE.DTOs.Response;
 using CleanAgricultureProductBE.Services.Category;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -26,11 +28,21 @@ namespace CleanAgricultureProductBE.Controllers
             try
             {
                 var categories = await _categoryService.GetAllCategoriesAsync();
-                return Ok(categories);
+                return base.Ok(new DTOs.Response.ResponseObject<List<CategoryResponseDto>>
+                {
+                    Success = "true",
+                    Message = "Lấy danh sách danh mục thành công!",
+                    Data = categories,
+                    Pagination = null
+                });
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return base.BadRequest(new DTOs.ApiResponse.ResponseObject<string>
+                {
+                    Success = "false",
+                    Message = ex.Message,
+                });
             }
         }
 
@@ -43,11 +55,20 @@ namespace CleanAgricultureProductBE.Controllers
             try
             {
                 var category = await _categoryService.GetCategoryByIdAsync(id);
-                return Ok(category);
+                return base.Ok(new DTOs.ApiResponse.ResponseObject<CategoryResponseDto>
+                {
+                    Success = "true",
+                    Message = "Lấy chi tiết danh mục thành công!",
+                    Data = category
+                });
             }
             catch (Exception ex)
             {
-                return NotFound(new { message = ex.Message });
+                return base.NotFound(new DTOs.ApiResponse.ResponseObject<string>
+                {
+                    Success = "false",
+                    Message = ex.Message,
+                });
             }
         }
 
@@ -60,11 +81,20 @@ namespace CleanAgricultureProductBE.Controllers
             try
             {
                 var result = await _categoryService.CreateCategoryAsync(dto);
-                return Ok(result);
+                return base.Ok(new DTOs.ApiResponse.ResponseObject<CategoryResponseDto>
+                {
+                    Success = "true",
+                    Message = "Tạo danh mục thành công!",
+                    Data = result
+                });
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return base.BadRequest(new DTOs.ApiResponse.ResponseObject<string> 
+                { 
+                    Success = "false",
+                    Message = ex.Message
+                });
             }
         }
 
@@ -77,11 +107,20 @@ namespace CleanAgricultureProductBE.Controllers
             try
             {
                 var result = await _categoryService.UpdateCategoryAsync(id, dto);
-                return Ok(result);
+                return base.Ok(new DTOs.ApiResponse.ResponseObject<CategoryResponseDto>
+                {
+                    Success = "true",
+                    Message = "Cập nhật danh mục thành công!",
+                    Data = result
+                });
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return base.BadRequest(new DTOs.ApiResponse.ResponseObject<string>
+                {
+                    Success = "false",
+                    Message = ex.Message
+                });
             }
         }
 
@@ -94,11 +133,20 @@ namespace CleanAgricultureProductBE.Controllers
             try
             {
                 var result = await _categoryService.DeleteCategoryAsync(id, confirm);
-                return Ok(new { message = "Category deleted successfully" });
+                return base.Ok(new DTOs.ApiResponse.ResponseObject<bool>
+                {
+                    Success = "true",
+                    Message = "Xóa danh mục thành công!",
+                    Data = result
+                });
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return base.BadRequest(new DTOs.ApiResponse.ResponseObject<string>
+                {
+                    Success = "false",
+                    Message = ex.Message
+                });
             }
         }
 
@@ -111,11 +159,20 @@ namespace CleanAgricultureProductBE.Controllers
             try
             {
                 var result = await _categoryService.UpdateCategoryStatusAsync(id, status);
-                return Ok(result);
+                return base.Ok(new DTOs.ApiResponse.ResponseObject<CategoryResponseDto>
+                {
+                    Success = "true",
+                    Message = "Cập nhật trạng thái danh mục thành công!",
+                    Data = result
+                });
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return base.BadRequest(new DTOs.ApiResponse.ResponseObject<string>
+                {
+                    Success = "false",
+                    Message = ex.Message
+                });
             }
         }
     }
