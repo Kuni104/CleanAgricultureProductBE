@@ -1,5 +1,3 @@
-using CleanAgricultureProductBE.Repositories.Complaint;
-using CleanAgricultureProductBE.Services.Complaint;
 using CleanAgricultureProductBE.Data;
 using CleanAgricultureProductBE.Models;
 using CleanAgricultureProductBE.Repositories;
@@ -7,27 +5,34 @@ using CleanAgricultureProductBE.Repositories.Address;
 using CleanAgricultureProductBE.Repositories.Cart;
 using CleanAgricultureProductBE.Repositories.CartItem;
 using CleanAgricultureProductBE.Repositories.Category;
+using CleanAgricultureProductBE.Repositories.Complaint;
 using CleanAgricultureProductBE.Repositories.DeliveryFee;
+using CleanAgricultureProductBE.Repositories.DSchedule;
 using CleanAgricultureProductBE.Repositories.Order;
 using CleanAgricultureProductBE.Repositories.OrderDetail;
 using CleanAgricultureProductBE.Repositories.OTP;
 using CleanAgricultureProductBE.Repositories.Payment;
 using CleanAgricultureProductBE.Repositories.PaymentMethod;
 using CleanAgricultureProductBE.Repositories.Product;
-using CleanAgricultureProductBE.Repositories.Schedule;
+using CleanAgricultureProductBE.Repositories.DSchedule;
+using CleanAgricultureProductBE.Repositories.UserProfile;
 using CleanAgricultureProductBE.Services;
+using CleanAgricultureProductBE.Services.Account;
 using CleanAgricultureProductBE.Services.Address;
 using CleanAgricultureProductBE.Services.Cart;
 using CleanAgricultureProductBE.Services.Category;
+using CleanAgricultureProductBE.Services.Complaint;
 using CleanAgricultureProductBE.Services.DeliveryFee;
 using CleanAgricultureProductBE.Services.Email;
 using CleanAgricultureProductBE.Services.Order;
 using CleanAgricultureProductBE.Services.OrderDetail;
+using CleanAgricultureProductBE.Services.OTP;
 using CleanAgricultureProductBE.Services.Payment;
 using CleanAgricultureProductBE.Services.PaymentMethod;
-using CleanAgricultureProductBE.Services.VnPay;
 using CleanAgricultureProductBE.Services.Product;
 using CleanAgricultureProductBE.Services.Schedule;
+using CleanAgricultureProductBE.Services.UserProfile;
+using CleanAgricultureProductBE.Services.VnPay;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -38,9 +43,6 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using System.Threading.Tasks;
 using VNPAY.Extensions;
-using CleanAgricultureProductBE.Services.Account;
-using CleanAgricultureProductBE.Repositories.UserProfile;
-using CleanAgricultureProductBE.Services.UserProfile;
 
 namespace CleanAgricultureProductBE
 {
@@ -156,12 +158,13 @@ namespace CleanAgricultureProductBE
             //Email DI
             builder.Services.AddScoped<IEmailService, EmailService>();
 
-            // OTP DI
-            builder.Services.AddScoped<IPasswordResetOtpRepository, PasswordResetOtpRepository>();
+            //OTP DI
+            builder.Services.AddScoped<IEmailOtpRepository, EmailOtpRepository>();
+            builder.Services.AddScoped<IEmailOtpService, EmailOtpService>();
 
             //Schedule DI
-            builder.Services.AddScoped<IDeliveryScheduleRepository, DeliveryScheduleRepository>();
-            builder.Services.AddScoped<IDeliveryScheduleService, DeliveryScheduleService>();
+            builder.Services.AddScoped<IScheduleRepository, ScheduleRepository>();
+            builder.Services.AddScoped<IScheduleService, ScheduleService>();
 
             //Complaint DI
             builder.Services.AddScoped<IComplaintRepository, ComplaintRepository>();

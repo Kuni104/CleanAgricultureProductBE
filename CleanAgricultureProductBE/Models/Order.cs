@@ -13,7 +13,7 @@
         /*------------------------------------------------------------------------------------------------------------------------*/
         public UserProfile Customer { get; set; } = null!;
         public Address Address { get; set; } = null!;
-        public Schedule Schedule { get; set; } = null!;
+        public Schedule? Schedule { get; set; } = null!;
         public DeliveryFee DeliveryFee { get; set; } = null!;
         public Payment Payment { get; set; } = null!;
         public Complaint Complaint { get; set; } = null!;

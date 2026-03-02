@@ -1,5 +1,4 @@
 ﻿using CleanAgricultureProductBE.DTOs;
-using CleanAgricultureProductBE.DTOs.OTP;
 
 namespace CleanAgricultureProductBE.Services
 {
