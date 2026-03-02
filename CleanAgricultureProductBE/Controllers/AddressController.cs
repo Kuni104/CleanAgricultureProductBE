@@ -7,7 +7,7 @@ using System.Security.Claims;
 
 namespace CleanAgricultureProductBE.Controllers
 {
-    [Route("api/me/addresses")]
+    [Route("api/v1/me/addresses")]
     [ApiController]
     [Authorize(Roles = "Customer")]
     public class AddressController : ControllerBase

@@ -7,7 +7,7 @@ namespace CleanAgricultureProductBE.Controllers
 {
     [Authorize(Roles = "Admin,Staff")]
     [ApiController]
-    [Route("api/delivery-schedules")]
+    [Route("api/v1/delivery-schedules")]
     public class DeliveryScheduleController : ControllerBase
     {
         private readonly IDeliveryScheduleService _service;

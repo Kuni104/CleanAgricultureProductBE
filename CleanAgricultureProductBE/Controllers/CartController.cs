@@ -12,7 +12,7 @@ using System.Security.Claims;
 namespace CleanAgricultureProductBE.Controllers
 {
     [Authorize(Roles = "Customer")]
-    [Route("api")]
+    [Route("api/v1")]
     [ApiController]
     public class CartController(ICartService cartService) : ControllerBase
     {

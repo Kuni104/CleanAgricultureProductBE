@@ -6,7 +6,7 @@ using Swashbuckle.AspNetCore.Annotations;
 
 namespace CleanAgricultureProductBE.Controllers
 {
-    [Route("api/categories")]
+    [Route("api/v1/categories")]
     [ApiController]
     public class CategoryController : ControllerBase
     {

@@ -9,7 +9,7 @@ using System.Security.Claims;
 
 namespace CleanAgricultureProductBE.Controllers
 {
-    [Route("api/me/profile")]
+    [Route("api/v1/me/profile")]
     [ApiController]
     public class UserProfileController(IUserProfileService userProfileService) : ControllerBase
     {

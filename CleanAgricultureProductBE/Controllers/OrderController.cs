@@ -11,7 +11,7 @@ using System.Security.Claims;
 
 namespace CleanAgricultureProductBE.Controllers
 {
-    [Route("api")]
+    [Route("api/v1")]
     [ApiController]
     public class OrderController(IOrderService orderService) : ControllerBase
     {
