@@ -9,7 +9,7 @@ using Swashbuckle.AspNetCore.Annotations;
 namespace CleanAgricultureProductBE.Controllers
 {
     [Authorize(Roles = "Admin,Staff")]
-    [Route("api/delivery-fee")]
+    [Route("api/v1/delivery-fee")]
     [ApiController]
     public class DeliveryFeeController(IDeliveryFeeService deliveryFeeService) : ControllerBase
     {

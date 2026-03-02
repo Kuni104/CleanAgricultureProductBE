@@ -8,7 +8,7 @@ using System.Security.Claims;
 
 namespace CleanAgricultureProductBE.Controllers
 {
-    [Route("api")]
+    [Route("api/v1")]
     [ApiController]
     public class ComplaintController(IComplaintService complaintService) : ControllerBase
     {
