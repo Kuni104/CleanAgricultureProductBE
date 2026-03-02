@@ -4,6 +4,7 @@ using CleanAgricultureProductBE.Services.DeliveryFee;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace CleanAgricultureProductBE.Controllers
 {
@@ -13,6 +14,7 @@ namespace CleanAgricultureProductBE.Controllers
     public class DeliveryFeeController(IDeliveryFeeService deliveryFeeService) : ControllerBase
     {
         [HttpGet]
+        [SwaggerOperation(Summary = "Lấy danh sách phí giao hàng (Admin/Staff)")]
         public async Task<IActionResult> GetDeliveryFeeList()
         {
             var success = "";
@@ -42,6 +44,7 @@ namespace CleanAgricultureProductBE.Controllers
         }
 
         [HttpPost]
+        [SwaggerOperation(Summary = "Thêm phí giao hàng mới (Admin/Staff)")]
         public async Task<IActionResult> AddDeliveryFee([FromBody] CreateDeliveryFeeRequestDto request)
         {
             var success = "";
@@ -71,6 +74,7 @@ namespace CleanAgricultureProductBE.Controllers
         }
 
         [HttpPut("{deliveryFeeId}")]
+        [SwaggerOperation(Summary = "Cập nhật phí giao hàng (Admin/Staff)")]
         public async Task<IActionResult> UpdateDeliveryFee([FromRoute]Guid deliveryFeeId, [FromBody]UpdateDeliveryFeeRequestDto resquest)
         {
             var result = await deliveryFeeService.UpdateDeliveryFee(deliveryFeeId, resquest);
@@ -90,6 +94,7 @@ namespace CleanAgricultureProductBE.Controllers
         }
 
         [HttpDelete("{deliveryFeeId}")]
+        [SwaggerOperation(Summary = "Xóa phí giao hàng (Admin/Staff)")]
         public async Task<IActionResult> DeleteDeliveryFeeById([FromRoute]Guid deliveryFeeId)
         {
             var result = await deliveryFeeService.DeleteDeliveryFeeById(deliveryFeeId);

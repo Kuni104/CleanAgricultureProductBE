@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 using System.Security.Claims;
 
 namespace CleanAgricultureProductBE.Controllers
@@ -16,6 +17,7 @@ namespace CleanAgricultureProductBE.Controllers
     {
         [Authorize(Roles = "Admin")]
         [HttpGet]
+        [SwaggerOperation(Summary = "Lấy danh sách tất cả đơn hàng (Admin)")]
         public async Task<IActionResult> GetOrders([FromQuery] int? page, [FromQuery] int? size, [FromQuery] string? keyword)
         {
             var success = "";
@@ -47,6 +49,7 @@ namespace CleanAgricultureProductBE.Controllers
 
         [Authorize(Roles = "Admin,Staff")]
         [HttpGet("{orderId}")]
+        [SwaggerOperation(Summary = "Lấy chi tiết đơn hàng theo ID (Admin/Staff)")]
         public async Task<IActionResult> GetOrderDetails([FromRoute] Guid orderId, [FromQuery] int? page, [FromQuery] int? size, [FromQuery] string? keyword)
         {
             var accountEmail = User.FindFirstValue(ClaimTypes.Email);
@@ -79,6 +82,7 @@ namespace CleanAgricultureProductBE.Controllers
 
         [Authorize(Roles = "Admin,Staff,DeliveryPerson")]
         [HttpPatch("{orderId}")]
+        [SwaggerOperation(Summary = "Cập nhật trạng thái đơn hàng (Admin/Staff/DeliveryPerson)")]
         public async Task<IActionResult> UpdateOrderStatus([FromRoute] Guid orderId, [FromBody] UpdateOrderStatusRequestDto request)
         {
             var success = "";

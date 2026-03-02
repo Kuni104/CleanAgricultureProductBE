@@ -1,3 +1,5 @@
+using CleanAgricultureProductBE.Repositories.Complaint;
+using CleanAgricultureProductBE.Services.Complaint;
 using CleanAgricultureProductBE.Data;
 using CleanAgricultureProductBE.Models;
 using CleanAgricultureProductBE.Repositories;
@@ -77,6 +79,7 @@ namespace CleanAgricultureProductBE
                         new string[] {}
                     }
                 });
+                options.EnableAnnotations();
             });
 
             var vnpayConfig = builder.Configuration.GetSection("VNPAY");
@@ -159,6 +162,10 @@ namespace CleanAgricultureProductBE
             //Schedule DI
             builder.Services.AddScoped<IDeliveryScheduleRepository, DeliveryScheduleRepository>();
             builder.Services.AddScoped<IDeliveryScheduleService, DeliveryScheduleService>();
+
+            //Complaint DI
+            builder.Services.AddScoped<IComplaintRepository, ComplaintRepository>();
+            builder.Services.AddScoped<IComplaintService, ComplaintService>();
 
             // JWT Authentication
             builder.Services

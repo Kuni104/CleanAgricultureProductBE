@@ -2,6 +2,7 @@ using CleanAgricultureProductBE.DTOs.Address;
 using CleanAgricultureProductBE.Services.Address;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 using System.Security.Claims;
 
 namespace CleanAgricultureProductBE.Controllers
@@ -19,6 +20,7 @@ namespace CleanAgricultureProductBE.Controllers
         }
 
         [HttpGet]
+        [SwaggerOperation(Summary = "Lấy danh sách địa chỉ của tôi")]
         public async Task<IActionResult> GetAllAddresses()
         {
             try
@@ -34,6 +36,7 @@ namespace CleanAgricultureProductBE.Controllers
         }
 
         [HttpGet("{id}")]
+        [SwaggerOperation(Summary = "Lấy địa chỉ theo ID")]
         public async Task<IActionResult> GetAddressById(Guid id)
         {
             try
@@ -49,6 +52,7 @@ namespace CleanAgricultureProductBE.Controllers
         }
 
         [HttpPost]
+        [SwaggerOperation(Summary = "Tạo địa chỉ mới")]
         public async Task<IActionResult> CreateAddress([FromBody] AddressRequestDto dto)
         {
             try
@@ -64,6 +68,7 @@ namespace CleanAgricultureProductBE.Controllers
         }
 
         [HttpPut("{id}")]
+        [SwaggerOperation(Summary = "Cập nhật địa chỉ")]
         public async Task<IActionResult> UpdateAddress(Guid id, [FromBody] AddressRequestDto dto)
         {
             try
@@ -79,6 +84,7 @@ namespace CleanAgricultureProductBE.Controllers
         }
 
         [HttpDelete("{id}")]
+        [SwaggerOperation(Summary = "Xóa địa chỉ")]
         public async Task<IActionResult> DeleteAddress(Guid id, [FromQuery] bool confirm = false)
         {
             try
@@ -94,6 +100,7 @@ namespace CleanAgricultureProductBE.Controllers
         }
 
         [HttpPatch("{id}/set-default")]
+        [SwaggerOperation(Summary = "Đặt địa chỉ mặc định")]
         public async Task<IActionResult> SetDefaultAddress(Guid id)
         {
             try

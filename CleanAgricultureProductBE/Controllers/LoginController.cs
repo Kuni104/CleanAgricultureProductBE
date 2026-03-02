@@ -6,10 +6,11 @@ using CleanAgricultureProductBE.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace CleanAgricultureProductBE.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/auth")]
     [ApiController]
     public class LoginController : ControllerBase
     {
@@ -25,6 +26,7 @@ namespace CleanAgricultureProductBE.Controllers
         }
 
         [HttpPost]
+        [SwaggerOperation(Summary = "Đăng nhập và nhận JWT token")]
         public async Task<IActionResult> Login(LoginRequestDto dto)
         {
             try
@@ -49,6 +51,7 @@ namespace CleanAgricultureProductBE.Controllers
         }
 
         [HttpPost("register")]
+        [SwaggerOperation(Summary = "Đăng ký tài khoản mới")]
         public async Task<IActionResult> Register(RegisterRequestDto dto)
         {
             if(!ModelState.IsValid)
@@ -67,6 +70,7 @@ namespace CleanAgricultureProductBE.Controllers
 
         [Authorize]
         [HttpPost("logout")]
+        [SwaggerOperation(Summary = "Đăng xuất và vô hiệu hóa token")]
         public async Task<IActionResult> Logout()
         {
             var token = await HttpContext.GetTokenAsync("access_token");
@@ -80,6 +84,7 @@ namespace CleanAgricultureProductBE.Controllers
         }
 
         [HttpPost("request-reset-password")]
+        [SwaggerOperation(Summary = "Yêu cầu đặt lại mật khẩu - gửi OTP qua email")]
         public async Task<IActionResult> RequestResetPassword(RequestResetPasswordDto dto)
         {
             await _authService.RequestResetPasswordAsync(dto.Email);
@@ -87,6 +92,7 @@ namespace CleanAgricultureProductBE.Controllers
         }
 
         [HttpPost("reset-password")]
+        [SwaggerOperation(Summary = "Xác nhận OTP và đặt lại mật khẩu mới")]
         public async Task<IActionResult> ResetPassword(ConfirmResetPasswordDto dto)
         {
             await _authService.ResetPasswordAsync(dto);

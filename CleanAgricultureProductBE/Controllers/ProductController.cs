@@ -2,10 +2,11 @@ using CleanAgricultureProductBE.DTOs;
 using CleanAgricultureProductBE.Services.Product;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace CleanAgricultureProductBE.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/products")]
     [ApiController]
     public class ProductController : ControllerBase
     {
@@ -19,6 +20,7 @@ namespace CleanAgricultureProductBE.Controllers
         // GET: api/Product - Tất cả user có thể xem
         [HttpGet]
         [AllowAnonymous]
+        [SwaggerOperation(Summary = "Lấy danh sách tất cả sản phẩm")]
         public async Task<IActionResult> GetAllProducts()
         {
             try
@@ -35,6 +37,7 @@ namespace CleanAgricultureProductBE.Controllers
         // GET: api/Product/{id} - Tất cả user có thể xem
         [HttpGet("{id}")]
         [AllowAnonymous]
+        [SwaggerOperation(Summary = "Lấy chi tiết sản phẩm theo ID")]
         public async Task<IActionResult> GetProductById(Guid id)
         {
             try
@@ -51,6 +54,7 @@ namespace CleanAgricultureProductBE.Controllers
         // POST: api/Product - Chỉ Admin và Staff
         [HttpPost]
         [Authorize(Roles = "Admin,Staff")]
+        [SwaggerOperation(Summary = "Tạo sản phẩm mới (Admin/Staff)")]
         public async Task<IActionResult> CreateProduct(CreateProductDto dto)
         {
             try
@@ -67,6 +71,7 @@ namespace CleanAgricultureProductBE.Controllers
         // PUT: api/Product/{id} - Chỉ Admin và Staff
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin,Staff")]
+        [SwaggerOperation(Summary = "Cập nhật sản phẩm (Admin/Staff)")]
         public async Task<IActionResult> UpdateProduct(Guid id, UpdateProductDto dto)
         {
             try
@@ -83,6 +88,7 @@ namespace CleanAgricultureProductBE.Controllers
         // DELETE: api/Product/{id} - Chỉ Admin
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]
+        [SwaggerOperation(Summary = "Xóa sản phẩm (Admin)")]
         public async Task<IActionResult> DeleteProduct(Guid id, [FromQuery] bool confirm = false)
         {
             try
@@ -99,6 +105,7 @@ namespace CleanAgricultureProductBE.Controllers
         // PUT: api/Product/{id}/status - Chỉ Admin
         [HttpPatch("{id}/status")]
         [Authorize(Roles = "Admin")]
+        [SwaggerOperation(Summary = "Cập nhật trạng thái sản phẩm (Admin)")]
         public async Task<IActionResult> UpdateProductStatus(Guid id, [FromBody] string status)
         {
             if (string.IsNullOrWhiteSpace(status))

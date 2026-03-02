@@ -6,6 +6,7 @@ using CleanAgricultureProductBE.Services.Order;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 using System.Security.Claims;
 
 namespace CleanAgricultureProductBE.Controllers
@@ -16,6 +17,7 @@ namespace CleanAgricultureProductBE.Controllers
     {
         [Authorize(Roles = "Customer")]
         [HttpGet("me/orders")]
+        [SwaggerOperation(Summary = "Lấy danh sách đơn hàng của tôi (Customer)")]
         public async Task<IActionResult> GetAllOrders([FromQuery] int? page, [FromQuery] int? size, [FromQuery] string? keyword)
         {
             var success = "";
@@ -49,6 +51,7 @@ namespace CleanAgricultureProductBE.Controllers
 
         [Authorize(Roles = "Customer")]
         [HttpGet("me/orders/{orderId}")]
+        [SwaggerOperation(Summary = "Lấy chi tiết đơn hàng theo ID (Customer)")]
         public async Task<IActionResult> GetOrderDetail([FromRoute] Guid orderId, [FromQuery] int? page, [FromQuery] int? size, [FromQuery] string? keyword)
         {
             var accountEmail = User.FindFirstValue(ClaimTypes.Email);
@@ -73,6 +76,7 @@ namespace CleanAgricultureProductBE.Controllers
 
         [Authorize(Roles = "Customer")]
         [HttpPost("me/orders")]
+        [SwaggerOperation(Summary = "Tạo đơn hàng mới (Customer)")]
         public async Task<IActionResult> PlaceOrder([FromBody] OrderRequestDto request)
         {
             var accountEmail = User.FindFirstValue(ClaimTypes.Email);
@@ -83,12 +87,14 @@ namespace CleanAgricultureProductBE.Controllers
         }
 
         [HttpPut("me/orders")]
+        [SwaggerOperation(Summary = "Cập nhật đơn hàng")]
         public async Task<IActionResult> UpdateOrder()
         {
             return Ok(); 
         }
 
         [HttpDelete("me/orders")]
+        [SwaggerOperation(Summary = "Hủy đơn hàng")]
         public async Task<IActionResult> CancelOrder()
         {
             return Ok();
