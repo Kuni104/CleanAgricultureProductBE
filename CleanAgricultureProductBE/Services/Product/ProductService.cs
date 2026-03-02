@@ -4,6 +4,12 @@ using ProductModel = CleanAgricultureProductBE.Models.Product;
 
 namespace CleanAgricultureProductBE.Services.Product
 {
+    public static class ProductStatus
+    {
+        public const string Active = "Active";
+        public const string Inactive = "Inactive";
+    }
+
     public class ProductService : IProductService
     {
         private readonly IProductRepository _productRepo;
@@ -34,7 +40,7 @@ namespace CleanAgricultureProductBE.Services.Product
                 Price = dto.Price,
                 Unit = unit,
                 Stock = dto.Stock,
-                Status = "Active"
+                Status = ProductStatus.Active
             };
 
             var created = await _productRepo.CreateAsync(product);
@@ -58,7 +64,7 @@ namespace CleanAgricultureProductBE.Services.Product
         {
             var products = await _productRepo.GetAllAsync();
             return products
-                .Where(p => p.Status == "Active")
+                .Where(p => p.Status == ProductStatus.Active)
                 .Select(p => new ProductResponseDto
                 {
                     ProductId = p.ProductId,
@@ -76,7 +82,7 @@ namespace CleanAgricultureProductBE.Services.Product
         public async Task<ProductResponseDto> GetProductByIdAsync(Guid id)
         {
             var product = await _productRepo.GetByIdAsync(id);
-            if (product == null || product.Status == "Inactive")
+            if (product == null || product.Status == ProductStatus.Inactive)
                 throw new Exception("Product not found");
 
             return new ProductResponseDto
@@ -96,7 +102,7 @@ namespace CleanAgricultureProductBE.Services.Product
         public async Task<ProductResponseDto> UpdateProductAsync(Guid id, UpdateProductDto dto)
         {
             var product = await _productRepo.GetByIdAsync(id);
-            if (product == null || product.Status == "Inactive")
+            if (product == null || product.Status == ProductStatus.Inactive)
                 throw new Exception("Product not found");
 
             if (dto.Price.HasValue && dto.Price.Value <= 0)
@@ -150,10 +156,10 @@ namespace CleanAgricultureProductBE.Services.Product
             if (product == null)
                 throw new Exception("Product not found");
 
-            if (product.Status == "Inactive")
+            if (product.Status == ProductStatus.Inactive)
                 throw new Exception("Product already deleted");
 
-            product.Status = "Inactive";
+            product.Status = ProductStatus.Inactive;
             await _productRepo.UpdateAsync(product);
             return true;
         }

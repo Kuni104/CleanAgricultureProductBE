@@ -200,7 +200,7 @@ namespace CleanAgricultureProductBE.Data
                         Price = 10000,
                         Unit = 1,
                         Stock = 100,
-                        Status = "In Stock",
+                        Status = "Active",
                     },
                     new Product
                     {
@@ -214,7 +214,7 @@ namespace CleanAgricultureProductBE.Data
                         Price = 10400,
                         Unit = 1,
                         Stock = 104,
-                        Status = "In Stock"
+                        Status = "Active"
                     },
                     new Product
                     {
@@ -228,7 +228,7 @@ namespace CleanAgricultureProductBE.Data
                         Price = 8000,
                         Unit = 1,
                         Stock = 150,
-                        Status = "In Stock"
+                        Status = "Active"
                     },
                     new Product
                     {
@@ -242,7 +242,7 @@ namespace CleanAgricultureProductBE.Data
                         Price = 25000,
                         Unit = 1,
                         Stock = 200,
-                        Status = "In Stock"
+                        Status = "Active"
                     }
                 };
 
