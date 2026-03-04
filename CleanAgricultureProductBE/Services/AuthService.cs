@@ -167,11 +167,6 @@ namespace CleanAgricultureProductBE.Services
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        Task<object> IAuthService.LoginAsync(LoginRequestDto dto)
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task RequestResetPasswordAsync(string email)
         {
             var user = await _accountRepo.GetByEmailAsync(email);
