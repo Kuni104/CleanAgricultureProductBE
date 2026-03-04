@@ -37,7 +37,7 @@ namespace CleanAgricultureProductBE.Controllers
                 {
                     Success = "success",
                     Message = "Login successful",
-                    Data = (LoginResponseDto)result
+                    Data = result
                 };
 
                 return Ok(apiResponse);
