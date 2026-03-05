@@ -1,34 +1,37 @@
-﻿using System.Net;
+﻿using CleanAgricultureProductBE.Models;
+using CleanAgricultureProductBE.Repositories.OTP;
+using CleanAgricultureProductBE.Services.OTP;
+using Microsoft.Extensions.Options;
+using System.Net;
 using System.Net.Mail;
 
 namespace CleanAgricultureProductBE.Services.Email
 {
     public class EmailService : IEmailService
     {
-        private readonly IConfiguration _config;
+        private readonly IEmailOtpRepository _otpRepository;
+        private readonly SmtpSettings _smtpSettings;
 
-        public EmailService(IConfiguration config)
+        public EmailService(IEmailOtpRepository otpRepository, IOptions<SmtpSettings> smtpOptions)
         {
-            _config = config;
+            _otpRepository = otpRepository;
+            _smtpSettings = smtpOptions.Value;
         }
 
-        public async Task SendEmailAsync(string to, string subject, string body)
+        public async Task SendEmailAsync(string toEmail, string otp)
         {
-            var smtp = new SmtpClient("smtp.gmail.com", 587)
-            {
-                Credentials = new NetworkCredential(
-                    _config["Smtp:Email"],
-                    _config["Smtp:Password"]
-                ),
-                EnableSsl = true
-            };
+            using var mail = new MailMessage();
+            mail.From = new MailAddress(_smtpSettings.Email);
+            mail.To.Add(toEmail);
+            mail.Subject = "Your OTP Code";
+            mail.Body = $"Your OTP is {otp}. It is valid for 5 minutes.";
 
-            var mail = new MailMessage(
-                _config["Smtp:Email"],
-                to,
-                subject,
-                body
+            using var smtp = new SmtpClient(_smtpSettings.Host, _smtpSettings.Port);
+            smtp.Credentials = new NetworkCredential(
+                _smtpSettings.Email,
+                _smtpSettings.Password
             );
+            smtp.EnableSsl = true;
 
             await smtp.SendMailAsync(mail);
         }

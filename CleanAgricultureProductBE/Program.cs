@@ -84,6 +84,9 @@ namespace CleanAgricultureProductBE
                 options.EnableAnnotations();
             });
 
+            builder.Services.Configure<SmtpSettings>(
+                builder.Configuration.GetSection("SmtpSettings"));
+
             var vnpayConfig = builder.Configuration.GetSection("VNPAY");
 
             builder.Services.AddVnpayClient(config =>
