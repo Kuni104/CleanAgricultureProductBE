@@ -12,7 +12,7 @@ using System.Security.Claims;
 
 namespace CleanAgricultureProductBE.Controllers
 {
-    [Route("api/v1/admin/orders")]
+    [Route("api/v1/manage-orders")]
     [ApiController]
     public class ManageOrderController(IOrderService orderService) : ControllerBase
     {
@@ -48,7 +48,39 @@ namespace CleanAgricultureProductBE.Controllers
             return Ok(response);
         }
 
-        [Authorize(Roles = "Admin,Staff")]
+        [Authorize(Roles = "DeliveryPerson,Admin")]
+        [HttpGet("schedules/{scheduleId}")]
+        [SwaggerOperation(Summary = "Lấy danh sách tất cả đơn hàng (Admin)")]
+        public async Task<IActionResult> GetOrdersInSchedule([FromRoute] Guid scheduleId ,[FromQuery] int? page, [FromQuery] int? size, [FromQuery] string? keyword)
+        {
+            var success = "";
+            var message = "";
+
+            var orders = await orderService.GetAllOrdersInSchedule(scheduleId, page, size, keyword);
+
+            if (orders.ResultObject == null || orders.ResultObject.Count == 0)
+            {
+                success = "true";
+                message = "Không có đơn hàng nào";
+            }
+            else
+            {
+                success = "true";
+                message = "Lấy tất cả đơn hàng thành công!";
+            }
+
+            var response = new ResponseObjectWithPagination<List<OrderResponseDto>>
+            {
+                Success = success,
+                Message = message,
+                Data = orders.ResultObject,
+                Pagination = orders.Pagination
+            };
+
+            return Ok(response);
+        }
+
+        [Authorize(Roles = "Admin,Staff,DeliveryPerson")]
         [HttpGet("{orderId}")]
         [SwaggerOperation(Summary = "Lấy chi tiết đơn hàng theo ID (Admin/Staff)")]
         public async Task<IActionResult> GetOrderDetails([FromRoute] Guid orderId, [FromQuery] int? page, [FromQuery] int? size, [FromQuery] string? keyword)

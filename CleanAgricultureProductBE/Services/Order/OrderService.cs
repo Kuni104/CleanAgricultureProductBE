@@ -88,7 +88,7 @@ namespace CleanAgricultureProductBE.Services.Order
 
             string paymentUrl = string.Empty;
 
-            if (true) {
+            if (request.PaymentMethodId == 2) {
                 paymentUrl = vnPayService.CreatePaymentUrl(new VNPAY.Models.VnpayPaymentRequest
                 {
                     Money = (double)totalOrderPrice,
@@ -421,6 +421,68 @@ namespace CleanAgricultureProductBE.Services.Order
             var cart = await cartRepository.GetCartByCustomerId(customerId);
 
             return cart!;
+        }
+
+        public async Task<ResponseDtoWithPagination<List<OrderResponseDto>>> GetAllOrdersInSchedule(Guid scheduleId, int? page, int? size, string? keyword)
+        {
+            bool isPagination = false;
+            int offset = 0;
+            int pageSize = 0;
+            if (page != null && size != null)
+            {
+                pageSize = (int)size;
+                offset = (int)((page - 1) * size);
+                isPagination = true;
+            }
+
+            var orders = await orderRepository.GetAllOrdersInSchedule(scheduleId);
+
+            int totalItems = orders.Count;
+
+            if (isPagination)
+            {
+                orders = await orderRepository.GetAllOrdersInScheduleWithPagination(scheduleId, offset, pageSize);
+            }
+
+            var orderResponseList = new List<OrderResponseDto>();
+            foreach (var order in orders)
+            {
+                orderResponseList.Add(new OrderResponseDto
+                {
+                    OrderId = order.OrderId,
+                    CustomerName = order.Address.RecipientName,
+                    Address = order.Address.AddressDetail,
+                    //Payment = (Guid)order.PaymentId,
+                    Schedule = TimeZoneInfo.ConvertTimeFromUtc(order.Schedule.ScheduledDate, timeZone),
+                    TotalPrice = order.Payment.TotalAmount,
+                    OrderDate = TimeZoneInfo.ConvertTimeFromUtc(order.OrderDate, timeZone),
+                    OrderStatus = order.OrderStatus
+                });
+            }
+
+            var result = new ResponseDtoWithPagination<List<OrderResponseDto>>
+            {
+                ResultObject = orderResponseList
+            };
+
+            if (isPagination)
+            {
+                int totalPage = totalItems / pageSize + (totalItems % pageSize == 0 ? 1 : 0);
+                if (totalItems < pageSize || page <= size)
+                {
+                    totalPage = 1;
+                }
+
+                result.Pagination = new Pagination
+                {
+                    PageNumber = (int)page!,
+                    PageSize = pageSize,
+                    TotalItems = totalItems,
+                    TotalPages = totalPage
+                };
+            }
+
+            return result;
         }
     }
 }
