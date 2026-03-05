@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace CleanAgricultureProductBE.Migrations
 {
     /// <inheritdoc />
-    public partial class Init : Migration
+    public partial class init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -55,6 +55,23 @@ namespace CleanAgricultureProductBE.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_DeliveryFees", x => x.DeliveryFeeId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "EmailOtps",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    OtpCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ExpiredAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsUsed = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EmailOtps", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -358,12 +375,13 @@ namespace CleanAgricultureProductBE.Migrations
                 columns: table => new
                 {
                     ComplaintId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    StaffId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    StaffId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     OrderId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Subject = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ResolveAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ResolveAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Evidence = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
@@ -374,7 +392,7 @@ namespace CleanAgricultureProductBE.Migrations
                         column: x => x.StaffId,
                         principalTable: "Accounts",
                         principalColumn: "AccountId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.SetNull);
                     table.ForeignKey(
                         name: "FK_Complaints_Orders_OrderId",
                         column: x => x.OrderId,
@@ -640,6 +658,9 @@ namespace CleanAgricultureProductBE.Migrations
 
             migrationBuilder.DropTable(
                 name: "DeliverySchedules");
+
+            migrationBuilder.DropTable(
+                name: "EmailOtps");
 
             migrationBuilder.DropTable(
                 name: "OrderDetails");

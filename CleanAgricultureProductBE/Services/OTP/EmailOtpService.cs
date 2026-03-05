@@ -51,14 +51,17 @@ namespace CleanAgricultureProductBE.Services.OTP
 
         private async Task SendEmail(string toEmail, string otp)
         {
+            string senderEmail = "trungvnse182447@fpt.edu.vn";
+            string appPassword = "gksozymnhlifkmuw";
+
             MailMessage mail = new MailMessage();
-            mail.From = new MailAddress("your-email@gmail.com");
+            mail.From = new MailAddress(senderEmail);
             mail.To.Add(toEmail);
             mail.Subject = "Your OTP Code";
             mail.Body = $"Your OTP is {otp}. It is valid for 5 minutes.";
 
             SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587);
-            smtp.Credentials = new NetworkCredential("your-email@gmail.com", "your-app-password");
+            smtp.Credentials = new NetworkCredential(senderEmail, appPassword);
             smtp.EnableSsl = true;
 
             await smtp.SendMailAsync(mail);
