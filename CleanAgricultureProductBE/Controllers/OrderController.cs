@@ -80,6 +80,15 @@ namespace CleanAgricultureProductBE.Controllers
         [SwaggerOperation(Summary = "Tạo đơn hàng mới (Customer)")]
         public async Task<IActionResult> PlaceOrder([FromBody] OrderRequestDto request)
         {
+            if(request.PaymentMethodId != 1 && request.PaymentMethodId != 2)
+            {
+                return BadRequest(new ResponseObject<string>
+                {
+                    Success = "false",
+                    Message = "Phương thức thanh toán không hợp lệ"
+                });
+            }
+
             var accountEmail = User.FindFirstValue(ClaimTypes.Email);
 
             var result = await orderService.PlaceOrder(accountEmail!, request);

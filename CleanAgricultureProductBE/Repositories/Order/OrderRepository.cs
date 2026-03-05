@@ -90,5 +90,29 @@ namespace CleanAgricultureProductBE.Repositories.Order
             await context.SaveChangesAsync();
         }
 
+        public async Task<List<Models.Order>> GetAllOrdersInSchedule(Guid scheduleId)
+        {
+            return await context.Orders.Include(o => o.Address)
+                                       .Include(o => o.Payment)
+                                       .Include(o => o.Schedule)
+                                       .Include(o => o.Customer)
+                                       .ThenInclude(c => c.Account)
+                                       .Where(o => o.ScheduleId == scheduleId)
+                                       .ToListAsync();
+        }
+
+        public async Task<List<Models.Order>> GetAllOrdersInScheduleWithPagination(Guid scheduleId, int offset, int pageSize)
+        {
+            return await context.Orders.Include(o => o.Address)
+                                       .Include(o => o.Payment)
+                                       .Include(o => o.Schedule)
+                                       .Include(o => o.Customer)
+                                       .ThenInclude(c => c.Account)
+                                       .Where(o => o.ScheduleId == scheduleId)
+                                       .OrderByDescending(o => o.OrderDate)
+                                       .Skip(offset)
+                                       .Take(pageSize)
+                                       .ToListAsync();
+        }
     }
 }
