@@ -23,7 +23,6 @@ using CleanAgricultureProductBE.Services.Cart;
 using CleanAgricultureProductBE.Services.Category;
 using CleanAgricultureProductBE.Services.Complaint;
 using CleanAgricultureProductBE.Services.DeliveryFee;
-using CleanAgricultureProductBE.Services.Email;
 using CleanAgricultureProductBE.Services.Order;
 using CleanAgricultureProductBE.Services.OrderDetail;
 using CleanAgricultureProductBE.Services.OTP;
@@ -154,9 +153,6 @@ namespace CleanAgricultureProductBE
 
             //VNPay DI
             builder.Services.AddScoped<IVnPayService, VnPayService>();
-
-            //Email DI
-            builder.Services.AddScoped<IEmailService, EmailService>();
 
             //OTP DI
             builder.Services.AddScoped<IEmailOtpRepository, EmailOtpRepository>();

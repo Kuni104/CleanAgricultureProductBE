@@ -30,13 +30,13 @@ namespace CleanAgricultureProductBE.Controllers
         }
 
         [HttpPost("send-otp")]
-        public async Task<IActionResult> SendOtp([FromBody] string email)
+        public async Task<IActionResult> SendOtp([FromBody] SendOtpDto request)
         {
-            await _otpService.SendOtpAsync(email);
+            await _otpService.SendOtpAsync(request.Email);
             return Ok("OTP sent successfully");
         }
 
-        [HttpPost("verify-otp")]
+        [HttpPost("test/verify-otp")]
         public async Task<IActionResult> VerifyOtp([FromBody] VerifyOtpRequest request)
         {
             var result = await _otpService.VerifyOtpAsync(request.Email, request.OtpCode);
@@ -79,8 +79,6 @@ namespace CleanAgricultureProductBE.Controllers
         [SwaggerOperation(Summary = "Đăng ký tài khoản mới")]
         public async Task<IActionResult> Register(RegisterRequestDto dto)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
             if (dto.PhoneNumber == null || dto.PhoneNumber.Trim() == "")
             {
 
@@ -119,7 +117,7 @@ namespace CleanAgricultureProductBE.Controllers
                 return BadRequest(new ResponseObject<string>
                 {
                     Success = "false",
-                    Message = ex.Message,
+                    Message = "ex.Message",
                 });
             }
         }
