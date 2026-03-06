@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Annotations;
+using System.Security.Claims;
 using System.Text.RegularExpressions;
 
 namespace CleanAgricultureProductBE.Controllers
@@ -58,7 +59,7 @@ namespace CleanAgricultureProductBE.Controllers
                 var apiResponse = new ResponseObject<LoginResponseDto>
                 {
                     Success = "success",
-                    Message = "Login successful",
+                    Message = "Đăng nhập thành công",
                     Data = result
                 };
 
@@ -108,7 +109,7 @@ namespace CleanAgricultureProductBE.Controllers
             }
             catch (Exception ex)
             {
-                if (ex.Message.Contains("Email already in use", StringComparison.OrdinalIgnoreCase))
+                if (ex.Message.Contains("Email đã được sử dụng", StringComparison.OrdinalIgnoreCase))
                     return Conflict(new ResponseObject<string>
                     {
                         Success = "false",
@@ -139,6 +140,59 @@ namespace CleanAgricultureProductBE.Controllers
             await _authService.LogoutAsync(token);
 
             return NoContent();
+        }
+
+        [HttpPost("forgotpassword")]
+        [SwaggerOperation(Summary = "Đặt lại mật khẩu bằng OTP")]
+        public async Task<IActionResult> ForgotPassword([FromBody] FotgotPasswordDto dto)
+        {
+            try
+            {
+                await _authService.ForgotPasswordAsync(dto);
+
+                return Ok(new ResponseObject<string>
+                {
+                    Success = "true",
+                    Message = "Đổi mật khẩu thành công"
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ResponseObject<string>
+                {
+                    Success = "false",
+                    Message = ex.Message
+                });
+            }
+        }
+
+        [Authorize]
+        [HttpPost("change-password")]
+        public async Task<IActionResult> ChangePassword([FromBody] ResetPasswordDto dto)
+        {
+            try
+            {
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                if (userId == null)
+                    return Unauthorized();
+
+                await _authService.ChangePasswordAsync(Guid.Parse(userId), dto);
+
+                return Ok(new ResponseObject<string>
+                {
+                    Success = "true",
+                    Message = "Đổi mật khẩu thành công"
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ResponseObject<string>
+                {
+                    Success = "false",
+                    Message = ex.Message
+                });
+            }
         }
 
         public class VerifyOtpRequest
