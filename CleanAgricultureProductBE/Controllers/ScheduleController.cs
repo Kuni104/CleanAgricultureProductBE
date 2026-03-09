@@ -1,10 +1,12 @@
+﻿using CleanAgricultureProductBE.Services.Schedule;
+using Microsoft.AspNetCore.Authorization;
 ﻿using CleanAgricultureProductBE.DTOs.ApiResponse;
-using CleanAgricultureProductBE.Services.Schedule;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace CleanAgricultureProductBE.Controllers
 {
+    [Authorize(Roles = "Admin,Staff")]
     [Route("api/v1/schedules")]
     [ApiController]
     public class ScheduleController : ControllerBase

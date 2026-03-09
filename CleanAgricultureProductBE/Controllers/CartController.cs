@@ -21,6 +21,16 @@ namespace CleanAgricultureProductBE.Controllers
         [SwaggerOperation(Summary = "Thêm sản phẩm vào giỏ hàng")]
         public async Task<IActionResult> AddToCart([FromRoute] Guid productId, [FromBody] CartRequestDto request)
         {
+            if(request.Quantity <= 0)
+            {
+                return BadRequest(new ResponseObject<string>
+                {
+                    Success = "false",
+                    Message = "Số lượng phải lớn hơn 0",
+                    Data = null
+                });
+            }
+
             var success = "";
             var message = "";
 
@@ -35,7 +45,7 @@ namespace CleanAgricultureProductBE.Controllers
             }else
             {
                 success = "true";
-                message = "Product added to cart successfully";
+                message = "Thêm vào giỏ hàng thành công";
             }
 
             var response = new DTOs.ApiResponse.ResponseObject<AddToCartResponseDto>()
@@ -68,12 +78,12 @@ namespace CleanAgricultureProductBE.Controllers
             if (cartItems.CartItemReponseList == null || cartItems.CartItemReponseList.Count == 0)
             {
                 success = "true";
-                message = "No items in cart";
+                message = "Không có sản phẩm trong giỏ hàng";
             }
             else
             {
                 success = "true";
-                message = "Cart items retrieved successfully";
+                message = "Lấy giỏ hàng thành công";
             }
 
             var pagination = result.Pagination == null ? null : result.Pagination;
@@ -101,7 +111,7 @@ namespace CleanAgricultureProductBE.Controllers
             var response = new DTOs.ApiResponse.ResponseObject<UpdateCartResponseDto>
             {
                 Success = "true",
-                Message = "Updated",
+                Message = "Cập nhật giỏ hàng thành công",
                 Data = result,
             };
 
@@ -122,7 +132,7 @@ namespace CleanAgricultureProductBE.Controllers
                 return base.NotFound(new DTOs.ApiResponse.ResponseObject<string>
                 {
                     Success = "fail",
-                    Message = "Product Not Found",
+                    Message = "Không tìm thấy sản phẩm",
                     Data = "404"
                 });
             }
@@ -130,7 +140,7 @@ namespace CleanAgricultureProductBE.Controllers
             var response = new DTOs.ApiResponse.ResponseObject<decimal>
             {
                 Success = "true",
-                Message = "Remove Item From Cart And Return New Total Price Of Cart",
+                Message = "Xóa sản phẩm khỏi giỏ hàng",
                 Data = result.Data
             };
 
@@ -150,14 +160,14 @@ namespace CleanAgricultureProductBE.Controllers
                 return base.NotFound(new DTOs.ApiResponse.ResponseObject<string>
                 {
                     Success = "fail",
-                    Message = "Invalid User ID"
+                    Message = "UserId không hợp lệ"
                 });
             }
 
             var response = new DTOs.ApiResponse.ResponseObject<decimal>
             {
                 Success = "true",
-                Message = "Remove All Items From Cart Successful",
+                Message = "Xóa tất cả sản phẩm trong giỏ hàng thành công",
                 Data = 0
             };
 
