@@ -10,13 +10,13 @@ using Swashbuckle.AspNetCore.Annotations;
 
 namespace CleanAgricultureProductBE.Controllers
 {
-    [Authorize(Roles = "Admin,Staff")]
+    [Authorize(Roles = "Admin")]
     [Route("api/v1/delivery-fee")]
     [ApiController]
     public class DeliveryFeeController(IDeliveryFeeService deliveryFeeService) : ControllerBase
     {
         [HttpGet]
-        [SwaggerOperation(Summary = "Lấy danh sách phí giao hàng (Admin/Staff)")]
+        [SwaggerOperation(Summary = "Lấy danh sách phí giao hàng (Admin)")]
         public async Task<IActionResult> GetDeliveryFeeList()
         {
             var success = "";
@@ -47,7 +47,7 @@ namespace CleanAgricultureProductBE.Controllers
         }
 
         [HttpPost]
-        [SwaggerOperation(Summary = "Thêm phí giao hàng mới (Admin/Staff)")]
+        [SwaggerOperation(Summary = "Thêm phí giao hàng mới (Admin)")]
         public async Task<IActionResult> AddDeliveryFee([FromBody] CreateDeliveryFeeRequestDto request)
         {
             if (request.FromKilometer >= request.ToKilometer)
@@ -86,7 +86,7 @@ namespace CleanAgricultureProductBE.Controllers
         }
 
         [HttpPatch("{deliveryFeeId}")]
-        [SwaggerOperation(Summary = "Cập nhật phí giao hàng (Admin/Staff)")]
+        [SwaggerOperation(Summary = "Cập nhật phí giao hàng (Admin)")]
         public async Task<IActionResult> UpdateDeliveryFee([FromRoute]Guid deliveryFeeId, [FromBody]UpdateDeliveryFeeRequestDto request)
         {
             if (request.FromKilometer >= request.ToKilometer)
@@ -126,7 +126,7 @@ namespace CleanAgricultureProductBE.Controllers
         }
 
         [HttpDelete("{deliveryFeeId}")]
-        [SwaggerOperation(Summary = "Xóa phí giao hàng (Admin/Staff)")]
+        [SwaggerOperation(Summary = "Xóa phí giao hàng (Admin)")]
         public async Task<IActionResult> DeleteDeliveryFeeById([FromRoute]Guid deliveryFeeId)
         {
             var result = await deliveryFeeService.DeleteDeliveryFeeById(deliveryFeeId);

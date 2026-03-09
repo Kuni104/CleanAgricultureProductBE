@@ -126,8 +126,8 @@ namespace CleanAgricultureProductBE.Controllers
 
         // DELETE: api/Product/{id} - Chỉ Admin
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Admin")]
-        [SwaggerOperation(Summary = "Xóa sản phẩm (Admin)")]
+        [Authorize(Roles = "Admin,Staff")]
+        [SwaggerOperation(Summary = "Xóa sản phẩm (Admin,Staff)")]
         public async Task<IActionResult> DeleteProduct(Guid id, [FromQuery] bool confirm = false)
         {
             try
@@ -152,8 +152,8 @@ namespace CleanAgricultureProductBE.Controllers
 
         // PUT: api/Product/{id}/status - Chỉ Admin
         [HttpPatch("{id}/status")]
-        [Authorize(Roles = "Admin")]
-        [SwaggerOperation(Summary = "Cập nhật trạng thái sản phẩm (Admin)")]
+        [Authorize(Roles = "Admin,Staff")]
+        [SwaggerOperation(Summary = "Cập nhật trạng thái sản phẩm (Admin,Staff)")]
         public async Task<IActionResult> UpdateProductStatus(Guid id, [FromBody] string status)
         {
             if (string.IsNullOrWhiteSpace(status))

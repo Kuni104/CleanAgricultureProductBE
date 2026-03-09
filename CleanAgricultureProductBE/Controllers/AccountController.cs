@@ -49,8 +49,9 @@ namespace CleanAgricultureProductBE.Controllers
 
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
-        [SwaggerOperation(Summary = "Tạo tài khoản mới")]
+        [SwaggerOperation(Summary = "Tạo tài khoản mới (Role: 1.Admin | 2.Customer | 3.Staff | 4.DeliveryPerson)")]
         public async Task<IActionResult> CreateAccount([FromBody] CreateAccountRequestDto request)
         {
             if (request.PhoneNumber != null || request.PhoneNumber.Trim() != "")
@@ -89,7 +90,7 @@ namespace CleanAgricultureProductBE.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPatch("{accountId}")]
-        [SwaggerOperation(Summary = "Thay đổi trạng thái tài khoản (Admin)")]
+        [SwaggerOperation(Summary = "Thay đổi trạng thái tài khoản (Admin | Status: Active, Inactive)")]
         public async Task<IActionResult> ChangeAccountStatus([FromRoute] Guid accountId, [FromBody] ChangeAccountStatusRequestDto request)
         {
             if (request == null || request.Status.Trim() == "")
