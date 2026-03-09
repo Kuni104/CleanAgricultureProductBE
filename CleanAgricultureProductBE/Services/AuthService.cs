@@ -38,10 +38,14 @@ namespace CleanAgricultureProductBE.Services
         {
             var account = await _accountRepo.GetByEmailAsync(dto.Email);
 
-            if (account == null || account.Status != "Active")
-                throw new Exception("Invalid credentials");
+            if (account == null)
+                throw new Exception("Sai tài khoản hoặc mật khẩu");
+
+            if (account.Status != "Active")
+                throw new Exception("Tài khoản đã bị vô hiệu hóa");
 
             var hasher = new PasswordHasher<Models.Account>();
+
             var result = hasher.VerifyHashedPassword(
                 account,
                 account.PasswordHash,
@@ -49,7 +53,7 @@ namespace CleanAgricultureProductBE.Services
             );
 
             if (result == PasswordVerificationResult.Failed)
-                throw new Exception("Invalid credentials");
+                throw new Exception("Sai tài khoản hoặc mật khẩu");
 
             var token = GenerateJwt(account);
 
@@ -71,14 +75,12 @@ namespace CleanAgricultureProductBE.Services
             var validOtp = await _emailOtpRepo.GetValidOtpAsync(dto.Email, dto.Otp);
 
             if (validOtp == null)
-                throw new Exception("Invalid or expired OTP");
-
-            validOtp.IsUsed = true;
-            await _emailOtpRepo.SaveChangesAsync();
+                throw new Exception("OTP không khả dụng hoặc không đúng");
 
             var existing = await _accountRepo.GetByEmailAsync(dto.Email);
+
             if (existing != null)
-                throw new Exception("Email already in use");
+                throw new Exception("Email đã được sử dụng");
 
             var account = new Models.Account
             {
@@ -109,6 +111,9 @@ namespace CleanAgricultureProductBE.Services
             };
 
             await _cartRepo.CreateCart(newCart);
+
+            validOtp.IsUsed = true;
+            await _emailOtpRepo.SaveChangesAsync();
 
             var token = GenerateJwt(created);
 
@@ -171,7 +176,7 @@ namespace CleanAgricultureProductBE.Services
         {
             var user = await _accountRepo.GetByEmailAsync(email);
             if (user == null)
-                throw new Exception("Email not found");
+                throw new Exception("Không tìm thấy email");
 
             var otpCode = new Random().Next(100000, 999999).ToString();
 
@@ -193,11 +198,11 @@ namespace CleanAgricultureProductBE.Services
             var otp = await _emailOtpRepo.GetValidOtpAsync(dto.Email, dto.Otp);
 
             if (otp == null)
-                throw new Exception("Invalid or expired OTP");
+                throw new Exception("OTP không khả dụng hoặc không đúng");
 
             var user = await _accountRepo.GetByEmailAsync(dto.Email);
             if (user == null)
-                throw new Exception("User not found");
+                throw new Exception("Không tìm thấy người dùng");
 
             var hasher = new PasswordHasher<Models.Account>();
             user.PasswordHash = hasher.HashPassword(user, dto.NewPassword);
@@ -236,7 +241,7 @@ namespace CleanAgricultureProductBE.Services
             var user = await _accountRepo.GetByIdAsync(accountId);
 
             if (user == null)
-                throw new Exception("User not found");
+                throw new Exception("Không tìm thấy người dùng");
 
             var hasher = new PasswordHasher<Models.Account>();
 

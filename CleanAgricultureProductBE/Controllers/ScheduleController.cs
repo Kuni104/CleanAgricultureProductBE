@@ -1,11 +1,13 @@
 ﻿using CleanAgricultureProductBE.Services.Schedule;
 using Microsoft.AspNetCore.Authorization;
+﻿using CleanAgricultureProductBE.DTOs.ApiResponse;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace CleanAgricultureProductBE.Controllers
 {
     [Authorize(Roles = "Admin,Staff")]
-    [Route("api/schedules")]
+    [Route("api/v1/schedules")]
     [ApiController]
     public class ScheduleController : ControllerBase
     {
@@ -17,17 +19,50 @@ namespace CleanAgricultureProductBE.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(Guid deliveryPersonId, DateTime scheduledDate)
+        public async Task<IActionResult> Create([FromBody] CreateScheduleRequestDto dto)
         {
-            var id = await _service.CreateScheduleAsync(deliveryPersonId, scheduledDate);
-            return Ok(new { ScheduleId = id });
+            try
+            {
+                var id = await _service.CreateScheduleAsync(dto.DeliveryPersonId, dto.ScheduledDate);
+
+                return Ok(new ResponseObject<Guid>
+                {
+                    Success = "true",
+                    Message = "Tạo lịch thành công",
+                    Data = id
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ResponseObject<string>
+                {
+                    Success = "false",
+                    Message = ex.Message
+                });
+            }
         }
 
         [HttpPost("assign-orders")]
-        public async Task<IActionResult> AssignOrders(Guid scheduleId, List<Guid> orderIds)
+        public async Task<IActionResult> AssignOrders([FromBody] AssignOrdersRequestDto dto)
         {
-            await _service.AssignOrdersAsync(scheduleId, orderIds);
-            return Ok("Orders assigned successfully");
+            try
+            {
+                await _service.AssignOrdersAsync(dto.ScheduleId, dto.OrderIds);
+
+                return Ok(new ResponseObject<string>
+                {
+                    Success = "true",
+                    Message = "Gắn đơn thành công"
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ResponseObject<string>
+                {
+                    Success = "false",
+                    Message = ex.Message
+                });
+            }
         }
     }
 }
