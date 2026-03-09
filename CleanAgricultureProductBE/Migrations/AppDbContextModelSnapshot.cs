@@ -285,21 +285,15 @@ namespace CleanAgricultureProductBE.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("City")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("District")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("EffectiveDay")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("EstimatedDay")
-                        .HasColumnType("datetime2");
-
                     b.Property<decimal>("FeeAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("FromKilometer")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("ToKilometer")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 

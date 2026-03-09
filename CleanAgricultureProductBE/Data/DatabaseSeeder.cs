@@ -285,11 +285,16 @@ namespace CleanAgricultureProductBE.Data
                     new DeliveryFee
                     {
                         DeliveryFeeId = Guid.NewGuid(),
-                        District = "A",
-                        City = "A",
-                        FeeAmount = 25,
-                        EffectiveDay = DateTime.UtcNow,
-                        EstimatedDay = DateTime.UtcNow.AddYears(5)
+                        FromKilometer = 0,
+                        ToKilometer = 5,
+                        FeeAmount = 5000,
+                    },
+                    new DeliveryFee
+                    {
+                        DeliveryFeeId = Guid.NewGuid(),
+                        FromKilometer = 5,
+                        ToKilometer = 10,
+                        FeeAmount = 10000,
                     }
                 };
 

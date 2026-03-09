@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CleanAgricultureProductBE.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260305021340_init")]
-    partial class init
+    [Migration("20260309012400_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -288,21 +288,15 @@ namespace CleanAgricultureProductBE.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("City")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("District")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("EffectiveDay")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("EstimatedDay")
-                        .HasColumnType("datetime2");
-
                     b.Property<decimal>("FeeAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("FromKilometer")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("ToKilometer")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
