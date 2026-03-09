@@ -3,11 +3,9 @@
     public class DeliveryFeeResponseDto
     {
         public Guid DeliveryFeeId { get; set;}
-        public string District { get; set; } = string.Empty;
-        public string City { get; set; } = string.Empty;
-        public decimal FeeAmount { get; set; }
-        public DateTime EstimatedDay { get; set; }
-        public DateTime EffectiveDay { get; set; }
+        public decimal FromKilometer { get; set;}
+        public decimal ToKilometer { get; set;}
+        public decimal FeeAmount { get; set;}
 
     }
 }

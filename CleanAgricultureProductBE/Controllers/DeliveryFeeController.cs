@@ -1,4 +1,5 @@
-﻿using CleanAgricultureProductBE.DTOs.ApiResponse;
+﻿using Azure.Core;
+using CleanAgricultureProductBE.DTOs.ApiResponse;
 using CleanAgricultureProductBE.DTOs.DeliveryFee;
 using CleanAgricultureProductBE.DTOs.Response;
 using CleanAgricultureProductBE.Services.DeliveryFee;
@@ -49,6 +50,15 @@ namespace CleanAgricultureProductBE.Controllers
         [SwaggerOperation(Summary = "Thêm phí giao hàng mới (Admin/Staff)")]
         public async Task<IActionResult> AddDeliveryFee([FromBody] CreateDeliveryFeeRequestDto request)
         {
+            if (request.FromKilometer >= request.ToKilometer)
+            {
+                return base.BadRequest(new DTOs.ApiResponse.ResponseObject<string>
+                {
+                    Success = "false",
+                    Message = "FromKilometer không được lớn hơn ToKilometer",
+                });
+            }
+
             var success = "";
             var message = "";
 
@@ -75,11 +85,20 @@ namespace CleanAgricultureProductBE.Controllers
             return Ok(response);
         }
 
-        [HttpPut("{deliveryFeeId}")]
+        [HttpPatch("{deliveryFeeId}")]
         [SwaggerOperation(Summary = "Cập nhật phí giao hàng (Admin/Staff)")]
-        public async Task<IActionResult> UpdateDeliveryFee([FromRoute]Guid deliveryFeeId, [FromBody]UpdateDeliveryFeeRequestDto resquest)
+        public async Task<IActionResult> UpdateDeliveryFee([FromRoute]Guid deliveryFeeId, [FromBody]UpdateDeliveryFeeRequestDto request)
         {
-            var result = await deliveryFeeService.UpdateDeliveryFee(deliveryFeeId, resquest);
+            if (request.FromKilometer >= request.ToKilometer)
+            {
+                return base.BadRequest(new DTOs.ApiResponse.ResponseObject<string>
+                {
+                    Success = "false",
+                    Message = "FromKilometer không được lớn hơn ToKilometer",
+                });
+            }
+
+            var result = await deliveryFeeService.UpdateDeliveryFee(deliveryFeeId, request);
             if (result == null)
             {
                 return base.BadRequest(new DTOs.ApiResponse.ResponseObject<string>
@@ -87,13 +106,20 @@ namespace CleanAgricultureProductBE.Controllers
                     Success = "false",
                     Message = $"Không có phí giao hàng nào với ID:{deliveryFeeId}"
                 });
+            }else if(result.Status == "Invalid Request")
+            {
+                return base.BadRequest(new DTOs.ApiResponse.ResponseObject<string>
+                {
+                    Success = "false",
+                    Message = "Request không hợp lệ (có thể km nằm giữa km đã có)"
+                });
             }
 
             var response = new DTOs.ApiResponse.ResponseObject<DeliveryFeeResponseDto>
             {
                 Success = "true",
                 Message = "Cập nhật phí giao hàng thành công",
-                Data = result
+                Data = result.Data
             };
 
             return Ok(response);

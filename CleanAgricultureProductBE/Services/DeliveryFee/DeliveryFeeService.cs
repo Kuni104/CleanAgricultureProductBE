@@ -1,4 +1,5 @@
-﻿using CleanAgricultureProductBE.DTOs.DeliveryFee;
+﻿using CleanAgricultureProductBE.DTOs.ApiResponse;
+using CleanAgricultureProductBE.DTOs.DeliveryFee;
 using CleanAgricultureProductBE.Repositories.DeliveryFee;
 
 namespace CleanAgricultureProductBE.Services.DeliveryFee
@@ -12,11 +13,9 @@ namespace CleanAgricultureProductBE.Services.DeliveryFee
             var deliveryFeeList = deliveryFees.Select(df => new DeliveryFeeResponseDto
             {
                 DeliveryFeeId = df.DeliveryFeeId,
-                District = df.District,
-                City = df.City,
-                FeeAmount = df.FeeAmount,
-                EstimatedDay = df.EstimatedDay,
-                EffectiveDay = df.EffectiveDay
+                FromKilometer = df.FromKilometer,
+                ToKilometer = df.ToKilometer,
+                FeeAmount = df.FeeAmount
             }).ToList();
 
             return deliveryFeeList;
@@ -29,11 +28,9 @@ namespace CleanAgricultureProductBE.Services.DeliveryFee
             return new DeliveryFeeResponseDto
             {
                 DeliveryFeeId = deliveryFee!.DeliveryFeeId,
-                District = deliveryFee.District,
-                City = deliveryFee.City,
-                FeeAmount = deliveryFee.FeeAmount,
-                EstimatedDay = deliveryFee.EstimatedDay,
-                EffectiveDay = deliveryFee.EffectiveDay
+                FromKilometer = deliveryFee!.FromKilometer,
+                ToKilometer = deliveryFee!.ToKilometer,
+                FeeAmount = deliveryFee!.FeeAmount
             };
         }
 
@@ -42,11 +39,9 @@ namespace CleanAgricultureProductBE.Services.DeliveryFee
             var newDeliveryFee = new Models.DeliveryFee
             {
                 DeliveryFeeId = Guid.NewGuid(),
-                District = request.District,
-                City = request.City,
-                FeeAmount = request.FeeAmount,
-                EstimatedDay = request.EstimatedDay,
-                EffectiveDay = request.EffectiveDay
+                FromKilometer = request.FromKilometer,
+                ToKilometer = request.ToKilometer,
+                FeeAmount = request.FeeAmount
             };
 
             await deliveryFeeRepository.AddDeliveryFee(newDeliveryFee);
@@ -54,17 +49,15 @@ namespace CleanAgricultureProductBE.Services.DeliveryFee
             var deliveryFeeDto = new DeliveryFeeResponseDto
             {
                 DeliveryFeeId = newDeliveryFee.DeliveryFeeId,
-                District = newDeliveryFee.District,
-                City = newDeliveryFee.City,
-                FeeAmount = newDeliveryFee.FeeAmount,
-                EstimatedDay = newDeliveryFee.EstimatedDay,
-                EffectiveDay = newDeliveryFee.EffectiveDay
+                FromKilometer = newDeliveryFee.FromKilometer,
+                ToKilometer = newDeliveryFee.ToKilometer,
+                FeeAmount = newDeliveryFee.FeeAmount
             };
 
             return deliveryFeeDto;
         }
 
-        public async Task<DeliveryFeeResponseDto> UpdateDeliveryFee(Guid deliveryFeeId, UpdateDeliveryFeeRequestDto request)
+        public async Task<ResultStatusWithData<DeliveryFeeResponseDto>> UpdateDeliveryFee(Guid deliveryFeeId, UpdateDeliveryFeeRequestDto request)
         {
             var existingDeliveryFee = await deliveryFeeRepository.GetDeliveryFeeById(deliveryFeeId);
 
@@ -73,25 +66,37 @@ namespace CleanAgricultureProductBE.Services.DeliveryFee
                 return null!;
             }
 
-            existingDeliveryFee.District = string.IsNullOrWhiteSpace(request.District) ? existingDeliveryFee.District : request.District;
-            existingDeliveryFee.City = string.IsNullOrWhiteSpace(request.City) ? existingDeliveryFee.City : request.City;
+            existingDeliveryFee.FromKilometer = request.FromKilometer == null ? existingDeliveryFee.FromKilometer : (decimal)request.FromKilometer;
+            existingDeliveryFee.ToKilometer = request.ToKilometer == null ? existingDeliveryFee.ToKilometer : (decimal)request.ToKilometer;
+
+            var checkValidRequest = await deliveryFeeRepository.CheckDeliveryFeeInBetween(existingDeliveryFee.FromKilometer, existingDeliveryFee.ToKilometer);
+
+            if (!checkValidRequest)
+            {
+                return new ResultStatusWithData<DeliveryFeeResponseDto>
+                {
+                    Status = "Invalid Request",
+                    Data = null,
+                };
+            }
+
             existingDeliveryFee.FeeAmount = request.FeeAmount == null ? existingDeliveryFee.FeeAmount : (decimal)request.FeeAmount;
-            existingDeliveryFee.EstimatedDay = request.EstimatedDay == null ? existingDeliveryFee.EstimatedDay : (DateTime)request.EstimatedDay;
-            existingDeliveryFee.EffectiveDay = request.EffectiveDay == null ? existingDeliveryFee.EffectiveDay : (DateTime)request.EffectiveDay;
 
             await deliveryFeeRepository.UpdateDeliveryFee(existingDeliveryFee);
 
             var updatedDeliveryFeeDto = new DeliveryFeeResponseDto
             {
                 DeliveryFeeId = existingDeliveryFee.DeliveryFeeId,
-                District = existingDeliveryFee.District,
-                City = existingDeliveryFee.City,
+                FromKilometer = existingDeliveryFee.FromKilometer,
+                ToKilometer = existingDeliveryFee.ToKilometer,
                 FeeAmount = existingDeliveryFee.FeeAmount,
-                EstimatedDay = existingDeliveryFee.EstimatedDay,
-                EffectiveDay = existingDeliveryFee.EffectiveDay
             };
 
-            return updatedDeliveryFeeDto;
+            return new ResultStatusWithData<DeliveryFeeResponseDto>
+            {
+                Status = "ok",
+                Data = updatedDeliveryFeeDto
+            };
         }
 
         public async Task<bool> DeleteDeliveryFeeById(Guid deliveryFeeId)

@@ -9,6 +9,14 @@ namespace CleanAgricultureProductBE.Repositories.DeliveryFee
         {
             return await context.DeliveryFees.FirstOrDefaultAsync(df => df.DeliveryFeeId == deliveryFeeId);
         }
+
+        public async Task<bool> CheckDeliveryFeeInBetween(decimal fromKm, decimal toKm)
+        {
+            return await context.DeliveryFees.Where(df => (df.FromKilometer <= fromKm || df.ToKilometer >= fromKm)
+                                                       && (df.FromKilometer <= toKm || df.ToKilometer >= toKm))
+                                                        .AnyAsync();
+        }
+
         public async Task<List<Models.DeliveryFee>> GetDeliveryFeeList()
         {
             return await context.DeliveryFees.ToListAsync();
