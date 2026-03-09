@@ -15,9 +15,9 @@ namespace CleanAgricultureProductBE.Controllers
     [ApiController]
     public class UserProfileController(IUserProfileService userProfileService) : ControllerBase
     {
-        [Authorize(Roles = "Customer")]
+        [Authorize]
         [HttpGet]
-        [SwaggerOperation(Summary = "Lấy thông tin hồ sơ của tôi (Customer)")]
+        [SwaggerOperation(Summary = "Lấy thông tin hồ sơ của tôi")]
         public async Task<IActionResult> GetUserProfile()
         {
             var accountEmail = User.FindFirstValue(ClaimTypes.Email);
@@ -44,9 +44,9 @@ namespace CleanAgricultureProductBE.Controllers
             return Ok(response);
         }
 
-        [Authorize (Roles = "Customer")]
+        [Authorize]
         [HttpPatch]
-        [SwaggerOperation(Summary = "Cập nhật thông tin hồ sơ của tôi (Customer)")]
+        [SwaggerOperation(Summary = "Cập nhật thông tin hồ sơ của tôi")]
         public async Task<IActionResult> UpdateUserProfile([FromBody] UserProfileRequestDto request)
         {
             if (request.PhoneNumber != null || request.PhoneNumber.Trim() != "") {
