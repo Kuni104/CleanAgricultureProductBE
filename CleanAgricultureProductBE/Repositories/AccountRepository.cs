@@ -62,5 +62,10 @@ namespace CleanAgricultureProductBE.Repositories
             _context.Accounts.Update(account);
             await _context.SaveChangesAsync();
         }
+
+        public async Task SaveChangeAsync()
+        {
+            await _context.SaveChangesAsync();
+        }
     }
 }

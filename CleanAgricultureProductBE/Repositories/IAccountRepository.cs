@@ -10,5 +10,6 @@ namespace CleanAgricultureProductBE.Repositories
         public Task<Account?> GetByEmailAsync(string email);
         public Task<Account> CreateAsync(Account account);
         public Task UpdateAsync(Models.Account account);
+        public Task SaveChangeAsync();
     }
 }

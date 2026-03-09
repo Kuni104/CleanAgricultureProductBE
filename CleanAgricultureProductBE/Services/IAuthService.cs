@@ -1,4 +1,5 @@
 ﻿using CleanAgricultureProductBE.DTOs;
+using Microsoft.AspNetCore.Identity.Data;
 
 namespace CleanAgricultureProductBE.Services
 {
@@ -8,6 +9,7 @@ namespace CleanAgricultureProductBE.Services
         Task<LoginResponseDto> RegisterAsync(RegisterRequestDto dto);
         Task LogoutAsync(string token);
         Task RequestResetPasswordAsync(string email);
-        Task ResetPasswordAsync(ConfirmResetPasswordDto dto);
+        Task ForgotPasswordAsync(FotgotPasswordDto dto);
+        Task ChangePasswordAsync(Guid accountId, ResetPasswordDto dto);
     }
 }

@@ -207,5 +207,54 @@ namespace CleanAgricultureProductBE.Services
             await _accountRepo.UpdateAsync(user);
             await _emailOtpRepo.SaveChangesAsync();
         }
+
+        public async Task ForgotPasswordAsync(FotgotPasswordDto dto)
+        {
+            if (dto.NewPassword != dto.ConfirmPassword)
+                throw new Exception("Mật khẩu xác nhận không trùng khớp");
+
+            var user = await _accountRepo.GetByEmailAsync(dto.Email);
+
+            if (user == null)
+                throw new Exception("Email không tồn tại");
+
+            var otpRecord = await _emailOtpRepo.GetValidOtpAsync(dto.Email, dto.OtpCode);
+
+            if (otpRecord == null)
+                throw new Exception("OTP không hợp lệ hoặc đã hết hạn");
+
+            var hasher = new PasswordHasher<Models.Account>();
+            user.PasswordHash = hasher.HashPassword(user, dto.NewPassword);
+
+            otpRecord.IsUsed = true;
+
+            await _accountRepo.SaveChangeAsync();
+        }
+
+        public async Task ChangePasswordAsync(Guid accountId, ResetPasswordDto dto)
+        {
+            var user = await _accountRepo.GetByIdAsync(accountId);
+
+            if (user == null)
+                throw new Exception("User not found");
+
+            var hasher = new PasswordHasher<Models.Account>();
+
+            var result = hasher.VerifyHashedPassword(
+                user,
+                user.PasswordHash,
+                dto.Oldpassword
+            );
+
+            if (result == PasswordVerificationResult.Failed)
+                throw new Exception("Mật khẩu cũ không đúng");
+
+            if (dto.NewPassword != dto.ConfirmPassword)
+                throw new Exception("Mật khẩu xác nhận không trùng khớp");
+
+            user.PasswordHash = hasher.HashPassword(user, dto.NewPassword);
+
+            await _accountRepo.SaveChangeAsync();
+        }
     }
 }
