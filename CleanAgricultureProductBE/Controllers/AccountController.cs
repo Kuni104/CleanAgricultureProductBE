@@ -73,14 +73,14 @@ namespace CleanAgricultureProductBE.Controllers
 
             if (result == null)
             {
-                return base.BadRequest(new DTOs.ApiResponse.ResponseObject<string>
+                return base.BadRequest(new ResponseObject<string>
                 {
                     Success = "false",
                     Message = "Email đã được sử dụng!"
                 });
             }
 
-            return base.Ok(new DTOs.ApiResponse.ResponseObject<AccountResponseDto>
+            return base.Ok(new ResponseObject<AccountResponseDto>
             {
                 Success = "true",
                 Message = "Tạo tài khoản thành công",
@@ -95,7 +95,7 @@ namespace CleanAgricultureProductBE.Controllers
         {
             if (request == null || request.Status.Trim() == "")
             {
-                return base.BadRequest(new DTOs.ApiResponse.ResponseObject<string>
+                return BadRequest(new ResponseObject<string>
                 {
                     Success = "false",
                     Message = "Trạng thái không được để trống!"
@@ -105,14 +105,14 @@ namespace CleanAgricultureProductBE.Controllers
             var result = await accountService.ChangeAccountStatus(accountId, request);
             if (result == null)
             {
-                return base.NotFound(new DTOs.ApiResponse.ResponseObject<string>
+                return NotFound(new ResponseObject<string>
                 {
                     Success = "false",
                     Message = "Không tìm thấy tài khoản!"
                 });
             }
             
-            return base.Ok(new DTOs.ApiResponse.ResponseObject<AccountResponseDto>
+            return Ok(new ResponseObject<AccountResponseDto>
             {
                 Success = "true",
                 Message = "Thay đổi trạng thái tài khoản thành công!",

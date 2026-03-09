@@ -1,8 +1,9 @@
-﻿using CleanAgricultureProductBE.Services.Schedule;
+﻿﻿using CleanAgricultureProductBE.DTOs.ApiResponse;
+using CleanAgricultureProductBE.Services.Schedule;
 using Microsoft.AspNetCore.Authorization;
-﻿using CleanAgricultureProductBE.DTOs.ApiResponse;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace CleanAgricultureProductBE.Controllers
 {
@@ -19,6 +20,7 @@ namespace CleanAgricultureProductBE.Controllers
         }
 
         [HttpPost]
+        [SwaggerOperation(Summary = "Tạo lịch giao hàng")]
         public async Task<IActionResult> Create([FromBody] CreateScheduleRequestDto dto)
         {
             try
@@ -42,7 +44,9 @@ namespace CleanAgricultureProductBE.Controllers
             }
         }
 
+
         [HttpPost("assign-orders")]
+        [SwaggerOperation(Summary = "Gán đơn hàng vào lịch giao hàng")]
         public async Task<IActionResult> AssignOrders([FromBody] AssignOrdersRequestDto dto)
         {
             try

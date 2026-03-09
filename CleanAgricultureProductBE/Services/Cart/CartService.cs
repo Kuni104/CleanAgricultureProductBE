@@ -14,7 +14,7 @@ namespace CleanAgricultureProductBE.Services.Cart
     public class CartService(IAccountRepository accountRepository,IProductService productService, ICartRepository cartRepository) : ICartService
     {
 
-        public async Task<AddToCartResponseDto> AddToCart(string accountEmail, Guid productId, CartRequestDto request)
+        public async Task<ResultStatusWithData<AddToCartResponseDto>> AddToCart(string accountEmail, Guid productId, CartRequestDto request)
         {
             var cart = await GetCartByAccoutEmail(accountEmail);
 
@@ -25,6 +25,15 @@ namespace CleanAgricultureProductBE.Services.Cart
 
             if (cartItem is null)
             {
+                if (product.Stock < request.Quantity)
+                {
+                    return new ResultStatusWithData<AddToCartResponseDto>
+                    {
+                        Status = "Stock Error",
+                        Data = null
+                    };
+                }
+
                 cartItem = new CartItem
                 {
                     CartItemId = Guid.NewGuid(),
@@ -41,12 +50,22 @@ namespace CleanAgricultureProductBE.Services.Cart
             else
             {
                 int updatedQuantity = request.Quantity + cartItem.Quantity;
+
+                if (product.Stock < updatedQuantity)
+                {
+                    return new ResultStatusWithData<AddToCartResponseDto>
+                    {
+                        Status = "Stock Error",
+                        Data = null
+                    };
+                }
+
                 cartItem.Quantity = updatedQuantity;
                 cartItem.TotalPrice = cartItem.UnitPrice * updatedQuantity;
                 await cartRepository.UpdateCartItem(cartItem);
             }
 
-            return new AddToCartResponseDto
+            var cartResponse = new AddToCartResponseDto
             {
                 CartItemId = cartItem.CartItemId,
                 CartId = cart.CartId,
@@ -54,6 +73,12 @@ namespace CleanAgricultureProductBE.Services.Cart
                 UnitPrice = cartItem.UnitPrice,
                 Quantity = cartItem.Quantity,
                 TotalPrice = cartItem.TotalPrice
+            };
+
+            return new ResultStatusWithData<AddToCartResponseDto>
+            {
+                Status = "OK",
+                Data = cartResponse
             };
         }
 
@@ -134,12 +159,21 @@ namespace CleanAgricultureProductBE.Services.Cart
             return result;
         }
 
-        public async Task<UpdateCartResponseDto> UpdateCartItemQuantity(string accountEmail, Guid productId, CartRequestDto request)
+        public async Task<ResultStatusWithData<UpdateCartResponseDto>> UpdateCartItemQuantity(string accountEmail, Guid productId, CartRequestDto request)
         {
             var cart = await GetCartByAccoutEmail(accountEmail);
 
             var cartItem = await cartRepository.GetCartItemByCartIdAndProductIdIncludeProduct(cart!.CartId, productId);
-            //var product = await productService.GetProductByIdAsync(productId);
+            var product = await productService.GetProductByIdAsync(productId);
+
+            if(product.Stock < request.Quantity)
+            {
+                return new ResultStatusWithData<UpdateCartResponseDto>
+                {
+                    Status = "Stock Error",
+                    Data = null
+                };
+            }
 
             cartItem!.Quantity = request.Quantity;
             cartItem!.TotalPrice = cartItem.UnitPrice * request.Quantity;
@@ -163,7 +197,11 @@ namespace CleanAgricultureProductBE.Services.Cart
                 TotalPriceOfAll = totalPrice
             };
 
-            return result;
+            return new ResultStatusWithData<UpdateCartResponseDto>
+            {
+                Status = "OK",
+                Data = result
+            };
         }
 
 
