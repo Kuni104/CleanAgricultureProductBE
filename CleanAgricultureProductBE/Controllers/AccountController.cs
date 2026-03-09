@@ -16,7 +16,7 @@ namespace CleanAgricultureProductBE.Controllers
     [ApiController]
     public class AccountController(IAccountService accountService) : ControllerBase
     {
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         [SwaggerOperation(Summary = "Lấy danh sách tất cả tài khoản (Admin)")]
         public async Task<IActionResult> GetAllAccount([FromQuery] int? page, [FromQuery] int? size, [FromQuery] string? keyword)
