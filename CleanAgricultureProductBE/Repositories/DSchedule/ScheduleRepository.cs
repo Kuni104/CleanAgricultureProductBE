@@ -35,4 +35,12 @@ public class ScheduleRepository : IScheduleRepository
     {
         await _context.SaveChangesAsync();
     }
+
+    public async Task<Schedule?> GetByDeliveryPersonAndDateAsync(Guid deliveryPersonId, DateTime date)
+    {
+        return await _context.Schedules
+            .FirstOrDefaultAsync(x =>
+                x.DeliveryPersonId == deliveryPersonId &&
+                x.ScheduledDate.Date == date.Date);
+    }
 }

@@ -16,12 +16,14 @@ namespace CleanAgricultureProductBE.Repositories.OTP
             await _context.EmailOtps.AddAsync(otp);
         }
 
-        public async Task<EmailOtp?> GetValidOtpAsync(string email, string otpCode)
+        public async Task<EmailOtp?> GetValidOtpAsync(string email, string otp)
         {
             return await _context.EmailOtps
-                .Where(x => x.Email == email
-                         && x.OtpCode == otpCode
-                         && x.IsUsed == false)
+                .Where(x =>
+                    x.Email == email &&
+                    x.OtpCode == otp &&
+                    x.IsUsed == false &&
+                    x.ExpiredAt > DateTime.UtcNow)
                 .OrderByDescending(x => x.CreatedAt)
                 .FirstOrDefaultAsync();
         }
