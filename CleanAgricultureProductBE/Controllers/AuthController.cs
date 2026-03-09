@@ -33,8 +33,45 @@ namespace CleanAgricultureProductBE.Controllers
         [HttpPost("send-otp")]
         public async Task<IActionResult> SendOtp([FromBody] SendOtpDto request)
         {
-            await _otpService.SendOtpAsync(request.Email);
-            return Ok("OTP sent successfully");
+            // ===== Validate Email =====
+            if (string.IsNullOrWhiteSpace(request.Email))
+            {
+                return BadRequest(new ResponseObject<string>
+                {
+                    Success = "false",
+                    Message = "Email không được để trống"
+                });
+            }
+
+            var emailRegex = new Regex(@"^[^\s@]+@[^\s@]+\.[^\s@]+$");
+
+            if (!emailRegex.IsMatch(request.Email))
+            {
+                return BadRequest(new ResponseObject<string>
+                {
+                    Success = "false",
+                    Message = "Email không đúng định dạng"
+                });
+            }
+
+            try
+            {
+                await _otpService.SendOtpAsync(request.Email);
+
+                return Ok(new ResponseObject<string>
+                {
+                    Success = "true",
+                    Message = "Gửi OTP thành công"
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ResponseObject<string>
+                {
+                    Success = "false",
+                    Message = "OTP hết hạn hoặc không khả dụng"
+                });
+            }
         }
 
         [HttpPost("test/verify-otp")]
@@ -43,9 +80,9 @@ namespace CleanAgricultureProductBE.Controllers
             var result = await _otpService.VerifyOtpAsync(request.Email, request.OtpCode);
 
             if (!result)
-                return BadRequest("Invalid or expired OTP");
+                return BadRequest("OTP hết hạn hoặc không khả dụng");
 
-            return Ok("OTP verified successfully");
+            return Ok("Xác minh OTP thành công");
         }
 
 
@@ -70,36 +107,134 @@ namespace CleanAgricultureProductBE.Controllers
                 return Unauthorized(new ResponseObject<LoginResponseDto>
                 {
                     Success = "error",
-                    Message = "Sai Tài Khoản Hoặc Mật Khẩu",
+                    Message = ex.Message,
                     Data = null
                 });
             }
         }
 
         [HttpPost("register")]
-        [SwaggerOperation(Summary = "Đăng ký tài khoản mới")]
+        [SwaggerOperation(Summary = "Đăng ký tài khoản mới (Customer)")]
         public async Task<IActionResult> Register(RegisterRequestDto dto)
         {
-            if (dto.PhoneNumber == null || dto.PhoneNumber.Trim() == "")
+            if (string.IsNullOrWhiteSpace(dto.Email))
             {
-
+                return BadRequest(new ResponseObject<string>
+                {
+                    Success = "false",
+                    Message = "Email không được để trống"
+                });
             }
-            else
+
+            var emailRegex = new Regex(@"^[^\s@]+@[^\s@]+\.[^\s@]+$");
+
+            if (!emailRegex.IsMatch(dto.Email))
             {
-                var isValidPhoneNumber = Regex.IsMatch(dto.PhoneNumber, @"^(?:\+84|0)\d{9}$");
-                if (!isValidPhoneNumber)
+                return BadRequest(new ResponseObject<string>
+                {
+                    Success = "false",
+                    Message = "Email không đúng định dạng"
+                });
+            }
+
+            var existingEmail = await _context.Accounts
+                                .AnyAsync(x => x.Email == dto.Email);
+
+            if (existingEmail)
+            {
+                return BadRequest(new ResponseObject<string>
+                {
+                    Success = "false",
+                    Message = "Email đã được sử dụng"
+                });
+            }
+
+            var passwordRegex = new Regex(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$");
+
+            if (!passwordRegex.IsMatch(dto.Password))
+            {
+                return BadRequest(new ResponseObject<string>
+                {
+                    Success = "false",
+                    Message = "Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt"
+                });
+            }
+
+            if (!string.IsNullOrWhiteSpace(dto.PhoneNumber))
+            {
+                dto.PhoneNumber = dto.PhoneNumber.Trim();
+
+                var numberRegex = new Regex(@"^[0-9]+$");
+
+                if (!numberRegex.IsMatch(dto.PhoneNumber))
                 {
                     return BadRequest(new ResponseObject<string>
                     {
                         Success = "false",
-                        Message = "Số điện thoại không hợp lệ! Số điện thoại phải bắt đầu bằng 0 và có 10 chữ số.",
+                        Message = "Số điện thoại chỉ được chứa chữ số"
                     });
                 }
+
+                if (dto.PhoneNumber.Length != 10)
+                {
+                    return BadRequest(new ResponseObject<string>
+                    {
+                        Success = "false",
+                        Message = "Số điện thoại phải có 10 chữ số"
+                    });
+                }
+
+                var existingPhone = await _context.Accounts
+                    .AnyAsync(x => x.PhoneNumber == dto.PhoneNumber);
+
+                if (existingPhone)
+                {
+                    return BadRequest(new ResponseObject<string>
+                    {
+                        Success = "false",
+                        Message = "Số điện thoại đã được sử dụng"
+                    });
+                }
+            }
+
+            var otpRecord = await _context.EmailOtps
+                .Where(x => x.Email == dto.Email && x.IsUsed == false)
+                .OrderByDescending(x => x.CreatedAt)
+                .FirstOrDefaultAsync();
+
+            if (otpRecord == null)
+            {
+                return BadRequest(new ResponseObject<string>
+                {
+                    Success = "false",
+                    Message = "Email này chưa gửi OTP"
+                });
+            }
+
+            if (otpRecord.OtpCode != dto.Otp)
+            {
+                return BadRequest(new ResponseObject<string>
+                {
+                    Success = "false",
+                    Message = "OTP không đúng"
+                });
+            }
+
+            if (otpRecord.ExpiredAt < DateTime.UtcNow)
+            {
+                return BadRequest(new ResponseObject<string>
+                {
+                    Success = "false",
+                    Message = "OTP đã hết hạn"
+                });
             }
 
             try
             {
                 var response = await _authService.RegisterAsync(dto);
+                otpRecord.IsUsed = true;
+                await _context.SaveChangesAsync();
+
                 return Created(string.Empty, new ResponseObject<LoginResponseDto>
                 {
                     Success = "true",
@@ -109,16 +244,10 @@ namespace CleanAgricultureProductBE.Controllers
             }
             catch (Exception ex)
             {
-                if (ex.Message.Contains("Email đã được sử dụng", StringComparison.OrdinalIgnoreCase))
-                    return Conflict(new ResponseObject<string>
-                    {
-                        Success = "false",
-                        Message = ex.Message,
-                    });
                 return BadRequest(new ResponseObject<string>
                 {
                     Success = "false",
-                    Message = "ex.Message",
+                    Message = ex.Message
                 });
             }
         }

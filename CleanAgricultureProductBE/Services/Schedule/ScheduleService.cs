@@ -1,4 +1,5 @@
-﻿using CleanAgricultureProductBE.Models;
+﻿using CleanAgricultureProductBE.DTOs.ApiResponse;
+using CleanAgricultureProductBE.Models;
 using CleanAgricultureProductBE.Repositories.DSchedule;
 using CleanAgricultureProductBE.Services.Schedule;
 
@@ -11,8 +12,30 @@ public class ScheduleService : IScheduleService
         _repository = repository;
     }
 
+    private ScheduleResponseDto MapToDto(Schedule schedule)
+    {
+        return new ScheduleResponseDto
+        {
+            ScheduleId = schedule.ScheduleId,
+            DeliveryPersonId = schedule.DeliveryPersonId,
+            ScheduledDate = schedule.ScheduledDate,
+            Status = schedule.Status,
+            TotalOrders = schedule.Orders.Count,
+            CreatedAt = schedule.CreatedAt,
+            UpdatedAt = schedule.UpdatedAt
+        };
+    }
+
     public async Task<Guid> CreateScheduleAsync(Guid deliveryPersonId, DateTime scheduledDate)
     {
+        scheduledDate = scheduledDate.Date;
+
+        var existingSchedule = await _repository
+            .GetByDeliveryPersonAndDateAsync(deliveryPersonId, scheduledDate);
+
+        if (existingSchedule != null)
+            throw new Exception("Delivery person already has a schedule on this date");
+
         var schedule = new Schedule
         {
             ScheduleId = Guid.NewGuid(),
@@ -43,9 +66,8 @@ public class ScheduleService : IScheduleService
 
         foreach (var order in orders)
         {
-            // nếu order đã có schedule rồi thì bỏ qua
             if (order.ScheduleId != null)
-                continue;
+                throw new Exception($"Order {order.OrderId} already assigned to a schedule");
 
             order.ScheduleId = schedule.ScheduleId;
         }
