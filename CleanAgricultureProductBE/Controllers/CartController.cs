@@ -122,8 +122,8 @@ namespace CleanAgricultureProductBE.Controllers
             {
                 return NotFound(new ResponseObject<string>
                 {
-                    Success = "fail",
-                    Message = "Quá số lượng sản phẩm",
+                    Success = "false",
+                    Message = "Cập nhật giỏ hàng không thành công, quá số lượng sản phẩm hiện có",
                     Data = null
                 });
             }
@@ -151,7 +151,7 @@ namespace CleanAgricultureProductBE.Controllers
 
                 return NotFound(new ResponseObject<string>
                 {
-                    Success = "fail",
+                    Success = "false",
                     Message = "Không có sản phẩm trong giỏ hàng",
                     Data = "404"
                 });
@@ -179,7 +179,7 @@ namespace CleanAgricultureProductBE.Controllers
             {
                 return NotFound(new ResponseObject<string>
                 {
-                    Success = "fail",
+                    Success = "false",
                     Message = "UserId không hợp lệ"
                 });
             }

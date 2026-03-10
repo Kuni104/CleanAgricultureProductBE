@@ -66,7 +66,7 @@ namespace CleanAgricultureProductBE.Controllers
 
             var response = new ResponseObjectWithPagination<OrderDetailListResponseDto>
             {
-                Success = "success",
+                Success = "true",
                 Message = "Lấy thông tin đơn hàng thành công",
                 Data = result.ResultObject,
                 Pagination = result.Pagination
@@ -161,7 +161,7 @@ namespace CleanAgricultureProductBE.Controllers
             {
                 return BadRequest(new ResponseObject<string>
                 {
-                    Success = "fasle",
+                    Success = "false",
                     Message = "Chỉ có thể cập nhật địa chỉ cho đơn hàng đang ở trạng thái Pending"
                 });
             }

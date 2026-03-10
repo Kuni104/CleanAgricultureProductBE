@@ -21,12 +21,17 @@ namespace CleanAgricultureProductBE.Services.Product
 
         public async Task<ProductResponseDto> CreateProductAsync(CreateProductDto dto)
         {
+            if (string.IsNullOrWhiteSpace(dto.Name))
+                throw new Exception("Product name is required");
+
+            if (dto.Name.Trim().Length > 200)
+                throw new Exception("Product name must not exceed 200 characters");
+
             if (dto.Price <= 0)
                 throw new Exception("Price must be greater than 0");
 
-            var unit = int.Parse(dto.Unit);
-            if (unit <= 0)
-                throw new Exception("Unit must be greater than 0");
+            if (string.IsNullOrWhiteSpace(dto.Unit))
+                throw new Exception("Unit is required");
 
             if (dto.Stock < 0)
                 throw new Exception("Stock must be greater than or equal to 0");
@@ -38,7 +43,7 @@ namespace CleanAgricultureProductBE.Services.Product
                 Name = dto.Name,
                 Description = dto.Description,
                 Price = dto.Price,
-                Unit = unit,
+                Unit = dto.Unit,
                 Stock = dto.Stock,
                 Status = ProductStatus.Active
             };
@@ -54,7 +59,7 @@ namespace CleanAgricultureProductBE.Services.Product
                 Name = result.Name,
                 Description = result.Description,
                 Price = result.Price,
-                Unit = result.Unit.ToString(),
+                Unit = result.Unit,
                 Stock = result.Stock,
                 Status = result.Status
             };
@@ -73,7 +78,7 @@ namespace CleanAgricultureProductBE.Services.Product
                     Name = p.Name,
                     Description = p.Description,
                     Price = p.Price,
-                    Unit = p.Unit.ToString(),
+                    Unit = p.Unit,
                     Stock = p.Stock,
                     Status = p.Status
                 }).ToList();
@@ -93,7 +98,7 @@ namespace CleanAgricultureProductBE.Services.Product
                 Name = product.Name,
                 Description = product.Description,
                 Price = product.Price,
-                Unit = product.Unit.ToString(),
+                Unit = product.Unit,
                 Stock = product.Stock,
                 Status = product.Status
             };
@@ -105,16 +110,11 @@ namespace CleanAgricultureProductBE.Services.Product
             if (product == null || product.Status == ProductStatus.Inactive)
                 throw new Exception("Product not found");
 
+            if (!string.IsNullOrWhiteSpace(dto.Name) && dto.Name.Trim().Length > 200)
+                throw new Exception("Product name must not exceed 200 characters");
+
             if (dto.Price.HasValue && dto.Price.Value <= 0)
                 throw new Exception("Price must be greater than 0");
-
-            if (!string.IsNullOrWhiteSpace(dto.Unit))
-            {
-                var unit = int.Parse(dto.Unit);
-                if (unit <= 0)
-                    throw new Exception("Unit must be greater than 0");
-                product.Unit = unit;
-            }
 
             if (dto.Stock.HasValue && dto.Stock.Value < 0)
                 throw new Exception("Stock must be greater than or equal to 0");
@@ -127,6 +127,8 @@ namespace CleanAgricultureProductBE.Services.Product
                 product.Description = dto.Description;
             if (dto.Price.HasValue)
                 product.Price = dto.Price.Value;
+            if (!string.IsNullOrWhiteSpace(dto.Unit))
+                product.Unit = dto.Unit;
             if (dto.Stock.HasValue)
                 product.Stock = dto.Stock.Value;
 
@@ -141,7 +143,7 @@ namespace CleanAgricultureProductBE.Services.Product
                 Name = result.Name,
                 Description = result.Description,
                 Price = result.Price,
-                Unit = result.Unit.ToString(),
+                Unit = result.Unit,
                 Stock = result.Stock,
                 Status = result.Status
             };
@@ -156,12 +158,7 @@ namespace CleanAgricultureProductBE.Services.Product
             if (product == null)
                 throw new Exception("Product not found");
 
-            if (product.Status == ProductStatus.Inactive)
-                throw new Exception("Product already deleted");
-
-            product.Status = ProductStatus.Inactive;
-            await _productRepo.UpdateAsync(product);
-            return true;
+            return await _productRepo.DeleteAsync(id);
         }
 
         public async Task<bool> UpdateProductStatusAsync(Guid productId, string status)

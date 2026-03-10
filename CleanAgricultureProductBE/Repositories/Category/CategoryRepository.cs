@@ -27,7 +27,15 @@ namespace CleanAgricultureProductBE.Repositories.Category
 
         public async Task<CategoryModel?> GetByIdAsync(Guid id)
         {
-            return await _context.Categories.FindAsync(id);
+            return await _context.Categories
+                .Include(c => c.Products)
+                .FirstOrDefaultAsync(c => c.CategoryId == id);
+        }
+
+        public async Task<CategoryModel?> GetByNameAsync(string name)
+        {
+            return await _context.Categories
+                .FirstOrDefaultAsync(c => c.Name == name);
         }
 
         public async Task<CategoryModel> UpdateAsync(CategoryModel category)
@@ -42,7 +50,9 @@ namespace CleanAgricultureProductBE.Repositories.Category
             var category = await GetByIdAsync(id);
             if (category == null) return false;
 
-            _context.Categories.Remove(category);
+            category.IsDeleted = true;
+            category.DeletedAt = DateTime.UtcNow;
+            _context.Categories.Update(category);
             await _context.SaveChangesAsync();
             return true;
         }

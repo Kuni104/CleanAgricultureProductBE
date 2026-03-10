@@ -118,6 +118,7 @@ namespace CleanAgricultureProductBE
             // Product DI
             builder.Services.AddScoped<IProductService, ProductService>();
             builder.Services.AddScoped<IProductRepository, ProductRepository>();
+            builder.Services.AddScoped<IProductStatisticsService, ProductStatisticsService>();
 
             // Category DI
             builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();

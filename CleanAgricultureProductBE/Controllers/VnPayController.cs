@@ -31,7 +31,7 @@ namespace CleanAgricultureProductBE.Controllers
         {
             if (User.Identity?.IsAuthenticated == true)
             {
-                return Forbid("Authenticated users are not allowed to access this endpoint. It is intended for VNPAY's server to call after payment processing.");
+                return Forbid("Người dùng đã xác thực không được phép truy cập endpoint này. Endpoint này chỉ dành cho server VNPay gọi lại sau khi thanh toán.");
             }
 
             try

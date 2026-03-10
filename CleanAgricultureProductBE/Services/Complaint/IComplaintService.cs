@@ -1,5 +1,6 @@
 using CleanAgricultureProductBE.DTOs.ApiResponse;
 using CleanAgricultureProductBE.DTOs.Complaint;
+using CleanAgricultureProductBE.DTOs.Response;
 
 namespace CleanAgricultureProductBE.Services.Complaint
 {
@@ -12,5 +13,6 @@ namespace CleanAgricultureProductBE.Services.Complaint
         // Staff
         Task<ResponseDtoWithPagination<List<ComplaintResponseDto>>> GetAllComplaintsAsync(int? page, int? size, string? keyword);
         Task<ComplaintResponseDto?> GetComplaintByIdAsync(Guid complaintId);
+        Task<ComplaintResponseDto> UpdateComplaintStatusAsync(string staffEmail, Guid complaintId, UpdateComplaintStatusDto dto);
     }
 }
