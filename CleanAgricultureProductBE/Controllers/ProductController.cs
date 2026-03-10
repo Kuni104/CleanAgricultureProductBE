@@ -1,6 +1,7 @@
 using CleanAgricultureProductBE.DTOs;
 using CleanAgricultureProductBE.DTOs.ApiResponse;
 using CleanAgricultureProductBE.DTOs.Response;
+using CleanAgricultureProductBE.Services.Image;
 using CleanAgricultureProductBE.Services.Product;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,10 +14,12 @@ namespace CleanAgricultureProductBE.Controllers
     public class ProductController : ControllerBase
     {
         private readonly IProductService _productService;
+        private readonly IProductImageService _productImageService;
 
-        public ProductController(IProductService productService)
+        public ProductController(IProductService productService, IProductImageService productImageService)
         {
             _productService = productService;
+            _productImageService = productImageService;
         }
 
         // GET: api/Product - Tất cả user có thể xem
@@ -191,6 +194,33 @@ namespace CleanAgricultureProductBE.Controllers
                 Message = $"Cập nhật trạng thái sản phẩm thành {status} thành công",
                 Data = true
             });
+        }
+
+        [HttpPost("{productId}/images")]
+        [Authorize(Roles = "Admin,Staff")]
+        [SwaggerOperation(Summary = "Đăng ảnh sản phẩm (Admin,Staff)")]
+        public async Task<IActionResult> UploadProductImages(Guid productId, [FromForm] List<IFormFile> images)
+        {
+            try
+            {
+                var result = await _productImageService
+                    .UploadProductImagesAsync(productId, images);
+
+                return Ok(new
+                {
+                    success = true,
+                    message = "Upload ảnh sản phẩm thành công",
+                    data = result
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    message = ex.Message
+                });
+            }
         }
     }
 }
