@@ -2,6 +2,7 @@
 using CleanAgricultureProductBE.DTOs.ApiResponse;
 using CleanAgricultureProductBE.DTOs.Order;
 using CleanAgricultureProductBE.DTOs.Response;
+using CleanAgricultureProductBE.Migrations;
 using CleanAgricultureProductBE.Models;
 using CleanAgricultureProductBE.Repositories;
 using CleanAgricultureProductBE.Repositories.Order;
@@ -115,7 +116,9 @@ namespace CleanAgricultureProductBE.Services.Account
                 return null!;
             }
 
-            account.Status = request.Status;
+
+            var accountStatus = char.ToUpper(request.Status[0]) + request.Status.Substring(1);
+            account.Status = accountStatus;
             await accountRepository.UpdateAsync(account);
 
             return new AccountResponseDto
