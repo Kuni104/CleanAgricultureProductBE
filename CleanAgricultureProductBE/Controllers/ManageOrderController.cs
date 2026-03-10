@@ -115,9 +115,19 @@ namespace CleanAgricultureProductBE.Controllers
 
         [Authorize(Roles = "Admin,Staff,DeliveryPerson")]
         [HttpPatch("{orderId}")]
-        [SwaggerOperation(Summary = "Cập nhật trạng thái đơn hàng (Admin/Staff/DeliveryPerson)")]
+        [SwaggerOperation(Summary = "Cập nhật trạng thái đơn hàng (Admin/Staff/DeliveryPerson) | Status: Pending, Delivering, Completed")]
         public async Task<IActionResult> UpdateOrderStatus([FromRoute] Guid orderId, [FromBody] UpdateOrderStatusRequestDto request)
         {
+            if (request.Status.ToLower() != "pending" || request.Status.ToLower() != "delivering" || request.Status.ToLower() != "completed")
+            {
+                return BadRequest(new ResponseObject<OrderResponseDto>
+                {
+                    Success = "false",
+                    Message = "Trạng thái đơn hàng không hợp lệ! Trạng thái hợp lệ: Pending, Delivering, Completed",
+                    Data = null
+                });
+            }
+
             var success = "";
             var message = "";
 
