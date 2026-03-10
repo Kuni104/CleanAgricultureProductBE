@@ -43,4 +43,21 @@ public class ScheduleRepository : IScheduleRepository
                 x.DeliveryPersonId == deliveryPersonId &&
                 x.ScheduledDate.Date == date.Date);
     }
+
+    public async Task<List<Schedule>> GetByDeliveryPerson(Guid deliveryPersonId)
+    {
+        return await _context.Schedules
+            .Where(s => s.DeliveryPersonId == deliveryPersonId)
+            .ToListAsync();
+    }
+
+    public async Task<List<Schedule>> GetByDeliveryPersonWithPagination(Guid deliveryPersonId, int offset, int pageSize)
+    {
+        return await _context.Schedules
+            .OrderByDescending(s => s.ScheduledDate)
+            .Where(s => s.DeliveryPersonId == deliveryPersonId)
+            .Skip(offset)
+            .Take(pageSize)
+            .ToListAsync();
+    }
 }

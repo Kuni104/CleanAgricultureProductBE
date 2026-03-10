@@ -103,7 +103,7 @@ namespace CleanAgricultureProductBE.Services.Order
                 OrderId = order!.OrderId,
                 CustomerName = order.Address.RecipientName,
                 Address = order.Address.AddressDetail,
-                Schedule = TimeZoneInfo.ConvertTimeFromUtc(order.Schedule.ScheduledDate, timeZone),
+                Schedule = order.Schedule != null ? TimeZoneInfo.ConvertTimeFromUtc(order.Schedule.ScheduledDate, timeZone) : null,
                 TotalPrice = totalOrderPrice,
                 OrderDate = TimeZoneInfo.ConvertTimeFromUtc(order.OrderDate, timeZone),
                 OrderStatus = order.OrderStatus,    

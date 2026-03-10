@@ -77,7 +77,7 @@ namespace CleanAgricultureProductBE.Controllers
 
         [Authorize(Roles = "Customer")]
         [HttpPost("me/orders")]
-        [SwaggerOperation(Summary = "Tạo đơn hàng mới (Customer)")]
+        [SwaggerOperation(Summary = "Tạo đơn hàng mới (Customer) | Phương thức thanh toán: 1.COD, 2.VNPay")]
         public async Task<IActionResult> PlaceOrder([FromBody] OrderRequestDto request)
         {
             if(request.PaymentMethodId != 1 && request.PaymentMethodId != 2)
