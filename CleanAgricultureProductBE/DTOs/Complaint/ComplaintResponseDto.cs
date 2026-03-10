@@ -12,6 +12,7 @@ namespace CleanAgricultureProductBE.DTOs.Complaint
         public DateTime? ResolveAt { get; set; }
         public string? StaffName { get; set; }
         public List<ProductComplaintResponseDto> ProductComplaints { get; set; } = [];
+        public List<ComplaintImageResponseDto> Images { get; set; } = new();
     }
 
     public class ProductComplaintResponseDto
