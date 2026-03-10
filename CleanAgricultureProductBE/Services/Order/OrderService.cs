@@ -13,13 +13,14 @@ using CleanAgricultureProductBE.Repositories.DSchedule;
 using CleanAgricultureProductBE.Repositories.Order;
 using CleanAgricultureProductBE.Repositories.OrderDetail;
 using CleanAgricultureProductBE.Repositories.Payment;
+using CleanAgricultureProductBE.Repositories.Product;
 using CleanAgricultureProductBE.Services.Cart;
 using CleanAgricultureProductBE.Services.DeliveryFee;
 using CleanAgricultureProductBE.Services.VnPay;
 
 namespace CleanAgricultureProductBE.Services.Order
 {
-    public class OrderService(IAccountRepository accountRepository, IOrderRepository orderRepository, IScheduleRepository scheduleRepository , ICycleScheduleRepository cycleScheduleRepository, IOrderDetailRepository orderDetailRepository, ICartRepository cartRepository,IDeliveryFeeRepository deliveryFeeRepository, IPaymentRepository paymentRepository, IVnPayService vnPayService ) : IOrderService
+    public class OrderService(IAccountRepository accountRepository, IOrderRepository orderRepository, IScheduleRepository scheduleRepository , ICycleScheduleRepository cycleScheduleRepository, IProductRepository productRepository, IOrderDetailRepository orderDetailRepository, ICartRepository cartRepository,IDeliveryFeeRepository deliveryFeeRepository, IPaymentRepository paymentRepository, IVnPayService vnPayService ) : IOrderService
     {
         //UTC+7 timezone
         private readonly TimeZoneInfo timeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
@@ -81,7 +82,7 @@ namespace CleanAgricultureProductBE.Services.Order
 
             payment.PaymentId = Guid.NewGuid();
             payment.PaymentMethodId = request.PaymentMethodId;
-            payment.PaymentStatus = "Waiting";
+            payment.PaymentStatus = "Pending";
             payment.TotalAmount = totalOrderPrice;
             payment.CreatedAt = DateTime.UtcNow;
 
@@ -118,6 +119,13 @@ namespace CleanAgricultureProductBE.Services.Order
 
             await orderDetailRepository.AddOrderDetails(orderDetails);
             await cartRepository.DeleteAllCartItems(cart.CartId);
+
+            foreach (var items in orderDetails ) 
+            {
+                var product = items.Product;
+                product.Stock = product.Stock - items.Quantity;
+                await productRepository.UpdateAsync(product);
+            }
 
             order = await orderRepository.GetOrderByOrderId(order.OrderId);
 
@@ -632,6 +640,13 @@ namespace CleanAgricultureProductBE.Services.Order
             }
 
             order.OrderStatus = "Cancelled";
+            var orderDetails = await orderDetailRepository.GetOrderDetailsByOrderId(orderId);
+            foreach (var items in orderDetails)
+            {
+                var product = items.Product;
+                product.Stock = product.Stock + items.Quantity;
+                await productRepository.UpdateAsync(product);
+            }
 
             await orderRepository.UpdateOrder(order);
 
