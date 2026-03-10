@@ -117,11 +117,6 @@ namespace CleanAgricultureProductBE.Data
 
             modelBuilder.Entity<DeliveryFee>(entity =>
             {
-                entity.Property(df => df.FromKilometer)
-                      .HasPrecision(18, 2);
-
-                entity.Property(df => df.ToKilometer)
-                      .HasPrecision(18, 2);
 
                 entity.Property(df => df.FeeAmount)
                       .HasPrecision(18, 2);

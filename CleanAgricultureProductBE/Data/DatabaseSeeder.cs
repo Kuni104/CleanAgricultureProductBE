@@ -285,15 +285,17 @@ namespace CleanAgricultureProductBE.Data
                     new DeliveryFee
                     {
                         DeliveryFeeId = Guid.NewGuid(),
-                        FromKilometer = 0,
-                        ToKilometer = 5,
+                        City = "HCM",
+                        Ward = "A",
+                        District = "A",
                         FeeAmount = 5000,
                     },
                     new DeliveryFee
                     {
                         DeliveryFeeId = Guid.NewGuid(),
-                        FromKilometer = 5,
-                        ToKilometer = 10,
+                        City = "HCM",
+                        Ward = "B",
+                        District = "B",
                         FeeAmount = 10000,
                     }
                 };
@@ -321,6 +323,67 @@ namespace CleanAgricultureProductBE.Data
                 };
 
                 context.Schedules.AddRange(schedules);
+                await context.SaveChangesAsync();
+            }
+
+            //Order Seeding
+            if (!await context.Set<Order>().AnyAsync())
+            {
+                var payment = new Payment
+                {
+                    PaymentId = Guid.NewGuid(),
+                    PaymentMethodId = 1,
+                    CreatedAt = DateTime.UtcNow,
+                    PaymentStatus = "Pending",
+                    TotalAmount = 10400,
+                };
+
+                context.Payments.Add(payment);
+                await context.SaveChangesAsync();
+
+                var order = new Order
+                {
+                    OrderId = Guid.NewGuid(),
+                    CustomerId = await context.Set<Account>()
+                                            .Where(a => a.Email == "user@gmail.com")
+                                            .Select(a => a.UserProfile.UserProfileId)
+                                            .FirstOrDefaultAsync(),
+
+                    AddressId = await context.Set<Account>()
+                                            .Where(a => a.Email == "user@gmail.com")
+                                            .Select(a => a.UserProfile.Addresses.Where(a => a.AddressDetail == "AAA")
+                                                                                .Select(a => a.AddressId)
+                                                                                .FirstOrDefault())
+                                            .FirstOrDefaultAsync(),
+
+                    DeliveryFeeId = await context.Set<DeliveryFee>()
+                                                .Where(df => df.City == "HCM")
+                                                .Select(df => df.DeliveryFeeId)
+                                                .FirstOrDefaultAsync(),
+
+                    PaymentId = payment.PaymentId,
+                    OrderDate = DateTime.UtcNow,
+                    OrderStatus = "Pending"
+                };
+
+                context.Orders.Add(order);
+                await context.SaveChangesAsync();
+
+                var orderDetail = new OrderDetail
+                {
+                    OrderDetailId = Guid.NewGuid(),
+                    OrderId = order.OrderId,
+                    ProductId = await context.Set<Product>()
+                                            .Where(p => p.Name == "Peach")
+                                            .Select(p => p.ProductId)
+                                            .FirstOrDefaultAsync(),
+                    Quantity = 1,
+                    TotalPrice = 10400,
+                    CreatedAt = DateTime.UtcNow,
+                    ExpiryDate = DateTime.UtcNow.AddDays(30),
+                };
+
+                context.OrderDetails.Add(orderDetail);
                 await context.SaveChangesAsync();
             }
         }
