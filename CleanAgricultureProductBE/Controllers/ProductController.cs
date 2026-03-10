@@ -197,6 +197,8 @@ namespace CleanAgricultureProductBE.Controllers
         }
 
         [HttpPost("{productId}/images")]
+        [Authorize(Roles = "Admin,Staff")]
+        [SwaggerOperation(Summary = "Đăng ảnh sản phẩm (Admin,Staff)")]
         public async Task<IActionResult> UploadProductImages(Guid productId, [FromForm] List<IFormFile> images)
         {
             try
