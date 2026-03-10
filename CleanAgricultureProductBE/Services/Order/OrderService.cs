@@ -57,7 +57,6 @@ namespace CleanAgricultureProductBE.Services.Order
                 CustomerId = cart.CustomerId,
                 AddressId = request.AddressId,
                 DeliveryFeeId = request.DeliveryFeeId,
-                ScheduleId = request.ScheduleId,
                 PaymentId = payment.PaymentId,
                 OrderDate = DateTime.UtcNow,
                 OrderStatus = "Waiting For Deliver"
@@ -146,7 +145,7 @@ namespace CleanAgricultureProductBE.Services.Order
                     CustomerName = order.Address.RecipientName,
                     Address = order.Address.AddressDetail,
                     //Payment = (Guid)order.PaymentId,
-                    Schedule = TimeZoneInfo.ConvertTimeFromUtc(order.Schedule.ScheduledDate, timeZone),
+                    Schedule = order.Schedule != null ? TimeZoneInfo.ConvertTimeFromUtc(order.Schedule.ScheduledDate, timeZone): null,
                     TotalPrice = order.Payment.TotalAmount,
                     OrderDate = TimeZoneInfo.ConvertTimeFromUtc(order.OrderDate, timeZone),
                     OrderStatus = order.OrderStatus
