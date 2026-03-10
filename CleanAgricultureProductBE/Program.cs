@@ -9,6 +9,7 @@ using CleanAgricultureProductBE.Repositories.Complaint;
 using CleanAgricultureProductBE.Repositories.DeliveryFee;
 using CleanAgricultureProductBE.Repositories.DSchedule;
 using CleanAgricultureProductBE.Repositories.DSchedule;
+using CleanAgricultureProductBE.Repositories.Image;
 using CleanAgricultureProductBE.Repositories.Order;
 using CleanAgricultureProductBE.Repositories.OrderDetail;
 using CleanAgricultureProductBE.Repositories.OTP;
@@ -23,6 +24,7 @@ using CleanAgricultureProductBE.Services.Cart;
 using CleanAgricultureProductBE.Services.Category;
 using CleanAgricultureProductBE.Services.Complaint;
 using CleanAgricultureProductBE.Services.DeliveryFee;
+using CleanAgricultureProductBE.Services.Image;
 using CleanAgricultureProductBE.Services.Order;
 using CleanAgricultureProductBE.Services.OrderDetail;
 using CleanAgricultureProductBE.Services.OTP;
@@ -166,7 +168,12 @@ namespace CleanAgricultureProductBE
             builder.Services.AddScoped<IComplaintRepository, ComplaintRepository>();
             builder.Services.AddScoped<IComplaintService, ComplaintService>();
 
-            
+            //Product Image DI
+            builder.Services.AddScoped<IProductImageRepository, ProductImageRepository>();
+            builder.Services.AddScoped<IProductImageService, ProductImageService>();
+
+            // Cloudinary DI
+            builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
 
             // JWT Authentication
             builder.Services
