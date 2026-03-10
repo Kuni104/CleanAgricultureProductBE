@@ -9,6 +9,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace CleanAgricultureProductBE.Services
 {
@@ -260,6 +261,52 @@ namespace CleanAgricultureProductBE.Services
             user.PasswordHash = hasher.HashPassword(user, dto.NewPassword);
 
             await _accountRepo.SaveChangeAsync();
+        }
+
+        public async Task ValidateRegisterAsync(RegisterRequestDto dto)
+        {
+            if (string.IsNullOrWhiteSpace(dto.Email))
+                throw new Exception("Email không được để trống");
+
+            var emailRegex = new Regex(@"^[^\s@]+@[^\s@]+\.[^\s@]+$");
+            if (!emailRegex.IsMatch(dto.Email))
+                throw new Exception("Email không đúng định dạng");
+
+            var existingEmail = await _accountRepo.GetByEmailAsync(dto.Email);
+            if (existingEmail != null)
+                throw new Exception("Email đã được sử dụng");
+
+            var passwordRegex = new Regex(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$");
+            if (!passwordRegex.IsMatch(dto.Password))
+                throw new Exception("Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt");
+
+            if (!string.IsNullOrWhiteSpace(dto.PhoneNumber))
+            {
+                dto.PhoneNumber = dto.PhoneNumber.Trim();
+
+                var numberRegex = new Regex(@"^[0-9]+$");
+                if (!numberRegex.IsMatch(dto.PhoneNumber))
+                    throw new Exception("Số điện thoại chỉ được chứa chữ số");
+
+                if (dto.PhoneNumber.Length != 10)
+                    throw new Exception("Số điện thoại phải có 10 chữ số");
+
+                var allAccounts = await _accountRepo.GetAllAccountsAsync();
+                var existingPhone = allAccounts.Any(x => x.PhoneNumber == dto.PhoneNumber);
+                if (existingPhone)
+                    throw new Exception("Số điện thoại đã được sử dụng");
+            }
+            else
+            {
+                throw new Exception("Số điện thoại không được để trống");
+            }
+
+            var otpRecord = await _emailOtpRepo.GetValidOtpAsync(dto.Email, dto.Otp);
+            if (otpRecord == null)
+                throw new Exception("OTP không khả dụng hoặc không đúng");
+
+            if (otpRecord.ExpiredAt < DateTime.UtcNow)
+                throw new Exception("OTP đã hết hạn");
         }
     }
 }
