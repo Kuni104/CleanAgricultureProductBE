@@ -22,7 +22,7 @@ namespace CleanAgricultureProductBE.Controllers
 
         [Authorize(Roles = "Admin,Staff")]
         [HttpPost]
-        [SwaggerOperation(Summary = "Tạo lịch giao hàng")]
+        [SwaggerOperation(Summary = "Tạo lịch giao hàng (Format: YYYY-MM-DDTHH:mm:ss.fffZ | 2026-03-1T17:30:45.123Z)")]
         public async Task<IActionResult> Create([FromBody] CreateScheduleRequestDto dto)
         {
             try
