@@ -50,7 +50,7 @@ namespace CleanAgricultureProductBE.Services.Image
 
                 try
                 {
-                    var imageUrl = await _cloudinaryService.UploadImageAsync(file);
+                    var imageUrl = await _cloudinaryService.UploadImageAsync(file, "products");
 
                     imageUrls.Add(imageUrl);
 

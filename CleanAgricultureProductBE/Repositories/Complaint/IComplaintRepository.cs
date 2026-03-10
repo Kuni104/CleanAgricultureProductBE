@@ -12,5 +12,7 @@ namespace CleanAgricultureProductBE.Repositories.Complaint
         Task<List<Models.Complaint>> GetByCustomerIdAsync(Guid customerId, int offset, int pageSize);
         Task<int> CountByCustomerIdAsync(Guid customerId);
         Task UpdateAsync(Models.Complaint complaint);
+        Task AddComplaintImageAsync(ComplaintImage image);
+        Task SaveChangesAsync();
     }
 }
