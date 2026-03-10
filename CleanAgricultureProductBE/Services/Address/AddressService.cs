@@ -1,6 +1,7 @@
 using CleanAgricultureProductBE.DTOs.Address;
 using CleanAgricultureProductBE.Repositories;
 using CleanAgricultureProductBE.Repositories.Address;
+using System.Text.RegularExpressions;
 using AddressModel = CleanAgricultureProductBE.Models.Address;
 
 namespace CleanAgricultureProductBE.Services.Address
@@ -19,6 +20,8 @@ namespace CleanAgricultureProductBE.Services.Address
         public async Task<AddressResponseDto> CreateAddressAsync(string accountEmail, AddressRequestDto dto)
         {
             var userProfileId = await GetUserProfileIdByEmail(accountEmail);
+
+            ValidateAddressDto(dto, isCreate: true);
 
             if (dto.IsDefault.HasValue && dto.IsDefault.Value)
             {
@@ -70,6 +73,8 @@ namespace CleanAgricultureProductBE.Services.Address
             if (address == null || address.UserProfileId != userProfileId)
                 throw new Exception("Address not found");
 
+            ValidateAddressDto(dto, isCreate: false);
+
             if (dto.IsDefault.HasValue && dto.IsDefault.Value && !address.IsDefault)
             {
                 await _addressRepo.UnsetDefaultAddressAsync(userProfileId);
@@ -99,7 +104,21 @@ namespace CleanAgricultureProductBE.Services.Address
             if (address == null || address.UserProfileId != userProfileId)
                 throw new Exception("Address not found");
 
-            return await _addressRepo.DeleteAsync(addressId);
+            var wasDefault = address.IsDefault;
+
+            var result = await _addressRepo.DeleteAsync(addressId);
+
+            if (wasDefault && result)
+            {
+                var mostRecent = await _addressRepo.GetMostRecentByUserProfileIdAsync(userProfileId, addressId);
+                if (mostRecent != null)
+                {
+                    mostRecent.IsDefault = true;
+                    await _addressRepo.UpdateAsync(mostRecent);
+                }
+            }
+
+            return result;
         }
 
         public async Task<AddressResponseDto> SetDefaultAddressAsync(string accountEmail, Guid addressId)
@@ -140,6 +159,43 @@ namespace CleanAgricultureProductBE.Services.Address
                 AddressDetail = address.AddressDetail,
                 IsDefault = address.IsDefault
             };
+        }
+
+        private static void ValidateAddressDto(AddressRequestDto dto, bool isCreate)
+        {
+            if (isCreate)
+            {
+                if (string.IsNullOrWhiteSpace(dto.RecipientName))
+                    throw new Exception("Recipient name is required");
+
+                if (string.IsNullOrWhiteSpace(dto.RecipientPhone))
+                    throw new Exception("Recipient phone is required");
+
+                if (string.IsNullOrWhiteSpace(dto.City))
+                    throw new Exception("City is required");
+
+                if (string.IsNullOrWhiteSpace(dto.District))
+                    throw new Exception("District is required");
+
+                if (string.IsNullOrWhiteSpace(dto.Ward))
+                    throw new Exception("Ward is required");
+
+                if (string.IsNullOrWhiteSpace(dto.AddressDetail))
+                    throw new Exception("Address detail is required");
+            }
+
+            if (!string.IsNullOrWhiteSpace(dto.RecipientName) && dto.RecipientName.Trim().Length > 100)
+                throw new Exception("Recipient name must not exceed 100 characters");
+
+            if (!string.IsNullOrWhiteSpace(dto.RecipientPhone))
+            {
+                var phoneRegex = new Regex(@"^(0|\+84)\d{9}$");
+                if (!phoneRegex.IsMatch(dto.RecipientPhone.Trim()))
+                    throw new Exception("Invalid phone number. Must start with 0 or +84 and contain 10 digits");
+            }
+
+            if (!string.IsNullOrWhiteSpace(dto.AddressDetail) && dto.AddressDetail.Trim().Length > 500)
+                throw new Exception("Address detail must not exceed 500 characters");
         }
     }
 }

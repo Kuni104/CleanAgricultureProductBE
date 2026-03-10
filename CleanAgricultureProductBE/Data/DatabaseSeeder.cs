@@ -198,7 +198,7 @@ namespace CleanAgricultureProductBE.Data
                         Name = "Apple",
                         Description = "Fresh red apples",
                         Price = 10000,
-                        Unit = 1,
+                        Unit = "kg",
                         Stock = 100,
                         Status = "Active",
                     },
@@ -212,7 +212,7 @@ namespace CleanAgricultureProductBE.Data
                         Name = "Peach",
                         Description = "Fresh Peach Made In Heaven",
                         Price = 10400,
-                        Unit = 1,
+                        Unit = "kg",
                         Stock = 104,
                         Status = "Active"
                     },
@@ -226,7 +226,7 @@ namespace CleanAgricultureProductBE.Data
                         Name = "Carrot",
                         Description = "Organic carrots",
                         Price = 8000,
-                        Unit = 1,
+                        Unit = "kg",
                         Stock = 150,
                         Status = "Active"
                     },
@@ -240,7 +240,7 @@ namespace CleanAgricultureProductBE.Data
                         Name = "Rice",
                         Description = "Brown rice",
                         Price = 25000,
-                        Unit = 1,
+                        Unit = "kg",
                         Stock = 200,
                         Status = "Active"
                     }

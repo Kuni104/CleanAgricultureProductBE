@@ -31,7 +31,7 @@ namespace CleanAgricultureProductBE.Controllers
                 return Ok(new ResponseObjectWithPagination<List<ProductResponseDto>>
                 {
                     Success = "true",
-                    Message = "Lấy các sản phẩm thành công",
+                    Message = "Lấy danh sách sản phẩm thành công",
                     Data = products,
                     Pagination = null
                 });
@@ -58,7 +58,7 @@ namespace CleanAgricultureProductBE.Controllers
                 return Ok(new ResponseObject<ProductResponseDto>
                 {
                     Success = "true",
-                    Message = "Lấy chi tiết sản phẩm thành công",
+                    Message = "Lấy thông tin sản phẩm thành công",
                     Data = product
                 });
             }
@@ -136,7 +136,7 @@ namespace CleanAgricultureProductBE.Controllers
                 return Ok(new ResponseObject<bool>
                 {
                     Success = "true",
-                    Message = result ? "Xóa sản phẩm thành công" : "Sản phẩm đã được xóa tạm thời. Hãy xác nhận xóa vĩnh viễn bằng cách thêm query parameter confirm=true",
+                    Message = "Xóa sản phẩm thành công",
                     Data = result
                 });
             }
@@ -161,7 +161,7 @@ namespace CleanAgricultureProductBE.Controllers
                 return BadRequest(new ResponseObject<string>
                 {
                     Success = "false",
-                    Message = "Cần có Status"
+                    Message = "Trạng thái không được để trống"
                 });
             }
 
@@ -170,7 +170,7 @@ namespace CleanAgricultureProductBE.Controllers
                 return BadRequest(new ResponseObject<string> 
                 { 
                     Success = "false", 
-                    Message = "Status không hợp lệ. (Active hoặc Inactive)" 
+                    Message = "Trạng thái không hợp lệ. ('Active' hoặc 'Inactive')" 
                 });
             }
 

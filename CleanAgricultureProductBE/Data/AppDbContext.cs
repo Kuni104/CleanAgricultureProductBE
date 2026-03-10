@@ -84,6 +84,11 @@ namespace CleanAgricultureProductBE.Data
 
             });
 
+            modelBuilder.Entity<Category>(entity =>
+            {
+                entity.HasQueryFilter(c => !c.IsDeleted);
+            });
+
             modelBuilder.Entity<Product>(entity =>
             {
                 entity.HasOne(a => a.Category)
@@ -94,6 +99,7 @@ namespace CleanAgricultureProductBE.Data
                 entity.Property(p => p.Price)
                       .HasPrecision(18, 2);
 
+                entity.HasQueryFilter(p => !p.IsDeleted);
             });
 
             modelBuilder.Entity<ProductImage>(entity =>

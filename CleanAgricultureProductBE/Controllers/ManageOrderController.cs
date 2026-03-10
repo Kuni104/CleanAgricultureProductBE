@@ -118,7 +118,7 @@ namespace CleanAgricultureProductBE.Controllers
         [SwaggerOperation(Summary = "Cập nhật trạng thái đơn hàng (Admin/Staff/DeliveryPerson) | Status: Pending, Delivering, Completed, Cancelled")]
         public async Task<IActionResult> UpdateOrderStatus([FromRoute] Guid orderId, [FromBody] UpdateOrderStatusRequestDto request)
         {
-            if (request.Status.ToLower() != "pending" || request.Status.ToLower() != "delivering" || request.Status.ToLower() != "completed" || request.Status.ToLower() != "cancelled")
+            if (request.Status.ToLower() != "pending" && request.Status.ToLower() != "delivering" && request.Status.ToLower() != "completed" && request.Status.ToLower() != "cancelled")
             {
                 return BadRequest(new ResponseObject<OrderResponseDto>
                 {

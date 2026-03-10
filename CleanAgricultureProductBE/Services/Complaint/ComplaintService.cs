@@ -26,7 +26,10 @@ namespace CleanAgricultureProductBE.Services.Complaint
 
             var existing = await complaintRepository.GetByOrderIdAsync(request.OrderId);
             if (existing != null)
-                throw new InvalidOperationException("A complaint for this order already exists");
+                throw new InvalidOperationException("Đơn hàng này đã có khiếu nại");
+
+            if (string.IsNullOrWhiteSpace(request.Evidence))
+                throw new Exception("Bằng chứng (evidence) là bắt buộc");
 
             var complaint = new Models.Complaint
             {
@@ -34,7 +37,7 @@ namespace CleanAgricultureProductBE.Services.Complaint
                 OrderId = request.OrderId,
                 Subject = request.Subject,
                 Description = request.Description,
-                Evidence = request.Evidence ?? string.Empty,
+                Evidence = request.Evidence,
                 Status = "Pending",
                 CreatedAt = DateTime.UtcNow
             };
@@ -99,6 +102,40 @@ namespace CleanAgricultureProductBE.Services.Complaint
             return complaint == null ? null : MapToDto(complaint);
         }
 
+        public async Task<ComplaintResponseDto> UpdateComplaintStatusAsync(string staffEmail, Guid complaintId, UpdateComplaintStatusDto dto)
+        {
+            var staffAccount = await accountRepository.GetByEmailAsync(staffEmail)
+                ?? throw new Exception("Không tìm thấy tài khoản");
+
+            var complaint = await complaintRepository.GetByIdAsync(complaintId)
+                ?? throw new Exception("Không tìm thấy khiếu nại");
+
+            if (complaint.Status != "Pending")
+                throw new InvalidOperationException($"Không thể cập nhật khiếu nại đang ở trạng thái '{complaint.Status}'");
+
+            var validStatuses = new[] { "Resolved", "Rejected" };
+            if (!validStatuses.Contains(dto.Status))
+                throw new Exception("Trạng thái không hợp lệ. Chỉ chấp nhận: Resolved, Rejected");
+
+            if (dto.Status == "Resolved")
+            {
+                var validResolutions = new[] { "Exchange", "Refund" };
+                if (string.IsNullOrWhiteSpace(dto.Resolution) || !validResolutions.Contains(dto.Resolution))
+                    throw new Exception("Khi xử lý khiếu nại (Resolved), phải chọn hình thức: Exchange (đổi hàng) hoặc Refund (hoàn tiền)");
+
+                complaint.Resolution = dto.Resolution;
+            }
+
+            complaint.Status = dto.Status;
+            complaint.StaffId = staffAccount.AccountId;
+            complaint.ResolveAt = DateTime.UtcNow;
+
+            await complaintRepository.UpdateAsync(complaint);
+
+            var updated = await complaintRepository.GetByIdAsync(complaintId);
+            return MapToDto(updated!);
+        }
+
         private static ComplaintResponseDto MapToDto(Models.Complaint c) => new()
         {
             ComplaintId = c.ComplaintId,
@@ -107,6 +144,7 @@ namespace CleanAgricultureProductBE.Services.Complaint
             Description = c.Description,
             Evidence = c.Evidence,
             Status = c.Status,
+            Resolution = c.Resolution,
             CreatedAt = c.CreatedAt,
             ResolveAt = c.ResolveAt,
             StaffName = c.Staff != null ? $"{c.Staff.UserProfile?.FirstName} {c.Staff.UserProfile?.LastName}".Trim() : null,

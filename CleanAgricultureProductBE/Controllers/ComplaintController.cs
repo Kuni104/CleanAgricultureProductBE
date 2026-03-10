@@ -91,9 +91,39 @@ namespace CleanAgricultureProductBE.Controllers
             return base.Ok(new DTOs.ApiResponse.ResponseObject<ComplaintResponseDto>
             {
                 Success = "true",
-                Message = "Complaint retrieved successfully",
+                Message = "Lấy thông tin khiếu nại thành công",
                 Data = result
             });
+        }
+
+        // Staff: cập nhật trạng thái complaint (Resolved + Exchange/Refund, hoặc Rejected)
+        [Authorize(Roles = "Staff,Admin")]
+        [HttpPatch("complaints/{complaintId}/status")]
+        [SwaggerOperation(Summary = "Cập nhật trạng thái khiếu nại - Resolved (Exchange/Refund) hoặc Rejected (Staff/Admin)")]
+        public async Task<IActionResult> UpdateComplaintStatus([FromRoute] Guid complaintId, [FromBody] UpdateComplaintStatusDto dto)
+        {
+            var email = User.FindFirstValue(ClaimTypes.Email)!;
+            try
+            {
+                var result = await complaintService.UpdateComplaintStatusAsync(email, complaintId, dto);
+                var message = dto.Status == "Resolved"
+                    ? $"Khiếu nại đã được xử lý: {dto.Resolution}"
+                    : "Khiếu nại đã bị từ chối";
+                return base.Ok(new DTOs.ApiResponse.ResponseObject<ComplaintResponseDto>
+                {
+                    Success = "true",
+                    Message = message,
+                    Data = result
+                });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return base.Conflict(new DTOs.ApiResponse.ResponseObject<object> { Success = "false", Message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return base.BadRequest(new DTOs.ApiResponse.ResponseObject<object> { Success = "false", Message = ex.Message });
+            }
         }
     }
 }

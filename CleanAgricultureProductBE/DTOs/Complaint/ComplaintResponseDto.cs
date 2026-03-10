@@ -8,6 +8,7 @@ namespace CleanAgricultureProductBE.DTOs.Complaint
         public string Description { get; set; } = string.Empty;
         public string Evidence { get; set; } = string.Empty;
         public string Status { get; set; } = string.Empty;
+        public string? Resolution { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime? ResolveAt { get; set; }
         public string? StaffName { get; set; }

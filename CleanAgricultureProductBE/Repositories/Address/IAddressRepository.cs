@@ -11,5 +11,6 @@ namespace CleanAgricultureProductBE.Repositories.Address
         Task<bool> DeleteAsync(Guid addressId);
         Task<AddressModel?> GetDefaultAddressByUserProfileIdAsync(Guid userProfileId);
         Task UnsetDefaultAddressAsync(Guid userProfileId);
+        Task<AddressModel?> GetMostRecentByUserProfileIdAsync(Guid userProfileId, Guid excludeAddressId);
     }
 }
