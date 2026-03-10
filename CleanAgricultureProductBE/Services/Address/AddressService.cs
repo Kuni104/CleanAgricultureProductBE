@@ -60,7 +60,7 @@ namespace CleanAgricultureProductBE.Services.Address
             var address = await _addressRepo.GetByIdAsync(addressId);
 
             if (address == null || address.UserProfileId != userProfileId)
-                throw new Exception("Address not found");
+                throw new Exception("Không tìm thấy địa chỉ");
 
             return MapToDto(address);
         }
@@ -71,7 +71,7 @@ namespace CleanAgricultureProductBE.Services.Address
             var address = await _addressRepo.GetByIdAsync(addressId);
 
             if (address == null || address.UserProfileId != userProfileId)
-                throw new Exception("Address not found");
+                throw new Exception("Không tìm thấy địa chỉ");
 
             ValidateAddressDto(dto, isCreate: false);
 
@@ -93,16 +93,13 @@ namespace CleanAgricultureProductBE.Services.Address
             return MapToDto(updated);
         }
 
-        public async Task<bool> DeleteAddressAsync(string accountEmail, Guid addressId, bool confirm)
+        public async Task<bool> DeleteAddressAsync(string accountEmail, Guid addressId)
         {
-            if (!confirm)
-                throw new Exception("Delete confirmation required");
-
             var userProfileId = await GetUserProfileIdByEmail(accountEmail);
             var address = await _addressRepo.GetByIdAsync(addressId);
 
             if (address == null || address.UserProfileId != userProfileId)
-                throw new Exception("Address not found");
+                throw new Exception("Không tìm thấy địa chỉ");
 
             var wasDefault = address.IsDefault;
 
@@ -127,7 +124,7 @@ namespace CleanAgricultureProductBE.Services.Address
             var address = await _addressRepo.GetByIdAsync(addressId);
 
             if (address == null || address.UserProfileId != userProfileId)
-                throw new Exception("Address not found");
+                throw new Exception("Không tìm thấy địa chỉ");
 
             await _addressRepo.UnsetDefaultAddressAsync(userProfileId);
 
@@ -141,7 +138,7 @@ namespace CleanAgricultureProductBE.Services.Address
         {
             var account = await _accountRepo.GetByEmailAsync(email);
             if (account == null)
-                throw new Exception("Account not found");
+                throw new Exception("Không tìm thấy tài khoản");
 
             return account.UserProfile.UserProfileId;
         }
@@ -166,36 +163,36 @@ namespace CleanAgricultureProductBE.Services.Address
             if (isCreate)
             {
                 if (string.IsNullOrWhiteSpace(dto.RecipientName))
-                    throw new Exception("Recipient name is required");
+                    throw new Exception("Tên người nhận không được để trống");
 
                 if (string.IsNullOrWhiteSpace(dto.RecipientPhone))
-                    throw new Exception("Recipient phone is required");
+                    throw new Exception("Số điện thoại người nhận không được để trống");
 
                 if (string.IsNullOrWhiteSpace(dto.City))
-                    throw new Exception("City is required");
+                    throw new Exception("Thành phố không được để trống");
 
                 if (string.IsNullOrWhiteSpace(dto.District))
-                    throw new Exception("District is required");
+                    throw new Exception("Quận/Huyện không được để trống");
 
                 if (string.IsNullOrWhiteSpace(dto.Ward))
-                    throw new Exception("Ward is required");
+                    throw new Exception("Phường/Xã không được để trống");
 
                 if (string.IsNullOrWhiteSpace(dto.AddressDetail))
-                    throw new Exception("Address detail is required");
+                    throw new Exception("Chi tiết địa chỉ không được để trống");
             }
 
             if (!string.IsNullOrWhiteSpace(dto.RecipientName) && dto.RecipientName.Trim().Length > 100)
-                throw new Exception("Recipient name must not exceed 100 characters");
+                throw new Exception("Tên người nhận không được vượt quá 100 ký tự");
 
             if (!string.IsNullOrWhiteSpace(dto.RecipientPhone))
             {
                 var phoneRegex = new Regex(@"^(0|\+84)\d{9}$");
                 if (!phoneRegex.IsMatch(dto.RecipientPhone.Trim()))
-                    throw new Exception("Invalid phone number. Must start with 0 or +84 and contain 10 digits");
+                    throw new Exception("Số điện thoại không hợp lệ. Phải bắt đầu bằng 0 hoặc +84 và có 10 chữ số");
             }
 
             if (!string.IsNullOrWhiteSpace(dto.AddressDetail) && dto.AddressDetail.Trim().Length > 500)
-                throw new Exception("Address detail must not exceed 500 characters");
+                throw new Exception("Chi tiết địa chỉ không được vượt quá 500 ký tự");
         }
     }
 }

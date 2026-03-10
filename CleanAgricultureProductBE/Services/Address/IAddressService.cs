@@ -8,7 +8,7 @@ namespace CleanAgricultureProductBE.Services.Address
         Task<List<AddressResponseDto>> GetAllAddressesAsync(string accountEmail);
         Task<AddressResponseDto> GetAddressByIdAsync(string accountEmail, Guid addressId);
         Task<AddressResponseDto> UpdateAddressAsync(string accountEmail, Guid addressId, AddressRequestDto dto);
-        Task<bool> DeleteAddressAsync(string accountEmail, Guid addressId, bool confirm);
+        Task<bool> DeleteAddressAsync(string accountEmail, Guid addressId);
         Task<AddressResponseDto> SetDefaultAddressAsync(string accountEmail, Guid addressId);
     }
 }

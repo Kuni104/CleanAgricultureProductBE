@@ -120,12 +120,12 @@ namespace CleanAgricultureProductBE.Controllers
 
         [HttpDelete("{id}")]
         [SwaggerOperation(Summary = "Xóa địa chỉ")]
-        public async Task<IActionResult> DeleteAddress(Guid id, [FromQuery] bool confirm = false)
+        public async Task<IActionResult> DeleteAddress(Guid id)
         {
             try
             {
                 var email = User.FindFirstValue(ClaimTypes.Email)!;
-                await _addressService.DeleteAddressAsync(email, id, confirm);
+                await _addressService.DeleteAddressAsync(email, id);
                 return Ok(new ResponseObject<string>
                 {
                     Success = "true",

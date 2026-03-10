@@ -17,6 +17,8 @@ namespace CleanAgricultureProductBE.Controllers
         [SwaggerOperation(Summary = "Lấy lịch xoay tua")]
         public async Task<IActionResult> GetCycleSchedules([FromQuery] int? page, [FromQuery] int? size, [FromQuery] string? keyword)
         {
+            try
+            {
             var message = "";
             var result = await cycleScheduleService.GetCycleSchedules(page, size, keyword);
 
@@ -36,6 +38,11 @@ namespace CleanAgricultureProductBE.Controllers
                 Data = result.ResultObject,
                 Pagination = result.Pagination
             });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ResponseObject<string> { Success = "false", Message = ex.Message });
+            }
         }
     }
 }

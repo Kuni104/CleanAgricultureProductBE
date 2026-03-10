@@ -21,6 +21,8 @@ namespace CleanAgricultureProductBE.Controllers
         [SwaggerOperation(Summary = "Lấy danh sách đơn hàng của tôi (Customer)")]
         public async Task<IActionResult> GetAllOrders([FromQuery] int? page, [FromQuery] int? size, [FromQuery] string? keyword)
         {
+            try
+            {
             var success = "";
             var message = "";
 
@@ -48,6 +50,11 @@ namespace CleanAgricultureProductBE.Controllers
             };
 
             return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ResponseObject<string> { Success = "false", Message = ex.Message });
+            }
         }
 
         [Authorize(Roles = "Customer")]
@@ -55,6 +62,8 @@ namespace CleanAgricultureProductBE.Controllers
         [SwaggerOperation(Summary = "Lấy chi tiết đơn hàng theo ID (Customer)")]
         public async Task<IActionResult> GetOrderDetail([FromRoute] Guid orderId, [FromQuery] int? page, [FromQuery] int? size, [FromQuery] string? keyword)
         {
+            try
+            {
             var accountEmail = User.FindFirstValue(ClaimTypes.Email);
 
             var result = await orderService.GetOrderDetails(accountEmail!, orderId, page, size, keyword);
@@ -73,6 +82,11 @@ namespace CleanAgricultureProductBE.Controllers
             };
 
             return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ResponseObject<string> { Success = "false", Message = ex.Message });
+            }
         }
 
         [Authorize(Roles = "Customer")]

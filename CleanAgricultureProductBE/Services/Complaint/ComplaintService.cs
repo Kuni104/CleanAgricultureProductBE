@@ -18,56 +18,63 @@ namespace CleanAgricultureProductBE.Services.Complaint
         public async Task<ComplaintResponseDto> CreateComplaintAsync(string accountEmail, CreateComplaintRequestDto request)
         {
             if (request.OrderId == Guid.Empty)
-                throw new ArgumentException("OrderId is required");
+                throw new ArgumentException("Mã đơn hàng không được để trống");
 
             if (string.IsNullOrWhiteSpace(request.Subject))
-                throw new ArgumentException("Subject is required");
+                throw new ArgumentException("Tiêu đề không được để trống");
 
             if (string.IsNullOrWhiteSpace(request.Description))
-                throw new ArgumentException("Description is required");
+                throw new ArgumentException("Mô tả không được để trống");
 
             if (request.Subject.Length > 200)
-                throw new ArgumentException("Subject must be less than 200 characters");
+                throw new ArgumentException("Tiêu đề không được vượt quá 200 ký tự");
 
             if (request.Description.Length > 2000)
-                throw new ArgumentException("Description must be less than 2000 characters");
+                throw new ArgumentException("Mô tả không được vượt quá 2000 ký tự");
+
+            // Bắt buộc phải có bằng chứng: ảnh hoặc evidence text
+            bool hasImages = request.Images != null && request.Images.Any();
+            bool hasEvidence = !string.IsNullOrWhiteSpace(request.Evidence);
+            if (!hasImages && !hasEvidence)
+                throw new ArgumentException("Bằng chứng là bắt buộc. Vui lòng cung cấp ảnh hoặc mô tả bằng chứng");
+
             if (request.Images != null && request.Images.Any())
             {
                 if (request.Images.Count > 5)
-                    throw new ArgumentException("Maximum 5 images allowed");
+                    throw new ArgumentException("Chỉ được upload tối đa 5 ảnh");
 
                 var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".webp" };
 
                 foreach (var file in request.Images)
                 {
                     if (file.Length == 0)
-                        throw new ArgumentException("Image file is empty");
+                        throw new ArgumentException("File ảnh không hợp lệ");
 
                     var extension = Path.GetExtension(file.FileName).ToLower();
 
                     if (!allowedExtensions.Contains(extension))
-                        throw new ArgumentException("Only jpg, jpeg, png, webp images are allowed");
+                        throw new ArgumentException("Chỉ chấp nhận ảnh định dạng jpg, jpeg, png, webp");
 
                     if (file.Length > 5 * 1024 * 1024)
-                        throw new ArgumentException("Image size must be less than 5MB");
+                        throw new ArgumentException("Dung lượng ảnh không được vượt quá 5MB");
                 }
             }
 
             var account = await accountRepository.GetByEmailAsync(accountEmail)
-                ?? throw new Exception("Account not found");
+                ?? throw new Exception("Không tìm thấy tài khoản");
 
             var order = await orderRepository.GetOrderByOrderId(request.OrderId)
-                ?? throw new Exception("Order not found");
+                ?? throw new Exception("Không tìm thấy đơn hàng");
 
             if (order.CustomerId != account.UserProfile.UserProfileId)
-                throw new UnauthorizedAccessException("This order does not belong to you");
+                throw new UnauthorizedAccessException("Đơn hàng này không thuộc về bạn");
+
+            if (order.OrderStatus != "Completed")
+                throw new InvalidOperationException("Chỉ có thể khiếu nại đơn hàng đã hoàn thành (Completed)");
 
             var existing = await complaintRepository.GetByOrderIdAsync(request.OrderId);
             if (existing != null)
                 throw new InvalidOperationException("Đơn hàng này đã có khiếu nại");
-
-            if (string.IsNullOrWhiteSpace(request.Evidence))
-                throw new Exception("Bằng chứng (evidence) là bắt buộc");
 
             var complaint = new Models.Complaint
             {
@@ -123,10 +130,16 @@ namespace CleanAgricultureProductBE.Services.Complaint
         public async Task<ResponseDtoWithPagination<List<ComplaintResponseDto>>> GetMyComplaintsAsync(string accountEmail, int? page, int? size)
         {
             var account = await accountRepository.GetByEmailAsync(accountEmail)
-                ?? throw new Exception("Account not found");
+                ?? throw new Exception("Không tìm thấy tài khoản");
 
             int pageSize = size ?? 10;
             int pageNumber = page ?? 1;
+
+            if (pageNumber <= 0)
+                throw new ArgumentException("Số trang (page) phải lớn hơn 0");
+            if (pageSize <= 0)
+                throw new ArgumentException("Kích thước trang (size) phải lớn hơn 0");
+
             int offset = (pageNumber - 1) * pageSize;
 
             var customerId = account.UserProfile.UserProfileId;
@@ -144,6 +157,12 @@ namespace CleanAgricultureProductBE.Services.Complaint
         {
             int pageSize = size ?? 10;
             int pageNumber = page ?? 1;
+
+            if (pageNumber <= 0)
+                throw new ArgumentException("Số trang (page) phải lớn hơn 0");
+            if (pageSize <= 0)
+                throw new ArgumentException("Kích thước trang (size) phải lớn hơn 0");
+
             int offset = (pageNumber - 1) * pageSize;
 
             var complaints = await complaintRepository.GetAllAsync(offset, pageSize, keyword);
