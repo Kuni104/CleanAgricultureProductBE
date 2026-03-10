@@ -18,52 +18,56 @@ namespace CleanAgricultureProductBE.Services.Complaint
         public async Task<ComplaintResponseDto> CreateComplaintAsync(string accountEmail, CreateComplaintRequestDto request)
         {
             if (request.OrderId == Guid.Empty)
-                throw new ArgumentException("OrderId is required");
+                throw new ArgumentException("OrderId không được để trống");
 
             if (string.IsNullOrWhiteSpace(request.Subject))
-                throw new ArgumentException("Subject is required");
+                throw new ArgumentException("Subject không được để trống");
 
             if (string.IsNullOrWhiteSpace(request.Description))
-                throw new ArgumentException("Description is required");
+                throw new ArgumentException("Description không được để trống");
 
-            if (request.Subject.Length > 200)
-                throw new ArgumentException("Subject must be less than 200 characters");
+            if (string.IsNullOrWhiteSpace(request.Evidence))
+                throw new ArgumentException("Evidence không được để trống");
 
-            if (request.Description.Length > 2000)
-                throw new ArgumentException("Description must be less than 2000 characters");
+
+            if (request.ProductIds == null || !request.ProductIds.Any())
+                throw new ArgumentException("Phải chọn ít nhất 1 sản phẩm");
+
             if (request.Images != null && request.Images.Any())
             {
                 if (request.Images.Count > 5)
-                    throw new ArgumentException("Maximum 5 images allowed");
+                    throw new ArgumentException("Chỉ được upload tối đa 5 ảnh");
 
                 var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".webp" };
 
                 foreach (var file in request.Images)
                 {
                     if (file.Length == 0)
-                        throw new ArgumentException("Image file is empty");
+                        throw new ArgumentException("File ảnh không hợp lệ");
 
                     var extension = Path.GetExtension(file.FileName).ToLower();
 
                     if (!allowedExtensions.Contains(extension))
-                        throw new ArgumentException("Only jpg, jpeg, png, webp images are allowed");
+                        throw new ArgumentException("Chỉ chấp nhận file jpg, jpeg, png, webp");
 
                     if (file.Length > 5 * 1024 * 1024)
-                        throw new ArgumentException("Image size must be less than 5MB");
+                        throw new ArgumentException("Ảnh phải nhỏ hơn 5MB");
                 }
             }
 
             var account = await accountRepository.GetByEmailAsync(accountEmail)
-                ?? throw new Exception("Account not found");
+                ?? throw new Exception("Account không tồn tại");
 
             var order = await orderRepository.GetOrderByOrderId(request.OrderId)
-                ?? throw new Exception("Order not found");
+                ?? throw new Exception("Order không tồn tại");
 
+ 
             if (order.CustomerId != account.UserProfile.UserProfileId)
-                throw new UnauthorizedAccessException("This order does not belong to you");
+                throw new UnauthorizedAccessException("Đơn hàng này không thuộc về bạn");
 
             var existing = await complaintRepository.GetByOrderIdAsync(request.OrderId);
             if (existing != null)
+
                 throw new InvalidOperationException("Đơn hàng này đã có khiếu nại");
 
             if (string.IsNullOrWhiteSpace(request.Evidence))
@@ -75,22 +79,20 @@ namespace CleanAgricultureProductBE.Services.Complaint
                 OrderId = request.OrderId,
                 Subject = request.Subject.Trim(),
                 Description = request.Description.Trim(),
-                Evidence = request.Evidence ?? string.Empty,
+                Evidence = request.Evidence.Trim(),
                 Status = "Pending",
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
+                Images = new List<ComplaintImage>()
             };
 
-            if (request.ProductIds != null && request.ProductIds.Count > 0)
+            foreach (var productId in request.ProductIds.Distinct())
             {
-                foreach (var productId in request.ProductIds.Distinct())
+                complaint.ProductComplaints.Add(new ProductComplaint
                 {
-                    complaint.ProductComplaints.Add(new ProductComplaint
-                    {
-                        ProductComplaintId = Guid.NewGuid(),
-                        ProductId = productId,
-                        ComplaintId = complaint.ComplaintId
-                    });
-                }
+                    ProductComplaintId = Guid.NewGuid(),
+                    ProductId = productId,
+                    ComplaintId = complaint.ComplaintId
+                });
             }
 
             if (request.Images != null && request.Images.Any())
@@ -109,8 +111,6 @@ namespace CleanAgricultureProductBE.Services.Complaint
                         });
                     }
                 }
-
-                complaint.Evidence = string.Empty;
             }
 
             await complaintRepository.AddAsync(complaint);
@@ -207,13 +207,22 @@ namespace CleanAgricultureProductBE.Services.Complaint
             Resolution = c.Resolution,
             CreatedAt = c.CreatedAt,
             ResolveAt = c.ResolveAt,
-            StaffName = c.Staff != null ? $"{c.Staff.UserProfile?.FirstName} {c.Staff.UserProfile?.LastName}".Trim() : null,
+            StaffName = c.Staff != null
+        ? $"{c.Staff.UserProfile?.FirstName} {c.Staff.UserProfile?.LastName}".Trim()
+        : null,
+
             ProductComplaints = c.ProductComplaints.Select(pc => new ProductComplaintResponseDto
             {
                 ProductComplaintId = pc.ProductComplaintId,
                 ProductId = pc.ProductId,
                 ProductName = pc.Product?.Name ?? string.Empty
-            }).ToList()
+            }).ToList(),
+
+            Images = c.Images?.Select(i => new ComplaintImageResponseDto
+            {
+                Id = i.Id,
+                ImageUrl = i.ImageUrl
+            }).ToList() ?? new List<ComplaintImageResponseDto>()
         };
     }
 }
