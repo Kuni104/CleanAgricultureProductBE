@@ -53,6 +53,7 @@ namespace CleanAgricultureProductBE.Repositories
         public Task<Account?> GetByEmailAsync(string email)
         {
             return _context.Accounts.Include(a => a.UserProfile)
+                                    .ThenInclude(up => up.Addresses)
                                     .Include(a => a.Role)
                                     .FirstOrDefaultAsync(a => a.Email == email);
         }

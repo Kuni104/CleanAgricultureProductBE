@@ -23,9 +23,30 @@ namespace CleanAgricultureProductBE.Services.Order
         private readonly TimeZoneInfo timeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
 
         //Place order
-        public async Task<PlaceOrderResponseDto> PlaceOrder(string accountEmail, OrderRequestDto request)
+        public async Task<ResultStatusWithData<PlaceOrderResponseDto>> PlaceOrder(string accountEmail, OrderRequestDto request)
         {
             //var timeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+            var deliveryFee = await deliveryFeeRepository.GetDeliveryFeeById(request.DeliveryFeeId);
+            if (deliveryFee == null)
+            {
+                return new ResultStatusWithData<PlaceOrderResponseDto>
+                {
+                    Status = "Delivery Fee 404",
+                    Data = null
+                };
+            }
+
+            var account = await accountRepository.GetByEmailAsync(accountEmail);
+            var address = account!.UserProfile.Addresses.FirstOrDefault(a => a.AddressId == request.AddressId);
+            if (address == null)
+            {
+                return new ResultStatusWithData<PlaceOrderResponseDto>
+                {
+                    Status = "Address 404",
+                    Data = null
+                };
+            }
+
 
             var cart = await GetCartByAccoutEmail(accountEmail);
 
@@ -35,8 +56,6 @@ namespace CleanAgricultureProductBE.Services.Order
             {
                 return null!;
             }
-
-            var deliveryFee = await deliveryFeeRepository.GetDeliveryFeeById(request.DeliveryFeeId);
 
             decimal totalCartPrice = await cartRepository.TotalPriceOfCartByCartId(cart.CartId);
             var totalOrderPrice = totalCartPrice + deliveryFee!.FeeAmount;
@@ -59,7 +78,7 @@ namespace CleanAgricultureProductBE.Services.Order
                 DeliveryFeeId = request.DeliveryFeeId,
                 PaymentId = payment.PaymentId,
                 OrderDate = DateTime.UtcNow,
-                OrderStatus = "Waiting For Deliver"
+                OrderStatus = "Pending"
             };
 
             await orderRepository.AddOrder(order);
@@ -109,7 +128,11 @@ namespace CleanAgricultureProductBE.Services.Order
                 PaymentUrl = paymentUrl
             };
 
-            return orderResponse;
+            return new ResultStatusWithData<PlaceOrderResponseDto>
+            {
+                Status = "Ok",
+                Data = orderResponse
+            };
         }
 
         //Get all orders
@@ -282,7 +305,7 @@ namespace CleanAgricultureProductBE.Services.Order
                     CustomerName = order.Address.RecipientName,
                     Address = order.Address.AddressDetail,
                     //Payment = (Guid)order.PaymentId,
-                    Schedule = TimeZoneInfo.ConvertTimeFromUtc(order.Schedule.ScheduledDate, timeZone),
+                    Schedule = order.Schedule != null ? TimeZoneInfo.ConvertTimeFromUtc(order.Schedule.ScheduledDate, timeZone) : null,
                     TotalPrice = order.Payment.TotalAmount,
                     OrderDate = TimeZoneInfo.ConvertTimeFromUtc(order.OrderDate, timeZone),
                     OrderStatus = order.OrderStatus
@@ -406,7 +429,7 @@ namespace CleanAgricultureProductBE.Services.Order
                 CustomerName = order.Address.RecipientName,
                 Address = order.Address.AddressDetail,
                 //Payment = (Guid)order.PaymentId,
-                Schedule = TimeZoneInfo.ConvertTimeFromUtc(order.Schedule.ScheduledDate, timeZone),
+                Schedule = order.Schedule != null ? TimeZoneInfo.ConvertTimeFromUtc(order.Schedule.ScheduledDate, timeZone) : null,
                 TotalPrice = order.Payment.TotalAmount,
                 OrderDate = TimeZoneInfo.ConvertTimeFromUtc(order.OrderDate, timeZone),
                 OrderStatus = order.OrderStatus
@@ -452,7 +475,7 @@ namespace CleanAgricultureProductBE.Services.Order
                     CustomerName = order.Address.RecipientName,
                     Address = order.Address.AddressDetail,
                     //Payment = (Guid)order.PaymentId,
-                    Schedule = TimeZoneInfo.ConvertTimeFromUtc(order.Schedule.ScheduledDate, timeZone),
+                    Schedule = order.Schedule != null ? TimeZoneInfo.ConvertTimeFromUtc(order.Schedule.ScheduledDate, timeZone) : null,
                     TotalPrice = order.Payment.TotalAmount,
                     OrderDate = TimeZoneInfo.ConvertTimeFromUtc(order.OrderDate, timeZone),
                     OrderStatus = order.OrderStatus
@@ -482,6 +505,101 @@ namespace CleanAgricultureProductBE.Services.Order
             }
 
             return result;
+        }
+
+        public async Task<ResultStatusWithData<OrderResponseDto>> UpdateOrderAddress(string accountEmail, Guid orderId, UpdateOrderAddressRequestDto request)
+        {
+            var order = await orderRepository.GetOrderByOrderId(orderId);
+            if (order == null || order.Customer.Account.Email != accountEmail)
+            {
+                return new ResultStatusWithData<OrderResponseDto>
+                {
+                    Status = "Order 404",
+                    Data = null
+                };
+            }
+
+            if (order.OrderStatus != "Pending")
+            {
+                return new ResultStatusWithData<OrderResponseDto>
+                {
+                    Status = "Status Error",
+                    Data = null
+                };
+            }
+
+            var account = await accountRepository.GetByEmailAsync(accountEmail);
+            var address = account!.UserProfile.Addresses.FirstOrDefault(a => a.AddressId == request.NewAddressId);
+            if (address == null)
+            {
+                return new ResultStatusWithData<OrderResponseDto>
+                {
+                    Status = "Address 404",
+                    Data = null
+                };
+            }
+
+            order.AddressId = request.NewAddressId;
+
+            await orderRepository.UpdateOrder(order);
+
+            return new ResultStatusWithData<OrderResponseDto>
+            {
+                Status = "Ok",
+                Data = new OrderResponseDto
+                {
+                    OrderId = order.OrderId,
+                    CustomerName = order.Address.RecipientName,
+                    Address = order.Address.AddressDetail,
+                    //Payment = (Guid)order.PaymentId,
+                    Schedule = order.Schedule != null ? TimeZoneInfo.ConvertTimeFromUtc(order.Schedule.ScheduledDate, timeZone) : null,
+                    TotalPrice = order.Payment.TotalAmount,
+                    OrderDate = TimeZoneInfo.ConvertTimeFromUtc(order.OrderDate, timeZone),
+                    OrderStatus = order.OrderStatus
+                }
+            };
+        }
+
+        public async Task<ResultStatusWithData<OrderResponseDto>> CancelOrder(string accountEmail, Guid orderId)
+        {
+            var order = await orderRepository.GetOrderByOrderId(orderId);
+            if (order == null || order.Customer.Account.Email != accountEmail)
+            {
+                return new ResultStatusWithData<OrderResponseDto>
+                {
+                    Status = "Order 404",
+                    Data = null
+                };
+            }
+
+            if (order.OrderStatus != "Pending")
+            {
+                return new ResultStatusWithData<OrderResponseDto>
+                {
+                    Status = "Status Error",
+                    Data = null
+                };
+            }
+
+            order.OrderStatus = "Cancelled";
+
+            await orderRepository.UpdateOrder(order);
+
+            return new ResultStatusWithData<OrderResponseDto>
+            {
+                Status = "Ok",
+                Data = new OrderResponseDto
+                {
+                    OrderId = order.OrderId,
+                    CustomerName = order.Address.RecipientName,
+                    Address = order.Address.AddressDetail,
+                    //Payment = (Guid)order.PaymentId,
+                    Schedule = order.Schedule != null ? TimeZoneInfo.ConvertTimeFromUtc(order.Schedule.ScheduledDate, timeZone) : null,
+                    TotalPrice = order.Payment.TotalAmount,
+                    OrderDate = TimeZoneInfo.ConvertTimeFromUtc(order.OrderDate, timeZone),
+                    OrderStatus = order.OrderStatus
+                }
+            };
         }
     }
 }

@@ -101,27 +101,105 @@ namespace CleanAgricultureProductBE.Controllers
                     Message = "Không có hàng nào trong vỏ hàng"
                 });
             }
+            else if (result.Status == "Delivery Fee 404")
+            {
+                return NotFound(new ResponseObject<string>
+                {
+                    Success = "false",
+                    Message = "Phí vận chuyển không tồn tại"
+                });
+            }
+            else if (result.Status == "Address 404")
+            {
+                return NotFound(new ResponseObject<string>
+                {
+                    Success = "false",
+                    Message = "Địa chỉ không tồn tại"
+                });
+            }
 
             return Ok(new ResponseObject<PlaceOrderResponseDto>
             {
-                Success = "success",
+                Success = "true",
                 Message = "Đặt hàng thành công",
-                Data = result
+                Data = result.Data
             });
         }
 
-        [HttpPut("me/orders")]
-        [SwaggerOperation(Summary = "Cập nhật đơn hàng (Nothing Here)")]
-        public async Task<IActionResult> UpdateOrder()
+        [Authorize(Roles = "Customer")]
+        [HttpPatch("me/orders/{orderId}")]
+        [SwaggerOperation(Summary = "Cập nhật địa chỉ đơn hàng")]
+        public async Task<IActionResult> UpdateOrder([FromRoute] Guid orderId, [FromBody] UpdateOrderAddressRequestDto request)
         {
-            return Ok(); 
+
+            var accountEmail = User.FindFirstValue(ClaimTypes.Email);
+            var result = await orderService.UpdateOrderAddress(accountEmail!, orderId, request);
+
+            if (result.Status == "Address 404")
+            {
+                return NotFound(new ResponseObject<string>
+                {
+                    Success = "false",
+                    Message = "Địa chỉ không tồn tại"
+                });
+            }
+            else if (result.Status == "Order 404")
+            {
+                return NotFound(new ResponseObject<string>
+                {
+                    Success = "false",
+                    Message = "Đơn hàng không tồn tại"
+                });
+            }else if (result.Status == "Status Error")
+            {
+                return BadRequest(new ResponseObject<string>
+                {
+                    Success = "fasle",
+                    Message = "Chỉ có thể cập nhật địa chỉ cho đơn hàng đang ở trạng thái Pending"
+                });
+            }
+
+            return Ok(new ResponseObject<OrderResponseDto>
+            {
+                Success = "true",
+                Message = "Cập nhật địa chỉ đơn hàng thành công",
+                Data = result.Data
+            });
+
         }
 
-        [HttpDelete("me/orders")]
+        [Authorize(Roles = "Customer")]
+        [HttpDelete("me/orders/{orderId}")]
         [SwaggerOperation(Summary = "Hủy đơn hàng (Nothing Here)")]
-        public async Task<IActionResult> CancelOrder()
+        public async Task<IActionResult> CancelOrder([FromRoute] Guid orderId)
         {
-            return Ok();
+            var accountEmail = User.FindFirstValue(ClaimTypes.Email);
+
+            var result = await orderService.CancelOrder(accountEmail!, orderId);
+
+            if (result.Status == "Order 404")
+            {
+                return NotFound(new ResponseObject<string>
+                {
+                    Success = "false",
+                    Message = "Đơn hàng không tồn tại"
+                });
+            }
+            else if (result.Status == "Status Error")
+            {
+                return BadRequest(new ResponseObject<string>
+                {
+                    Success = "false",
+                    Message = "Chỉ có thể cập nhật địa chỉ cho đơn hàng đang ở trạng thái Pending"
+                });
+            }
+
+            return Ok(new ResponseObject<OrderResponseDto>
+            {
+                Success = "true",
+                Message = "Hủy đơn hàng thành công",
+                Data = result.Data
+            });
         }
     }
 }
