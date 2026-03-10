@@ -8,5 +8,6 @@ namespace CleanAgricultureProductBE.DTOs.Complaint
         public string? Evidence { get; set; }
         // Optional: list of product IDs to attach as product complaints
         public List<Guid>? ProductIds { get; set; }
+        public List<IFormFile>? Images { get; set; } = new List<IFormFile>();
     }
 }

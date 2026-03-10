@@ -27,6 +27,7 @@ namespace CleanAgricultureProductBE.Data
         public DbSet<PasswordResetOtp> PasswordResetOtps => Set<PasswordResetOtp>();
         public DbSet<DeliverySchedule> DeliverySchedules => Set<DeliverySchedule>();
         public DbSet<EmailOtp> EmailOtps => Set<EmailOtp>();
+        public DbSet<ComplaintImage> ComplaintImages => Set<ComplaintImage>();
         // Blacklisted tokens for logout/revocation
         public DbSet<BlackListedToken> BlacklistedTokens => Set<BlackListedToken>();
 

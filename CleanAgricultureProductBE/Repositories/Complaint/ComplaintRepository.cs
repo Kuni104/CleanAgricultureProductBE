@@ -1,4 +1,5 @@
 using CleanAgricultureProductBE.Data;
+using CleanAgricultureProductBE.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace CleanAgricultureProductBE.Repositories.Complaint
@@ -16,7 +17,7 @@ namespace CleanAgricultureProductBE.Repositories.Complaint
             return await context.Complaints
                 .Include(c => c.Order)
                 .Include(c => c.Staff)
-                .Include(c => c.ProductComplaints)
+                .Include(c => c.ProductComplaints)  
                     .ThenInclude(pc => pc.Product)
                 .FirstOrDefaultAsync(c => c.ComplaintId == complaintId);
         }
@@ -74,6 +75,16 @@ namespace CleanAgricultureProductBE.Repositories.Complaint
         public async Task UpdateAsync(Models.Complaint complaint)
         {
             context.Complaints.Update(complaint);
+            await context.SaveChangesAsync();
+        }
+
+        public async Task AddComplaintImageAsync(ComplaintImage image)
+        {
+            await context.ComplaintImages.AddAsync(image);
+        }
+
+        public async Task SaveChangesAsync()
+        {
             await context.SaveChangesAsync();
         }
     }
