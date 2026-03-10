@@ -54,7 +54,7 @@ namespace CleanAgricultureProductBE.Controllers
         [SwaggerOperation(Summary = "Tạo tài khoản mới (Role: 1.Admin | 2.Customer | 3.Staff | 4.DeliveryPerson)")]
         public async Task<IActionResult> CreateAccount([FromBody] CreateAccountRequestDto request)
         {
-            if (request.PhoneNumber != null || request.PhoneNumber.Trim() != "")
+            if (request.PhoneNumber != null && request.PhoneNumber.Trim() != "")
             {
                 var isValidPhoneNumber = Regex.IsMatch(request.PhoneNumber, @"^(?:\+84|0)\d{9}$");
                 if (!isValidPhoneNumber)

@@ -90,7 +90,7 @@ namespace CleanAgricultureProductBE.Controllers
                 var result = await _authService.LoginAsync(dto);
                 var apiResponse = new ResponseObject<LoginResponseDto>
                 {
-                    Success = "success",
+                    Success = "true",
                     Message = "Đăng nhập thành công",
                     Data = result
                 };
@@ -101,7 +101,7 @@ namespace CleanAgricultureProductBE.Controllers
             {
                 return Unauthorized(new ResponseObject<LoginResponseDto>
                 {
-                    Success = "error",
+                    Success = "false",
                     Message = ex.Message,
                     Data = null
                 });

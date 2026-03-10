@@ -15,10 +15,20 @@ namespace CleanAgricultureProductBE.Services.Category
 
         public async Task<CategoryResponseDto> CreateCategoryAsync(CreateCategoryDto dto)
         {
+            if (string.IsNullOrWhiteSpace(dto.Name))
+                throw new Exception("Category name is required");
+
+            if (dto.Name.Trim().Length > 100)
+                throw new Exception("Category name must not exceed 100 characters");
+
+            var existing = await _categoryRepo.GetByNameAsync(dto.Name.Trim());
+            if (existing != null)
+                throw new Exception("Category name already exists");
+
             var category = new CategoryModel
             {
                 CategoryId = Guid.NewGuid(),
-                Name = dto.Name,
+                Name = dto.Name.Trim(),
                 Description = dto.Description,
                 Status = "Active"
             };
@@ -67,10 +77,17 @@ namespace CleanAgricultureProductBE.Services.Category
                 throw new Exception("Category not found");
 
             if (!string.IsNullOrWhiteSpace(dto.Name))
-                category.Name = dto.Name;
+            {
+                if (dto.Name.Trim().Length > 100)
+                    throw new Exception("Category name must not exceed 100 characters");
+
+                var existing = await _categoryRepo.GetByNameAsync(dto.Name.Trim());
+                if (existing != null && existing.CategoryId != id)
+                    throw new Exception("Category name already exists");
+                category.Name = dto.Name.Trim();
+            }
             if (!string.IsNullOrWhiteSpace(dto.Description))
                 category.Description = dto.Description;
-
 
             var updated = await _categoryRepo.UpdateAsync(category);
 
@@ -92,12 +109,10 @@ namespace CleanAgricultureProductBE.Services.Category
             if (category == null)
                 throw new Exception("Category not found");
 
-            if (category.Status == "Inactive")
-                throw new Exception("Category already deleted");
-                
-            category.Status = "Inactive";
-            await _categoryRepo.UpdateAsync(category);
-            return true;
+            if (category.Products != null && category.Products.Any())
+                throw new Exception("Cannot delete category that still has products");
+
+            return await _categoryRepo.DeleteAsync(id);
         }
 
         public async Task<CategoryResponseDto> UpdateCategoryStatusAsync(Guid id, string status)

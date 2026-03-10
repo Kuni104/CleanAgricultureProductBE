@@ -7,9 +7,11 @@
         public string Name { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public decimal Price { get; set; }
-        public int Unit { get; set; }
+        public string Unit { get; set; } = string.Empty;
         public int Stock { get; set; }
         public string Status { get; set; } = string.Empty;
+        public bool IsDeleted { get; set; } = false;
+        public DateTime? DeletedAt { get; set; }
         /*------------------------------------------------------------------------------------------------------------------------*/
         public Category Category { get; set; } = null!;
         public ICollection<ProductImage> ProductImages { get; set; } = new List<ProductImage>();

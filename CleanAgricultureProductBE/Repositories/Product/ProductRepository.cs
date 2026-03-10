@@ -46,7 +46,9 @@ namespace CleanAgricultureProductBE.Repositories.Product
             var product = await GetByIdAsync(id);
             if (product == null) return false;
 
-            _context.Products.Remove(product);
+            product.IsDeleted = true;
+            product.DeletedAt = DateTime.UtcNow;
+            _context.Products.Update(product);
             await _context.SaveChangesAsync();
             return true;
         }

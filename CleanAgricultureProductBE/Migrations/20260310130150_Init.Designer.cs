@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CleanAgricultureProductBE.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260310115148_Init")]
+    [Migration("20260310130150_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -186,9 +186,15 @@ namespace CleanAgricultureProductBE.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -222,6 +228,9 @@ namespace CleanAgricultureProductBE.Migrations
 
                     b.Property<Guid>("OrderId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Resolution")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("ResolveAt")
                         .HasColumnType("datetime2");
@@ -550,9 +559,15 @@ namespace CleanAgricultureProductBE.Migrations
                     b.Property<Guid>("CategoryId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -569,8 +584,9 @@ namespace CleanAgricultureProductBE.Migrations
                     b.Property<int>("Stock")
                         .HasColumnType("int");
 
-                    b.Property<int>("Unit")
-                        .HasColumnType("int");
+                    b.Property<string>("Unit")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("ProductId");
 

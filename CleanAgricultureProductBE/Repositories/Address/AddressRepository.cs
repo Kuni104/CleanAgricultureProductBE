@@ -69,5 +69,13 @@ namespace CleanAgricultureProductBE.Repositories.Address
 
             await _context.SaveChangesAsync();
         }
+
+        public async Task<AddressModel?> GetMostRecentByUserProfileIdAsync(Guid userProfileId, Guid excludeAddressId)
+        {
+            return await _context.Addresses
+                .Where(a => a.UserProfileId == userProfileId && a.AddressId != excludeAddressId)
+                .OrderByDescending(a => a.AddressId)
+                .FirstOrDefaultAsync();
+        }
     }
 }

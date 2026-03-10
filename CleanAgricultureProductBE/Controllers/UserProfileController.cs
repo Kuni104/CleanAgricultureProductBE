@@ -49,7 +49,7 @@ namespace CleanAgricultureProductBE.Controllers
         [SwaggerOperation(Summary = "Cập nhật thông tin hồ sơ của tôi")]
         public async Task<IActionResult> UpdateUserProfile([FromBody] UserProfileRequestDto request)
         {
-            if (request.PhoneNumber != null || request.PhoneNumber.Trim() != "") {
+            if (request.PhoneNumber != null && request.PhoneNumber.Trim() != "") {
                 var isValidPhoneNumber = Regex.IsMatch(request.PhoneNumber, @"^(?:\+84|0)\d{9}$");
                 if (!isValidPhoneNumber)
                 {
@@ -76,7 +76,7 @@ namespace CleanAgricultureProductBE.Controllers
             else
             {
                 success = "true";
-                message = "Lấy thông tin người dùng thành công!";
+                message = "Cập nhật thông tin người dùng thành công!";
             }
             var response = new ResponseObject<UserProfileResponseDto>
             {

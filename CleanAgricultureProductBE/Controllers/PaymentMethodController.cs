@@ -82,7 +82,7 @@ namespace CleanAgricultureProductBE.Controllers
             if (result != null)
             {
                 success = "true";
-                message = "Cập nhật hình thức thánh toán thành công";
+                message = "Cập nhật hình thức thanh toán thành công";
             }
             else
             {
@@ -111,7 +111,7 @@ namespace CleanAgricultureProductBE.Controllers
             if (result)
             {
                 success = "true";
-                message = "Xóa hình thức thánh toán thành công";
+                message = "Xoá hình thức thanh toán thành công";
             }
             else
             {
