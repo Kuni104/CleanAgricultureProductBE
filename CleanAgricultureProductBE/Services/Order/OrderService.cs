@@ -7,17 +7,20 @@ using CleanAgricultureProductBE.Models;
 using CleanAgricultureProductBE.Repositories;
 using CleanAgricultureProductBE.Repositories.Cart;
 using CleanAgricultureProductBE.Repositories.CartItem;
+using CleanAgricultureProductBE.Repositories.CycleSchedule;
 using CleanAgricultureProductBE.Repositories.DeliveryFee;
+using CleanAgricultureProductBE.Repositories.DSchedule;
 using CleanAgricultureProductBE.Repositories.Order;
 using CleanAgricultureProductBE.Repositories.OrderDetail;
 using CleanAgricultureProductBE.Repositories.Payment;
+using CleanAgricultureProductBE.Repositories.Product;
 using CleanAgricultureProductBE.Services.Cart;
 using CleanAgricultureProductBE.Services.DeliveryFee;
 using CleanAgricultureProductBE.Services.VnPay;
 
 namespace CleanAgricultureProductBE.Services.Order
 {
-    public class OrderService(IAccountRepository accountRepository, IOrderRepository orderRepository, IOrderDetailRepository orderDetailRepository, ICartRepository cartRepository,IDeliveryFeeRepository deliveryFeeRepository, IPaymentRepository paymentRepository, IVnPayService vnPayService ) : IOrderService
+    public class OrderService(IAccountRepository accountRepository, IOrderRepository orderRepository, IScheduleRepository scheduleRepository , ICycleScheduleRepository cycleScheduleRepository, IProductRepository productRepository, IOrderDetailRepository orderDetailRepository, ICartRepository cartRepository,IDeliveryFeeRepository deliveryFeeRepository, IPaymentRepository paymentRepository, IVnPayService vnPayService ) : IOrderService
     {
         //UTC+7 timezone
         private readonly TimeZoneInfo timeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
@@ -47,6 +50,21 @@ namespace CleanAgricultureProductBE.Services.Order
                 };
             }
 
+            var isCycleSchedule = false;
+
+            if (request.IsCycleSchedule == true)
+            {
+                isCycleSchedule = true;
+
+                if (request.IsMonthly == false && (request.DayCycle == null || request.DayCycle <= 0))
+                {
+                    return new ResultStatusWithData<PlaceOrderResponseDto>
+                    {
+                        Status = "Day Cycle Error",
+                        Data = null
+                    };
+                }
+            }
 
             var cart = await GetCartByAccoutEmail(accountEmail);
 
@@ -64,7 +82,7 @@ namespace CleanAgricultureProductBE.Services.Order
 
             payment.PaymentId = Guid.NewGuid();
             payment.PaymentMethodId = request.PaymentMethodId;
-            payment.PaymentStatus = "Waiting";
+            payment.PaymentStatus = "Pending";
             payment.TotalAmount = totalOrderPrice;
             payment.CreatedAt = DateTime.UtcNow;
 
@@ -102,6 +120,13 @@ namespace CleanAgricultureProductBE.Services.Order
             await orderDetailRepository.AddOrderDetails(orderDetails);
             await cartRepository.DeleteAllCartItems(cart.CartId);
 
+            foreach (var items in orderDetails ) 
+            {
+                var product = items.Product;
+                product.Stock = product.Stock - items.Quantity;
+                await productRepository.UpdateAsync(product);
+            }
+
             order = await orderRepository.GetOrderByOrderId(order.OrderId);
 
             string paymentUrl = string.Empty;
@@ -114,6 +139,25 @@ namespace CleanAgricultureProductBE.Services.Order
                     Description = order.PaymentId.ToString(),
                     Language = 0
                 });
+            }
+
+
+            //Cycle Schedule Here
+            if (isCycleSchedule)
+            {
+                var cycleSchedule = new Models.CycleSchedule
+                {
+                    CycleScheduleId = Guid.NewGuid(),
+                    OrderId = order!.OrderId,
+                    DayCycle = request.IsMonthly ? DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month) : (int) request.DayCycle,
+                    isMonthly = request.IsMonthly,
+                    StartAt = DateTime.UtcNow,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow,
+                    Status = "Active"
+                };
+
+                await cycleScheduleRepository.AddCycleSchedule(cycleSchedule);
             }
 
             var orderResponse = new PlaceOrderResponseDto
@@ -247,6 +291,7 @@ namespace CleanAgricultureProductBE.Services.Order
             {
                 OrderId = order.OrderId,
                 OrderDetails = orderDetailResponseList,
+                Address = order.Address.AddressDetail,
                 TotalPrice = order.Payment.TotalAmount
             };
 
@@ -384,6 +429,7 @@ namespace CleanAgricultureProductBE.Services.Order
             {
                 OrderId = order.OrderId,
                 OrderDetails = orderDetailResponseList,
+                Address = order.Address.AddressDetail,
                 TotalPrice = order.Payment.TotalAmount
             };
 
@@ -422,6 +468,20 @@ namespace CleanAgricultureProductBE.Services.Order
 
             order.OrderStatus = request.Status;
             await orderRepository.UpdateOrder(order);
+
+            //Handle Cycle Schedule After Complete Order Here
+            if (order.OrderStatus.ToLower() == "completed")
+            {
+                var isCycleSchedule = await cycleScheduleRepository.CheckOrderIsCycleSchedule(order.OrderId);
+                if (isCycleSchedule == true)
+                {
+                    var cycleSchedule = await cycleScheduleRepository.GetCycleScheduleByOrderId(order.OrderId);
+                    cycleSchedule.UpdatedAt = DateTime.UtcNow;
+                    cycleSchedule.DayCycle = cycleSchedule.isMonthly ? DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month) : cycleSchedule.DayCycle;
+                    
+                    await cycleScheduleRepository.UpdateCycleSchedule(cycleSchedule);
+                }
+            }
 
             return new OrderResponseDto
             {
@@ -582,8 +642,26 @@ namespace CleanAgricultureProductBE.Services.Order
             }
 
             order.OrderStatus = "Cancelled";
+            var orderDetails = await orderDetailRepository.GetOrderDetailsByOrderId(orderId);
+            foreach (var items in orderDetails)
+            {
+                var product = items.Product;
+                product.Stock = product.Stock + items.Quantity;
+                await productRepository.UpdateAsync(product);
+            }
 
             await orderRepository.UpdateOrder(order);
+
+            var isCycleSchedule = await cycleScheduleRepository.CheckOrderIsCycleSchedule(order.OrderId);
+            if (isCycleSchedule == true)
+            {
+                var cycleSchedule = await cycleScheduleRepository.GetCycleScheduleByOrderId(order.OrderId);
+                cycleSchedule.UpdatedAt = DateTime.UtcNow;
+                cycleSchedule.DayCycle = cycleSchedule.isMonthly ? DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month) : cycleSchedule.DayCycle;
+                cycleSchedule.Status = "Inactive";
+
+                await cycleScheduleRepository.UpdateCycleSchedule(cycleSchedule);
+            }
 
             return new ResultStatusWithData<OrderResponseDto>
             {

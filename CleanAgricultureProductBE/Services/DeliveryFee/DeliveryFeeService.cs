@@ -1,6 +1,7 @@
 ﻿using CleanAgricultureProductBE.DTOs.ApiResponse;
 using CleanAgricultureProductBE.DTOs.DeliveryFee;
 using CleanAgricultureProductBE.Repositories.DeliveryFee;
+using System.Management;
 
 namespace CleanAgricultureProductBE.Services.DeliveryFee
 {
@@ -13,8 +14,7 @@ namespace CleanAgricultureProductBE.Services.DeliveryFee
             var deliveryFeeList = deliveryFees.Select(df => new DeliveryFeeResponseDto
             {
                 DeliveryFeeId = df.DeliveryFeeId,
-                FromKilometer = df.FromKilometer,
-                ToKilometer = df.ToKilometer,
+                
                 FeeAmount = df.FeeAmount
             }).ToList();
 
@@ -28,19 +28,28 @@ namespace CleanAgricultureProductBE.Services.DeliveryFee
             return new DeliveryFeeResponseDto
             {
                 DeliveryFeeId = deliveryFee!.DeliveryFeeId,
-                FromKilometer = deliveryFee!.FromKilometer,
-                ToKilometer = deliveryFee!.ToKilometer,
+                City = deliveryFee.City,
+                District = deliveryFee.District,
+                Ward = deliveryFee.Ward,
                 FeeAmount = deliveryFee!.FeeAmount
             };
         }
 
         public async Task<DeliveryFeeResponseDto> AddDeliveryFee(CreateDeliveryFeeRequestDto request)
         {
+            var checkValidRequest = await deliveryFeeRepository.CheckDeliveryFee(request.City, request.Ward, request.District);
+            if (checkValidRequest == true)
+            {
+                return null!;
+            }
+
+
             var newDeliveryFee = new Models.DeliveryFee
             {
                 DeliveryFeeId = Guid.NewGuid(),
-                FromKilometer = request.FromKilometer,
-                ToKilometer = request.ToKilometer,
+                City = request.City,
+                District = request.District,
+                Ward = request.Ward,
                 FeeAmount = request.FeeAmount
             };
 
@@ -49,8 +58,9 @@ namespace CleanAgricultureProductBE.Services.DeliveryFee
             var deliveryFeeDto = new DeliveryFeeResponseDto
             {
                 DeliveryFeeId = newDeliveryFee.DeliveryFeeId,
-                FromKilometer = newDeliveryFee.FromKilometer,
-                ToKilometer = newDeliveryFee.ToKilometer,
+                City = newDeliveryFee.City,
+                District = newDeliveryFee.District,
+                Ward = newDeliveryFee.Ward,
                 FeeAmount = newDeliveryFee.FeeAmount
             };
 
@@ -66,10 +76,13 @@ namespace CleanAgricultureProductBE.Services.DeliveryFee
                 return null!;
             }
 
-            existingDeliveryFee.FromKilometer = request.FromKilometer == null ? existingDeliveryFee.FromKilometer : (decimal)request.FromKilometer;
-            existingDeliveryFee.ToKilometer = request.ToKilometer == null ? existingDeliveryFee.ToKilometer : (decimal)request.ToKilometer;
+            existingDeliveryFee.City = string.IsNullOrEmpty(request.City) ? existingDeliveryFee.City : request.City;
+            existingDeliveryFee.City = string.IsNullOrEmpty(request.Ward) ? existingDeliveryFee.Ward : request.Ward;
+            existingDeliveryFee.City = string.IsNullOrEmpty(request.District) ? existingDeliveryFee.District : request.District;
 
-            var checkValidRequest = await deliveryFeeRepository.CheckDeliveryFeeInBetween(existingDeliveryFee.FromKilometer, existingDeliveryFee.ToKilometer);
+            existingDeliveryFee.FeeAmount = request.FeeAmount == null ? existingDeliveryFee.FeeAmount : (decimal)request.FeeAmount;
+
+            var checkValidRequest = await deliveryFeeRepository.CheckDeliveryFee(existingDeliveryFee.City, existingDeliveryFee.Ward, existingDeliveryFee.District);
 
             if (!checkValidRequest)
             {
@@ -80,15 +93,14 @@ namespace CleanAgricultureProductBE.Services.DeliveryFee
                 };
             }
 
-            existingDeliveryFee.FeeAmount = request.FeeAmount == null ? existingDeliveryFee.FeeAmount : (decimal)request.FeeAmount;
-
             await deliveryFeeRepository.UpdateDeliveryFee(existingDeliveryFee);
 
             var updatedDeliveryFeeDto = new DeliveryFeeResponseDto
             {
                 DeliveryFeeId = existingDeliveryFee.DeliveryFeeId,
-                FromKilometer = existingDeliveryFee.FromKilometer,
-                ToKilometer = existingDeliveryFee.ToKilometer,
+                City = existingDeliveryFee.City,
+                Ward = existingDeliveryFee.Ward,
+                District = existingDeliveryFee.District,
                 FeeAmount = existingDeliveryFee.FeeAmount,
             };
 

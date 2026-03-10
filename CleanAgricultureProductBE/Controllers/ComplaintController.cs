@@ -16,9 +16,9 @@ namespace CleanAgricultureProductBE.Controllers
         // Customer: tạo complaint cho order (có thể kèm product)
         [Authorize(Roles = "Customer")]
         [HttpPost("me/complaints")]
-        [Consumes("application/json")]
+        [Consumes("multipart/form-data")]
         [SwaggerOperation(Summary = "Tạo khiếu nại cho đơn hàng (Customer)")]
-        public async Task<IActionResult> CreateComplaint([FromBody] CreateComplaintRequestDto request)
+        public async Task<IActionResult> CreateComplaint([FromForm] CreateComplaintRequestDto request)
         {
             var email = User.FindFirstValue(ClaimTypes.Email)!;
             try

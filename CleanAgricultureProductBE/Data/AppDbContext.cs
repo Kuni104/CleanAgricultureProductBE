@@ -27,6 +27,7 @@ namespace CleanAgricultureProductBE.Data
         public DbSet<PasswordResetOtp> PasswordResetOtps => Set<PasswordResetOtp>();
         public DbSet<DeliverySchedule> DeliverySchedules => Set<DeliverySchedule>();
         public DbSet<EmailOtp> EmailOtps => Set<EmailOtp>();
+        public DbSet<ComplaintImage> ComplaintImages => Set<ComplaintImage>();
         // Blacklisted tokens for logout/revocation
         public DbSet<BlackListedToken> BlacklistedTokens => Set<BlackListedToken>();
 
@@ -123,11 +124,6 @@ namespace CleanAgricultureProductBE.Data
 
             modelBuilder.Entity<DeliveryFee>(entity =>
             {
-                entity.Property(df => df.FromKilometer)
-                      .HasPrecision(18, 2);
-
-                entity.Property(df => df.ToKilometer)
-                      .HasPrecision(18, 2);
 
                 entity.Property(df => df.FeeAmount)
                       .HasPrecision(18, 2);

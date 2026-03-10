@@ -101,6 +101,14 @@ namespace CleanAgricultureProductBE.Controllers
                     Message = "Trạng thái không được để trống!"
                 });
             }
+            if(request.Status.Trim().ToLower() != "active" || request.Status.Trim().ToLower() != "inactive")
+            {
+                return BadRequest(new ResponseObject<string>
+                {
+                    Success = "false",
+                    Message = "Trạng thái phải là active hoặc inactive"
+                });
+            }
 
             var result = await accountService.ChangeAccountStatus(accountId, request);
             if (result == null)

@@ -116,6 +116,13 @@ namespace CleanAgricultureProductBE.Controllers
                     Success = "false",
                     Message = "Địa chỉ không tồn tại"
                 });
+            }else if (result.Status == "Day Cycle Error")
+            {
+                return BadRequest(new ResponseObject<string>
+                {
+                    Success = "false",
+                    Message = "Nếu là xoay tua thì số ngày tuần hoàn phải có (nếu là theo tháng thì không cần) "
+                });
             }
 
             return Ok(new ResponseObject<PlaceOrderResponseDto>

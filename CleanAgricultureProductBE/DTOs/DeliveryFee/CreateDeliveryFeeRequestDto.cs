@@ -4,9 +4,10 @@ namespace CleanAgricultureProductBE.DTOs.DeliveryFee
 {
     public class CreateDeliveryFeeRequestDto
     {
-        public decimal FromKilometer { get; set; }
-        public decimal ToKilometer { get; set;}
+        public string City { get; set; } = string.Empty;
+        public string Ward { get; set; } = string.Empty;
+        public string District { get; set; } = string.Empty;
         public decimal FeeAmount { get; set; }
-        
+
     }
 }

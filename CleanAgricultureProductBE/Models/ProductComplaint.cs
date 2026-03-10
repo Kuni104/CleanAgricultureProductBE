@@ -8,5 +8,6 @@
         /*------------------------------------------------------------------------------------------------------------------------*/
         public Complaint Complaint { get; set; } = null!;
         public Product Product { get; set; } = null!;
+        public ICollection<ProductConplaintImage> Images { get; set; }
     }
 }

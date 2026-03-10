@@ -16,5 +16,6 @@
         public Account? Staff { get; set; }
         public Order Order { get; set; } = null!;
         public ICollection<ProductComplaint> ProductComplaints { get; set; } = new List<ProductComplaint>();
+        public ICollection<ComplaintImage> Images { get; set; } = new List<ComplaintImage>();
     }
 }

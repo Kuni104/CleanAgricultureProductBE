@@ -6,9 +6,10 @@ using CleanAgricultureProductBE.Repositories.Cart;
 using CleanAgricultureProductBE.Repositories.CartItem;
 using CleanAgricultureProductBE.Repositories.Category;
 using CleanAgricultureProductBE.Repositories.Complaint;
+using CleanAgricultureProductBE.Repositories.CycleSchedule;
 using CleanAgricultureProductBE.Repositories.DeliveryFee;
 using CleanAgricultureProductBE.Repositories.DSchedule;
-using CleanAgricultureProductBE.Repositories.DSchedule;
+using CleanAgricultureProductBE.Repositories.Image;
 using CleanAgricultureProductBE.Repositories.Order;
 using CleanAgricultureProductBE.Repositories.OrderDetail;
 using CleanAgricultureProductBE.Repositories.OTP;
@@ -22,7 +23,9 @@ using CleanAgricultureProductBE.Services.Address;
 using CleanAgricultureProductBE.Services.Cart;
 using CleanAgricultureProductBE.Services.Category;
 using CleanAgricultureProductBE.Services.Complaint;
+using CleanAgricultureProductBE.Services.CycleSchedule;
 using CleanAgricultureProductBE.Services.DeliveryFee;
+using CleanAgricultureProductBE.Services.Image;
 using CleanAgricultureProductBE.Services.Order;
 using CleanAgricultureProductBE.Services.OrderDetail;
 using CleanAgricultureProductBE.Services.OTP;
@@ -163,11 +166,20 @@ namespace CleanAgricultureProductBE
             builder.Services.AddScoped<IScheduleRepository, ScheduleRepository>();
             builder.Services.AddScoped<IScheduleService, ScheduleService>();
 
+            //CycleSchedule DI
+            builder.Services.AddScoped<ICycleScheduleRepository, CycleScheduleRepository>();
+            builder.Services.AddScoped<ICycleScheduleService, CycleScheduleService>();
+
             //Complaint DI
             builder.Services.AddScoped<IComplaintRepository, ComplaintRepository>();
             builder.Services.AddScoped<IComplaintService, ComplaintService>();
 
-            
+            //Product Image DI
+            builder.Services.AddScoped<IProductImageRepository, ProductImageRepository>();
+            builder.Services.AddScoped<IProductImageService, ProductImageService>();
+
+            // Cloudinary DI
+            builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
 
             // JWT Authentication
             builder.Services
