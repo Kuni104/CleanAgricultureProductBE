@@ -8,13 +8,13 @@ using CleanAgricultureProductBE.Repositories.Category;
 using CleanAgricultureProductBE.Repositories.Complaint;
 using CleanAgricultureProductBE.Repositories.DeliveryFee;
 using CleanAgricultureProductBE.Repositories.DSchedule;
+using CleanAgricultureProductBE.Repositories.DSchedule;
 using CleanAgricultureProductBE.Repositories.Order;
 using CleanAgricultureProductBE.Repositories.OrderDetail;
 using CleanAgricultureProductBE.Repositories.OTP;
 using CleanAgricultureProductBE.Repositories.Payment;
 using CleanAgricultureProductBE.Repositories.PaymentMethod;
 using CleanAgricultureProductBE.Repositories.Product;
-using CleanAgricultureProductBE.Repositories.DSchedule;
 using CleanAgricultureProductBE.Repositories.UserProfile;
 using CleanAgricultureProductBE.Services;
 using CleanAgricultureProductBE.Services.Account;
@@ -165,6 +165,8 @@ namespace CleanAgricultureProductBE
             //Complaint DI
             builder.Services.AddScoped<IComplaintRepository, ComplaintRepository>();
             builder.Services.AddScoped<IComplaintService, ComplaintService>();
+
+            
 
             // JWT Authentication
             builder.Services
