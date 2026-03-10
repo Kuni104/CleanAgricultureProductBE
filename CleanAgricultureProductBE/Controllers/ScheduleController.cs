@@ -1,12 +1,15 @@
-﻿using CleanAgricultureProductBE.Services.Schedule;
+﻿﻿using CleanAgricultureProductBE.DTOs.ApiResponse;
+using CleanAgricultureProductBE.DTOs.Response;
+using CleanAgricultureProductBE.DTOs.Schedule;
+using CleanAgricultureProductBE.Services.Schedule;
 using Microsoft.AspNetCore.Authorization;
-﻿using CleanAgricultureProductBE.DTOs.ApiResponse;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Swashbuckle.AspNetCore.Annotations;
+using System.Security.Claims;
 
 namespace CleanAgricultureProductBE.Controllers
 {
-    [Authorize(Roles = "Admin,Staff")]
     [Route("api/v1/schedules")]
     [ApiController]
     public class ScheduleController : ControllerBase
@@ -18,7 +21,9 @@ namespace CleanAgricultureProductBE.Controllers
             _service = service;
         }
 
+        [Authorize(Roles = "Admin,Staff")]
         [HttpPost]
+        [SwaggerOperation(Summary = "Tạo lịch giao hàng")]
         public async Task<IActionResult> Create([FromBody] CreateScheduleRequestDto dto)
         {
             try
@@ -42,7 +47,9 @@ namespace CleanAgricultureProductBE.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin,Staff")]
         [HttpPost("assign-orders")]
+        [SwaggerOperation(Summary = "Gán đơn hàng vào lịch giao hàng")]
         public async Task<IActionResult> AssignOrders([FromBody] AssignOrdersRequestDto dto)
         {
             try
@@ -63,6 +70,38 @@ namespace CleanAgricultureProductBE.Controllers
                     Message = ex.Message
                 });
             }
+        }
+
+        [Authorize(Roles = "DeliveryPerson")]
+        [HttpGet("delivery-person-schedules")]
+        [SwaggerOperation(Summary = "Lấy tất cả lịch giao hàng của người vận chuyển")]
+        public async Task<IActionResult> GetAllScheduleOfDeliveryPerson([FromQuery] int? page, [FromQuery] int? size, [FromQuery] string? keyword)
+        {
+            var success = "";
+            var message = "";
+
+            var accountEmail = User.FindFirstValue(ClaimTypes.Email);
+
+            var schedules = await _service.GetSchedulesOfDeliveryPerson(accountEmail!, page, size, keyword);
+
+            if (schedules.ResultObject == null || schedules.ResultObject.Count <= 0)
+            {
+                success = "true";
+                message = "Không có lịch nào";
+            }
+            else
+            {
+                success = "true";
+                message = "Lấy lịch thành công";
+            }
+
+            return Ok(new ResponseObjectWithPagination<List<ScheduleResponseDto>>
+            {
+                Success = success,
+                Message = message,
+                Data = schedules.ResultObject,
+                Pagination = schedules.Pagination
+            });
         }
     }
 }

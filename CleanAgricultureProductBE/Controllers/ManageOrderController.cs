@@ -18,7 +18,7 @@ namespace CleanAgricultureProductBE.Controllers
     {
         [Authorize(Roles = "Admin,Staff")]
         [HttpGet]
-        [SwaggerOperation(Summary = "Lấy danh sách tất cả đơn hàng (Admin,Staff     )")]
+        [SwaggerOperation(Summary = "Lấy danh sách tất cả đơn hàng (Admin,Staff)")]
         public async Task<IActionResult> GetOrders([FromQuery] int? page, [FromQuery] int? size, [FromQuery] string? keyword)
         {
             var success = "";
@@ -48,7 +48,7 @@ namespace CleanAgricultureProductBE.Controllers
             return Ok(response);
         }
 
-        [Authorize(Roles = "DeliveryPerson,Admin,Staff")]
+        [Authorize(Roles = "Admin,Staff,DeliveryPerson")]
         [HttpGet("schedules/{scheduleId}")]
         [SwaggerOperation(Summary = "Lấy danh sách tất cả đơn hàng theo lịch giao hàng (Admin,Staff,DeliveryPerson)")]
         public async Task<IActionResult> GetOrdersInSchedule([FromRoute] Guid scheduleId ,[FromQuery] int? page, [FromQuery] int? size, [FromQuery] string? keyword)

@@ -185,7 +185,7 @@ namespace CleanAgricultureProductBE.Controllers
                 }
 
                 var existingPhone = await _context.Accounts
-                    .AnyAsync(x => x.PhoneNumber == dto.PhoneNumber);
+                        .AnyAsync(x => x.PhoneNumber == dto.PhoneNumber);
 
                 if (existingPhone)
                 {
@@ -195,6 +195,14 @@ namespace CleanAgricultureProductBE.Controllers
                         Message = "Số điện thoại đã được sử dụng"
                     });
                 }
+            }
+            else
+            {
+                return BadRequest(new ResponseObject<string>
+                {
+                    Success = "false",
+                    Message = "Số điện thoại không được để trống"
+                });
             }
 
             var otpRecord = await _context.EmailOtps

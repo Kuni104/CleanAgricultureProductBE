@@ -1,16 +1,20 @@
 ﻿using CleanAgricultureProductBE.DTOs.ApiResponse;
+using CleanAgricultureProductBE.DTOs.Response;
 using CleanAgricultureProductBE.DTOs.Schedule;
 using CleanAgricultureProductBE.Models;
+using CleanAgricultureProductBE.Repositories;
 using CleanAgricultureProductBE.Repositories.DSchedule;
 using CleanAgricultureProductBE.Services.Schedule;
 
 public class ScheduleService : IScheduleService
 {
     private readonly IScheduleRepository _repository;
+    private readonly IAccountRepository _accountRepository;
 
-    public ScheduleService(IScheduleRepository repository)
+    public ScheduleService(IScheduleRepository repository, IAccountRepository accountRepository)
     {
         _repository = repository;
+        _accountRepository = accountRepository;
     }
 
     private ScheduleResponseDto MapToDto(Schedule schedule)
@@ -76,5 +80,69 @@ public class ScheduleService : IScheduleService
         schedule.UpdatedAt = DateTime.UtcNow;
 
         await _repository.SaveChangesAsync();
+    }
+
+    public async Task<ResponseDtoWithPagination<List<ScheduleResponseDto>>> GetSchedulesOfDeliveryPerson(string accountEmail, int? page, int? size, string? keyword)
+    {
+        bool isPagination = false;
+        int offset = 0;
+        int pageSize = 0;
+        if (page != null && size != null)
+        {
+            pageSize = (int)size;
+            offset = (int)((page - 1) * size);
+            isPagination = true;
+        }
+
+        var account = await _accountRepository.GetByEmailAsync(accountEmail);
+
+        var schedules = await _repository.GetByDeliveryPerson(account!.AccountId);
+
+        var totalItems = schedules.Count();
+
+        if (isPagination)
+        {
+            schedules = await _repository.GetByDeliveryPersonWithPagination(account!.AccountId, offset, pageSize);
+        }
+
+        List<ScheduleResponseDto> scheduleDtos = new List<ScheduleResponseDto>();
+
+        foreach (var schedule in schedules)
+        {
+            scheduleDtos.Add(new ScheduleResponseDto
+            {
+                ScheduleId = schedule.ScheduleId,
+                DeliveryPersonId = schedule.DeliveryPersonId,
+                ScheduledDate = schedule.ScheduledDate,
+                Status = schedule.Status,
+                TotalOrders = schedule.Orders.Count,
+                CreatedAt = schedule.CreatedAt,
+                UpdatedAt = schedule.UpdatedAt
+            });
+        }
+
+        var result = new ResponseDtoWithPagination<List<ScheduleResponseDto>>
+        {
+            ResultObject = scheduleDtos
+        };
+
+        if (isPagination)
+        {
+            int totalPage = totalItems / pageSize + (totalItems % pageSize == 0 ? 1 : 0);
+            if (totalItems < pageSize || page <= size)
+            {
+                totalPage = 1;
+            }
+
+            result.Pagination = new Pagination
+            {
+                PageNumber = (int)page!,
+                PageSize = pageSize,
+                TotalItems = totalItems,
+                TotalPages = totalPage
+            };
+        }
+
+        return result;
     }
 }
