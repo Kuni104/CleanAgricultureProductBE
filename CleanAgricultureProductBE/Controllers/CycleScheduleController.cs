@@ -2,6 +2,7 @@
 using CleanAgricultureProductBE.DTOs.CycleSchedule;
 using CleanAgricultureProductBE.DTOs.Response;
 using CleanAgricultureProductBE.Services.CycleSchedule;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -12,9 +13,9 @@ namespace CleanAgricultureProductBE.Controllers
     [ApiController]
     public class CycleScheduleController(ICycleScheduleService cycleScheduleService) : ControllerBase
     {
-
+        [Authorize(Roles = "Admin,Staff")]
         [HttpGet]
-        [SwaggerOperation(Summary = "Lấy lịch xoay tua")]
+        [SwaggerOperation(Summary = "Lấy lịch xoay tua (Admin, Staff)")]
         public async Task<IActionResult> GetCycleSchedules([FromQuery] int? page, [FromQuery] int? size, [FromQuery] string? keyword)
         {
             var message = "";
