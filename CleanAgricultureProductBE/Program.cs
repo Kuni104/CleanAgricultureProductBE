@@ -6,8 +6,8 @@ using CleanAgricultureProductBE.Repositories.Cart;
 using CleanAgricultureProductBE.Repositories.CartItem;
 using CleanAgricultureProductBE.Repositories.Category;
 using CleanAgricultureProductBE.Repositories.Complaint;
+using CleanAgricultureProductBE.Repositories.CycleSchedule;
 using CleanAgricultureProductBE.Repositories.DeliveryFee;
-using CleanAgricultureProductBE.Repositories.DSchedule;
 using CleanAgricultureProductBE.Repositories.DSchedule;
 using CleanAgricultureProductBE.Repositories.Image;
 using CleanAgricultureProductBE.Repositories.Order;
@@ -23,6 +23,7 @@ using CleanAgricultureProductBE.Services.Address;
 using CleanAgricultureProductBE.Services.Cart;
 using CleanAgricultureProductBE.Services.Category;
 using CleanAgricultureProductBE.Services.Complaint;
+using CleanAgricultureProductBE.Services.CycleSchedule;
 using CleanAgricultureProductBE.Services.DeliveryFee;
 using CleanAgricultureProductBE.Services.Image;
 using CleanAgricultureProductBE.Services.Order;
@@ -163,6 +164,10 @@ namespace CleanAgricultureProductBE
             //Schedule DI
             builder.Services.AddScoped<IScheduleRepository, ScheduleRepository>();
             builder.Services.AddScoped<IScheduleService, ScheduleService>();
+
+            //CycleSchedule DI
+            builder.Services.AddScoped<ICycleScheduleRepository, CycleScheduleRepository>();
+            builder.Services.AddScoped<ICycleScheduleService, CycleScheduleService>();
 
             //Complaint DI
             builder.Services.AddScoped<IComplaintRepository, ComplaintRepository>();
