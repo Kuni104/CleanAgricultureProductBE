@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace CleanAgricultureProductBE.Migrations
 {
     /// <inheritdoc />
-    public partial class Ini : Migration
+    public partial class Init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -481,6 +481,25 @@ namespace CleanAgricultureProductBE.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ComplaintImages",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ComplaintId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ComplaintImages", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ComplaintImages_Complaints_ComplaintId",
+                        column: x => x.ComplaintId,
+                        principalTable: "Complaints",
+                        principalColumn: "ComplaintId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ProductComplaints",
                 columns: table => new
                 {
@@ -502,6 +521,25 @@ namespace CleanAgricultureProductBE.Migrations
                         column: x => x.ProductId,
                         principalTable: "Products",
                         principalColumn: "ProductId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ProductConplaintImage",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ProductComplaintId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProductConplaintImage", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ProductConplaintImage_ProductComplaints_ProductComplaintId",
+                        column: x => x.ProductComplaintId,
+                        principalTable: "ProductComplaints",
+                        principalColumn: "ProductComplaintId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -542,6 +580,11 @@ namespace CleanAgricultureProductBE.Migrations
                 table: "Carts",
                 column: "CustomerId",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ComplaintImages_ComplaintId",
+                table: "ComplaintImages",
+                column: "ComplaintId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Complaints_OrderId",
@@ -622,6 +665,11 @@ namespace CleanAgricultureProductBE.Migrations
                 column: "ProductId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ProductConplaintImage_ProductComplaintId",
+                table: "ProductConplaintImage",
+                column: "ProductComplaintId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ProductImages_ProductId",
                 table: "ProductImages",
                 column: "ProductId");
@@ -653,6 +701,9 @@ namespace CleanAgricultureProductBE.Migrations
                 name: "CartItems");
 
             migrationBuilder.DropTable(
+                name: "ComplaintImages");
+
+            migrationBuilder.DropTable(
                 name: "CycleSchedules");
 
             migrationBuilder.DropTable(
@@ -668,13 +719,16 @@ namespace CleanAgricultureProductBE.Migrations
                 name: "PasswordResetOtps");
 
             migrationBuilder.DropTable(
-                name: "ProductComplaints");
+                name: "ProductConplaintImage");
 
             migrationBuilder.DropTable(
                 name: "ProductImages");
 
             migrationBuilder.DropTable(
                 name: "Carts");
+
+            migrationBuilder.DropTable(
+                name: "ProductComplaints");
 
             migrationBuilder.DropTable(
                 name: "Complaints");

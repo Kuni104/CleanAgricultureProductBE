@@ -261,7 +261,7 @@ namespace CleanAgricultureProductBE.Migrations
 
                     b.HasIndex("ComplaintId");
 
-                    b.ToTable("ComplaintImage");
+                    b.ToTable("ComplaintImages");
                 });
 
             modelBuilder.Entity("CleanAgricultureProductBE.Models.CycleSchedule", b =>
