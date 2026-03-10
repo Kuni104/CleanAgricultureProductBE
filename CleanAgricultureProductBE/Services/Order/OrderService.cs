@@ -291,6 +291,7 @@ namespace CleanAgricultureProductBE.Services.Order
             {
                 OrderId = order.OrderId,
                 OrderDetails = orderDetailResponseList,
+                Address = order.Address.AddressDetail,
                 TotalPrice = order.Payment.TotalAmount
             };
 
@@ -428,6 +429,7 @@ namespace CleanAgricultureProductBE.Services.Order
             {
                 OrderId = order.OrderId,
                 OrderDetails = orderDetailResponseList,
+                Address = order.Address.AddressDetail,
                 TotalPrice = order.Payment.TotalAmount
             };
 

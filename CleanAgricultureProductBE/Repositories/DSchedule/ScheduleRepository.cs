@@ -39,6 +39,7 @@ public class ScheduleRepository : IScheduleRepository
     public async Task<Schedule?> GetByDeliveryPersonAndDateAsync(Guid deliveryPersonId, DateTime date)
     {
         return await _context.Schedules
+            .Include(s => s.Orders)
             .FirstOrDefaultAsync(x =>
                 x.DeliveryPersonId == deliveryPersonId &&
                 x.ScheduledDate.Date == date.Date);

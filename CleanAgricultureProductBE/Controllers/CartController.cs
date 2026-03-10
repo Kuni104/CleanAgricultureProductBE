@@ -123,7 +123,7 @@ namespace CleanAgricultureProductBE.Controllers
                 return NotFound(new ResponseObject<string>
                 {
                     Success = "fail",
-                    Message = "",
+                    Message = "Quá số lượng sản phẩm",
                     Data = null
                 });
             }
