@@ -20,6 +20,7 @@ namespace CleanAgricultureProductBE.Services
         private readonly IConfiguration _config;
         private readonly ITokenBlacklistRepository _tokenBlacklistRepo;
         private readonly IEmailOtpRepository _emailOtpRepo;
+        private static readonly Regex PasswordRegex = new Regex(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$");
 
         public AuthService(
             IAccountRepository accountRepo,
@@ -83,6 +84,12 @@ namespace CleanAgricultureProductBE.Services
             if (existing != null)
                 throw new Exception("Email đã được sử dụng");
 
+            if (string.IsNullOrWhiteSpace(dto.FirstName))
+                throw new Exception("First name không được để trống");
+
+            if (string.IsNullOrWhiteSpace(dto.LastName))
+                throw new Exception("Last name không được để trống");
+
             var account = new Models.Account
             {
                 AccountId = Guid.NewGuid(),
@@ -93,8 +100,8 @@ namespace CleanAgricultureProductBE.Services
                 UserProfile = new Models.UserProfile
                 {
                     UserProfileId = Guid.NewGuid(),
-                    FirstName = dto.FirstName,
-                    LastName = dto.LastName,
+                    FirstName = dto.FirstName.Trim(),
+                    LastName = dto.LastName.Trim(),
                 }
             };
 
@@ -135,6 +142,9 @@ namespace CleanAgricultureProductBE.Services
         {
             if (string.IsNullOrWhiteSpace(token))
                 throw new ArgumentException("Token missing");
+
+            if (token.StartsWith("Bearer "))
+                token = token.Substring(7);
 
             var handler = new JwtSecurityTokenHandler();
             var jwt = handler.ReadJwtToken(token);
@@ -219,6 +229,9 @@ namespace CleanAgricultureProductBE.Services
             if (dto.NewPassword != dto.ConfirmPassword)
                 throw new Exception("Mật khẩu xác nhận không trùng khớp");
 
+            if (!PasswordRegex.IsMatch(dto.NewPassword))
+                throw new Exception("Mật khẩu phải có ít nhất 8 ký tự, gồm chữ hoa, chữ thường, số và ký tự đặc biệt");
+
             var user = await _accountRepo.GetByEmailAsync(dto.Email);
 
             if (user == null)
@@ -258,6 +271,9 @@ namespace CleanAgricultureProductBE.Services
             if (dto.NewPassword != dto.ConfirmPassword)
                 throw new Exception("Mật khẩu xác nhận không trùng khớp");
 
+            if (!PasswordRegex.IsMatch(dto.NewPassword))
+                throw new Exception("Mật khẩu phải có ít nhất 8 ký tự, gồm chữ hoa, chữ thường, số và ký tự đặc biệt");
+
             user.PasswordHash = hasher.HashPassword(user, dto.NewPassword);
 
             await _accountRepo.SaveChangeAsync();
@@ -265,6 +281,12 @@ namespace CleanAgricultureProductBE.Services
 
         public async Task ValidateRegisterAsync(RegisterRequestDto dto)
         {
+            if (string.IsNullOrWhiteSpace(dto.FirstName))
+                throw new Exception("First name không được để trống");
+
+            if (string.IsNullOrWhiteSpace(dto.LastName))
+                throw new Exception("Last name không được để trống");
+
             if (string.IsNullOrWhiteSpace(dto.Email))
                 throw new Exception("Email không được để trống");
 
