@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CleanAgricultureProductBE.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260310104244_SoftDeleteAndUnitStringUpdate")]
-    partial class SoftDeleteAndUnitStringUpdate
+    [Migration("20260310133232_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -229,6 +229,9 @@ namespace CleanAgricultureProductBE.Migrations
                     b.Property<Guid>("OrderId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("Resolution")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime?>("ResolveAt")
                         .HasColumnType("datetime2");
 
@@ -251,6 +254,26 @@ namespace CleanAgricultureProductBE.Migrations
                     b.HasIndex("StaffId");
 
                     b.ToTable("Complaints");
+                });
+
+            modelBuilder.Entity("CleanAgricultureProductBE.Models.ComplaintImage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ComplaintId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ComplaintId");
+
+                    b.ToTable("ComplaintImages");
                 });
 
             modelBuilder.Entity("CleanAgricultureProductBE.Models.CycleSchedule", b =>
@@ -294,17 +317,21 @@ namespace CleanAgricultureProductBE.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("District")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<decimal>("FeeAmount")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<decimal>("FromKilometer")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("ToKilometer")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<string>("Ward")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("DeliveryFeeId");
 
@@ -590,6 +617,26 @@ namespace CleanAgricultureProductBE.Migrations
                     b.ToTable("ProductComplaints");
                 });
 
+            modelBuilder.Entity("CleanAgricultureProductBE.Models.ProductConplaintImage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("ProductComplaintId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductComplaintId");
+
+                    b.ToTable("ProductConplaintImage");
+                });
+
             modelBuilder.Entity("CleanAgricultureProductBE.Models.ProductImage", b =>
                 {
                     b.Property<Guid>("ProductImageId")
@@ -785,6 +832,17 @@ namespace CleanAgricultureProductBE.Migrations
                     b.Navigation("Staff");
                 });
 
+            modelBuilder.Entity("CleanAgricultureProductBE.Models.ComplaintImage", b =>
+                {
+                    b.HasOne("CleanAgricultureProductBE.Models.Complaint", "Complaint")
+                        .WithMany("Images")
+                        .HasForeignKey("ComplaintId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Complaint");
+                });
+
             modelBuilder.Entity("CleanAgricultureProductBE.Models.CycleSchedule", b =>
                 {
                     b.HasOne("CleanAgricultureProductBE.Models.Order", "Order")
@@ -914,6 +972,17 @@ namespace CleanAgricultureProductBE.Migrations
                     b.Navigation("Product");
                 });
 
+            modelBuilder.Entity("CleanAgricultureProductBE.Models.ProductConplaintImage", b =>
+                {
+                    b.HasOne("CleanAgricultureProductBE.Models.ProductComplaint", "ProductComplaint")
+                        .WithMany("Images")
+                        .HasForeignKey("ProductComplaintId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ProductComplaint");
+                });
+
             modelBuilder.Entity("CleanAgricultureProductBE.Models.ProductImage", b =>
                 {
                     b.HasOne("CleanAgricultureProductBE.Models.Product", "Product")
@@ -974,6 +1043,8 @@ namespace CleanAgricultureProductBE.Migrations
 
             modelBuilder.Entity("CleanAgricultureProductBE.Models.Complaint", b =>
                 {
+                    b.Navigation("Images");
+
                     b.Navigation("ProductComplaints");
                 });
 
@@ -1011,6 +1082,11 @@ namespace CleanAgricultureProductBE.Migrations
                     b.Navigation("ProductComplaints");
 
                     b.Navigation("ProductImages");
+                });
+
+            modelBuilder.Entity("CleanAgricultureProductBE.Models.ProductComplaint", b =>
+                {
+                    b.Navigation("Images");
                 });
 
             modelBuilder.Entity("CleanAgricultureProductBE.Models.Role", b =>
