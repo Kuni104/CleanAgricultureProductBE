@@ -16,5 +16,6 @@ namespace CleanAgricultureProductBE.Services.Order
         public Task<ResponseDtoWithPagination<List<OrderResponseDto>>> GetAllOrdersInSchedule(Guid scheduleId, int? page, int? size, string? keyword);
         public Task<OrderResponseDto> UpdateOrderStatus(Guid orderId, UpdateOrderStatusRequestDto request);
         public Task<ResultStatusWithData<OrderResponseDto>> UpdateOrderAddress(string accountEmail, Guid orderId, UpdateOrderAddressRequestDto request);
+        public Task<ResultStatusWithData<OrderResponseDto>> CancelOrder(string accountEmail, Guid orderId);
     }
 }

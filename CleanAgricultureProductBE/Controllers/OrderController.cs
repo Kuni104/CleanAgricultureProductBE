@@ -127,7 +127,7 @@ namespace CleanAgricultureProductBE.Controllers
         }
 
         [Authorize(Roles = "Customer")]
-        [HttpPut("me/orders/{orderId}")]
+        [HttpPatch("me/orders/{orderId}")]
         [SwaggerOperation(Summary = "Cập nhật địa chỉ đơn hàng")]
         public async Task<IActionResult> UpdateOrder([FromRoute] Guid orderId, [FromBody] UpdateOrderAddressRequestDto request)
         {
@@ -139,7 +139,7 @@ namespace CleanAgricultureProductBE.Controllers
             {
                 return NotFound(new ResponseObject<string>
                 {
-                    Success = "fail",
+                    Success = "false",
                     Message = "Địa chỉ không tồn tại"
                 });
             }
@@ -147,14 +147,14 @@ namespace CleanAgricultureProductBE.Controllers
             {
                 return NotFound(new ResponseObject<string>
                 {
-                    Success = "fail",
+                    Success = "false",
                     Message = "Đơn hàng không tồn tại"
                 });
             }else if (result.Status == "Status Error")
             {
                 return BadRequest(new ResponseObject<string>
                 {
-                    Success = "fail",
+                    Success = "fasle",
                     Message = "Chỉ có thể cập nhật địa chỉ cho đơn hàng đang ở trạng thái Pending"
                 });
             }
@@ -169,11 +169,37 @@ namespace CleanAgricultureProductBE.Controllers
         }
 
         [Authorize(Roles = "Customer")]
-        [HttpDelete("me/orders")]
+        [HttpDelete("me/orders/{orderId}")]
         [SwaggerOperation(Summary = "Hủy đơn hàng (Nothing Here)")]
-        public async Task<IActionResult> CancelOrder()
+        public async Task<IActionResult> CancelOrder([FromRoute] Guid orderId)
         {
-            return Ok();
+            var accountEmail = User.FindFirstValue(ClaimTypes.Email);
+
+            var result = await orderService.CancelOrder(accountEmail!, orderId);
+
+            if (result.Status == "Order 404")
+            {
+                return NotFound(new ResponseObject<string>
+                {
+                    Success = "false",
+                    Message = "Đơn hàng không tồn tại"
+                });
+            }
+            else if (result.Status == "Status Error")
+            {
+                return BadRequest(new ResponseObject<string>
+                {
+                    Success = "false",
+                    Message = "Chỉ có thể cập nhật địa chỉ cho đơn hàng đang ở trạng thái Pending"
+                });
+            }
+
+            return Ok(new ResponseObject<OrderResponseDto>
+            {
+                Success = "true",
+                Message = "Hủy đơn hàng thành công",
+                Data = result.Data
+            });
         }
     }
 }

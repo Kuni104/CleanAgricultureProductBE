@@ -559,5 +559,47 @@ namespace CleanAgricultureProductBE.Services.Order
                 }
             };
         }
+
+        public async Task<ResultStatusWithData<OrderResponseDto>> CancelOrder(string accountEmail, Guid orderId)
+        {
+            var order = await orderRepository.GetOrderByOrderId(orderId);
+            if (order == null || order.Customer.Account.Email != accountEmail)
+            {
+                return new ResultStatusWithData<OrderResponseDto>
+                {
+                    Status = "Order 404",
+                    Data = null
+                };
+            }
+
+            if (order.OrderStatus != "Pending")
+            {
+                return new ResultStatusWithData<OrderResponseDto>
+                {
+                    Status = "Status Error",
+                    Data = null
+                };
+            }
+
+            order.OrderStatus = "Cancelled";
+
+            await orderRepository.UpdateOrder(order);
+
+            return new ResultStatusWithData<OrderResponseDto>
+            {
+                Status = "Ok",
+                Data = new OrderResponseDto
+                {
+                    OrderId = order.OrderId,
+                    CustomerName = order.Address.RecipientName,
+                    Address = order.Address.AddressDetail,
+                    //Payment = (Guid)order.PaymentId,
+                    Schedule = order.Schedule != null ? TimeZoneInfo.ConvertTimeFromUtc(order.Schedule.ScheduledDate, timeZone) : null,
+                    TotalPrice = order.Payment.TotalAmount,
+                    OrderDate = TimeZoneInfo.ConvertTimeFromUtc(order.OrderDate, timeZone),
+                    OrderStatus = order.OrderStatus
+                }
+            };
+        }
     }
 }
