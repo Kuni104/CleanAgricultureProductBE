@@ -1,10 +1,9 @@
-﻿﻿using CleanAgricultureProductBE.DTOs.ApiResponse;
+﻿using CleanAgricultureProductBE.DTOs.ApiResponse;
 using CleanAgricultureProductBE.DTOs.Response;
 using CleanAgricultureProductBE.DTOs.Schedule;
 using CleanAgricultureProductBE.Services.Schedule;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Security.Claims;
 
@@ -39,10 +38,11 @@ namespace CleanAgricultureProductBE.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new ResponseObject<string>
+                return BadRequest(new ResponseObject<Guid>
                 {
                     Success = "false",
-                    Message = ex.Message
+                    Message = ex.Message,
+                    Data = Guid.Empty
                 });
             }
         }
@@ -59,7 +59,8 @@ namespace CleanAgricultureProductBE.Controllers
                 return Ok(new ResponseObject<string>
                 {
                     Success = "true",
-                    Message = "Gắn đơn thành công"
+                    Message = "Gắn đơn thành công",
+                    Data = null
                 });
             }
             catch (Exception ex)
@@ -67,7 +68,8 @@ namespace CleanAgricultureProductBE.Controllers
                 return BadRequest(new ResponseObject<string>
                 {
                     Success = "false",
-                    Message = ex.Message
+                    Message = ex.Message,
+                    Data = null
                 });
             }
         }

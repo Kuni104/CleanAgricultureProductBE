@@ -1,12 +1,10 @@
-﻿using CleanAgricultureProductBE.Data;
-using CleanAgricultureProductBE.DTOs;
+﻿using CleanAgricultureProductBE.DTOs;
 using CleanAgricultureProductBE.DTOs.ApiResponse;
 using CleanAgricultureProductBE.Services;
 using CleanAgricultureProductBE.Services.OTP;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Security.Claims;
 using System.Text.RegularExpressions;
@@ -20,12 +18,10 @@ namespace CleanAgricultureProductBE.Controllers
         private readonly IEmailOtpService _otpService;
         private readonly IAuthService _authService;
         private readonly IConfiguration _configuration;
-        private readonly AppDbContext _context;
 
-        public AuthController(IEmailOtpService otpService, AppDbContext context, IConfiguration configuration, IAuthService authService)
+        public AuthController(IEmailOtpService otpService, IConfiguration configuration, IAuthService authService)
         {
             _otpService = otpService;
-            _context = context;
             _configuration = configuration;
             _authService = authService;
         }
@@ -33,7 +29,6 @@ namespace CleanAgricultureProductBE.Controllers
         [HttpPost("send-otp")]
         public async Task<IActionResult> SendOtp([FromBody] SendOtpDto request)
         {
-            // ===== Validate Email =====
             if (string.IsNullOrWhiteSpace(request.Email))
             {
                 return BadRequest(new ResponseObject<string>
@@ -117,131 +112,10 @@ namespace CleanAgricultureProductBE.Controllers
         [SwaggerOperation(Summary = "Đăng ký tài khoản mới (Customer)")]
         public async Task<IActionResult> Register(RegisterRequestDto dto)
         {
-            if (string.IsNullOrWhiteSpace(dto.Email))
-            {
-                return BadRequest(new ResponseObject<string>
-                {
-                    Success = "false",
-                    Message = "Email không được để trống"
-                });
-            }
-
-            var emailRegex = new Regex(@"^[^\s@]+@[^\s@]+\.[^\s@]+$");
-
-            if (!emailRegex.IsMatch(dto.Email))
-            {
-                return BadRequest(new ResponseObject<string>
-                {
-                    Success = "false",
-                    Message = "Email không đúng định dạng"
-                });
-            }
-
-            var existingEmail = await _context.Accounts
-                                .AnyAsync(x => x.Email == dto.Email);
-
-            if (existingEmail)
-            {
-                return BadRequest(new ResponseObject<string>
-                {
-                    Success = "false",
-                    Message = "Email đã được sử dụng"
-                });
-            }
-
-            var passwordRegex = new Regex(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$");
-
-            if (!passwordRegex.IsMatch(dto.Password))
-            {
-                return BadRequest(new ResponseObject<string>
-                {
-                    Success = "false",
-                    Message = "Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt"
-                });
-            }
-
-            if (!string.IsNullOrWhiteSpace(dto.PhoneNumber))
-            {
-                dto.PhoneNumber = dto.PhoneNumber.Trim();
-
-                var numberRegex = new Regex(@"^[0-9]+$");
-
-                if (!numberRegex.IsMatch(dto.PhoneNumber))
-                {
-                    return BadRequest(new ResponseObject<string>
-                    {
-                        Success = "false",
-                        Message = "Số điện thoại chỉ được chứa chữ số"
-                    });
-                }
-
-                if (dto.PhoneNumber.Length != 10)
-                {
-                    return BadRequest(new ResponseObject<string>
-                    {
-                        Success = "false",
-                        Message = "Số điện thoại phải có 10 chữ số"
-                    });
-                }
-
-                var existingPhone = await _context.Accounts
-                        .AnyAsync(x => x.PhoneNumber == dto.PhoneNumber);
-
-                if (existingPhone)
-                {
-                    return BadRequest(new ResponseObject<string>
-                    {
-                        Success = "false",
-                        Message = "Số điện thoại đã được sử dụng"
-                    });
-                }
-            }
-            else
-            {
-                return BadRequest(new ResponseObject<string>
-                {
-                    Success = "false",
-                    Message = "Số điện thoại không được để trống"
-                });
-            }
-
-            var otpRecord = await _context.EmailOtps
-                .Where(x => x.Email == dto.Email && x.IsUsed == false)
-                .OrderByDescending(x => x.CreatedAt)
-                .FirstOrDefaultAsync();
-
-            if (otpRecord == null)
-            {
-                return BadRequest(new ResponseObject<string>
-                {
-                    Success = "false",
-                    Message = "Email này chưa gửi OTP"
-                });
-            }
-
-            if (otpRecord.OtpCode != dto.Otp)
-            {
-                return BadRequest(new ResponseObject<string>
-                {
-                    Success = "false",
-                    Message = "OTP không đúng"
-                });
-            }
-
-            if (otpRecord.ExpiredAt < DateTime.UtcNow)
-            {
-                return BadRequest(new ResponseObject<string>
-                {
-                    Success = "false",
-                    Message = "OTP đã hết hạn"
-                });
-            }
-
             try
             {
+                await _authService.ValidateRegisterAsync(dto);
                 var response = await _authService.RegisterAsync(dto);
-                otpRecord.IsUsed = true;
-                await _context.SaveChangesAsync();
 
                 return Created(string.Empty, new ResponseObject<LoginResponseDto>
                 {

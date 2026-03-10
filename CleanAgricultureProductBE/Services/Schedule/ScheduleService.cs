@@ -33,7 +33,19 @@ public class ScheduleService : IScheduleService
 
     public async Task<Guid> CreateScheduleAsync(Guid deliveryPersonId, DateTime scheduledDate)
     {
+        var deliveryPerson = await _accountRepository.GetByIdAsync(deliveryPersonId);
+
+        if (deliveryPerson == null)
+            throw new Exception("DeliveryPersonId không tồn tại");
+
+        if (deliveryPerson.RoleId != 4)
+            throw new Exception("Tài khoản này không phải là nhân viên giao hàng");
+
+        var todayDate = DateTime.UtcNow.Date;
         scheduledDate = scheduledDate.Date;
+
+        if (scheduledDate < todayDate)
+            throw new Exception("Không được tạo lịch trong quá khứ");
 
         var existingSchedule = await _repository
             .GetByDeliveryPersonAndDateAsync(deliveryPersonId, scheduledDate);
@@ -62,12 +74,12 @@ public class ScheduleService : IScheduleService
         var schedule = await _repository.GetByIdAsync(scheduleId);
 
         if (schedule == null)
-            throw new Exception("Schedule not found");
+            throw new Exception("Không tìm thấy lịch");
 
         var orders = await _repository.GetOrdersByIdsAsync(orderIds);
 
         if (!orders.Any())
-            throw new Exception("No valid orders found");
+            throw new Exception("Không tìm thấy order");
 
         foreach (var order in orders)
         {
