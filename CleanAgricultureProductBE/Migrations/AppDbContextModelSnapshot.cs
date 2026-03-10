@@ -226,6 +226,9 @@ namespace CleanAgricultureProductBE.Migrations
                     b.Property<Guid>("OrderId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("Resolution")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime?>("ResolveAt")
                         .HasColumnType("datetime2");
 
