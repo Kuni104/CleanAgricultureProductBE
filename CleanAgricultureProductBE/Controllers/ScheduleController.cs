@@ -22,27 +22,30 @@ namespace CleanAgricultureProductBE.Controllers
 
         [Authorize(Roles = "Admin,Staff")]
         [HttpPost]
-        [SwaggerOperation(Summary = "Tạo lịch giao hàng")]
+        [SwaggerOperation(Summary = "Tạo lịch giao hàng (Format: YYYY-MM-DDTHH:mm:ss.fffZ | 2026-03-1T17:30:45.123Z)")]
         public async Task<IActionResult> Create([FromBody] CreateScheduleRequestDto dto)
         {
             try
             {
                 var id = await _service.CreateScheduleAsync(dto.DeliveryPersonId, dto.ScheduledDate);
 
-                return Ok(new ResponseObject<Guid>
+                return Ok(new ResponseObject<CreateScheduleResponseDto>
                 {
                     Success = "true",
                     Message = "Tạo lịch thành công",
-                    Data = id
+                    Data = new CreateScheduleResponseDto
+                    {
+                        ScheduleId = id
+                    }
                 });
             }
             catch (Exception ex)
             {
-                return BadRequest(new ResponseObject<Guid>
+                return BadRequest(new ResponseObject<CreateScheduleResponseDto>
                 {
                     Success = "false",
                     Message = ex.Message,
-                    Data = Guid.Empty
+                    Data = null
                 });
             }
         }
@@ -103,6 +106,37 @@ namespace CleanAgricultureProductBE.Controllers
                 Message = message,
                 Data = schedules.ResultObject,
                 Pagination = schedules.Pagination
+            });
+        }
+
+        [Authorize(Roles = "DeliveryPerson")]
+        [HttpGet("delivery-person-schedules/today")]
+        [SwaggerOperation(Summary = "Lấy lịch giao hàng của người vận chuyển hôm nay")]
+        public async Task<IActionResult> GetAllScheduleOfDeliveryPersonToday()
+        {
+            var success = "";
+            var message = "";
+
+            var accountEmail = User.FindFirstValue(ClaimTypes.Email);
+
+            var schedule = await _service.GetSchedulesOfDeliveryPersonToday(accountEmail!);
+
+            if (schedule == null)
+            {
+                success = "true";
+                message = "Không có lịch nào vào ngày hôm nay";
+            }
+            else
+            {
+                success = "true";
+                message = "Lấy lịch thành công";
+            }
+
+            return Ok(new ResponseObject<ScheduleResponseDto>
+            {
+                Success = success,
+                Message = message,
+                Data = schedule
             });
         }
     }

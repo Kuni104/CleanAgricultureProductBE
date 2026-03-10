@@ -157,4 +157,28 @@ public class ScheduleService : IScheduleService
 
         return result;
     }
+
+    public async Task<ScheduleResponseDto> GetSchedulesOfDeliveryPersonToday(string accountEmail)
+    {
+
+        var account = await _accountRepository.GetByEmailAsync(accountEmail);
+
+        var schedule = await _repository.GetByDeliveryPersonAndDateAsync(account.AccountId, DateTime.UtcNow);
+
+        if (schedule == null)
+        {
+            return null!;
+        }
+
+        return new ScheduleResponseDto
+        {
+            ScheduleId = schedule.ScheduleId,
+            DeliveryPersonId = schedule.DeliveryPersonId,
+            ScheduledDate = schedule.ScheduledDate,
+            CreatedAt = schedule.CreatedAt,
+            UpdatedAt = schedule.UpdatedAt,
+            TotalOrders = schedule.Orders.Count,
+            Status = schedule.Status
+        };
+    }
 }

@@ -50,12 +50,12 @@ namespace CleanAgricultureProductBE.Controllers
         [SwaggerOperation(Summary = "Thêm phí giao hàng mới (Admin)")]
         public async Task<IActionResult> AddDeliveryFee([FromBody] CreateDeliveryFeeRequestDto request)
         {
-            if (request.FromKilometer >= request.ToKilometer)
+            if (string.IsNullOrEmpty(request.City.Trim()) || string.IsNullOrEmpty(request.Ward.Trim()) || string.IsNullOrEmpty(request.District.Trim()))
             {
-                return base.BadRequest(new DTOs.ApiResponse.ResponseObject<string>
+                return BadRequest(new ResponseObject<string>
                 {
                     Success = "false",
-                    Message = "FromKilometer không được lớn hơn ToKilometer",
+                    Message = "Không được để trống thành phố, xã, phường"
                 });
             }
 
@@ -67,7 +67,7 @@ namespace CleanAgricultureProductBE.Controllers
             if (result == null)
             {
                 success = "false";
-                message = "Thêm phí giao hàng không thành công";
+                message = "Đã có phí giao hàng với thông tin này";
             }
             else
             {
@@ -75,7 +75,7 @@ namespace CleanAgricultureProductBE.Controllers
                 message = "Thêm phí giao hàng thành công";
             }
 
-            var response = new DTOs.ApiResponse.ResponseObject<DeliveryFeeResponseDto>
+            var response = new ResponseObject<DeliveryFeeResponseDto>
             {
                 Success = success,
                 Message = message,
@@ -89,33 +89,24 @@ namespace CleanAgricultureProductBE.Controllers
         [SwaggerOperation(Summary = "Cập nhật phí giao hàng (Admin)")]
         public async Task<IActionResult> UpdateDeliveryFee([FromRoute]Guid deliveryFeeId, [FromBody]UpdateDeliveryFeeRequestDto request)
         {
-            if (request.FromKilometer >= request.ToKilometer)
-            {
-                return base.BadRequest(new DTOs.ApiResponse.ResponseObject<string>
-                {
-                    Success = "false",
-                    Message = "FromKilometer không được lớn hơn ToKilometer",
-                });
-            }
-
             var result = await deliveryFeeService.UpdateDeliveryFee(deliveryFeeId, request);
             if (result == null)
             {
-                return base.BadRequest(new DTOs.ApiResponse.ResponseObject<string>
+                return base.BadRequest(new ResponseObject<string>
                 {
                     Success = "false",
                     Message = $"Không có phí giao hàng nào với ID:{deliveryFeeId}"
                 });
             }else if(result.Status == "Invalid Request")
             {
-                return base.BadRequest(new DTOs.ApiResponse.ResponseObject<string>
+                return base.BadRequest(new ResponseObject<string>
                 {
                     Success = "false",
                     Message = "Request không hợp lệ (có thể km nằm giữa km đã có)"
                 });
             }
 
-            var response = new DTOs.ApiResponse.ResponseObject<DeliveryFeeResponseDto>
+            var response = new ResponseObject<DeliveryFeeResponseDto>
             {
                 Success = "true",
                 Message = "Cập nhật phí giao hàng thành công",
@@ -132,14 +123,14 @@ namespace CleanAgricultureProductBE.Controllers
             var result = await deliveryFeeService.DeleteDeliveryFeeById(deliveryFeeId);
             if (!result)
             {
-                return base.BadRequest(new DTOs.ApiResponse.ResponseObject<string>
+                return base.BadRequest(new ResponseObject<string>
                 {
                     Success = "false",
                     Message = $"Không có phí giao hàng nào với ID:{deliveryFeeId}"
                 });
             }
 
-            var response = new DTOs.ApiResponse.ResponseObject<bool>
+            var response = new ResponseObject<bool>
             {
                 Success = "true",
                 Message = "Xóa phí giao hàng thành công",
