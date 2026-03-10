@@ -51,7 +51,7 @@ public class ScheduleService : IScheduleService
             .GetByDeliveryPersonAndDateAsync(deliveryPersonId, scheduledDate);
 
         if (existingSchedule != null)
-            throw new Exception("Delivery person already has a schedule on this date");
+            throw new Exception("Tài xế đã có lịch giao hàng, hãy gắn cho tài xế khác");
 
         var schedule = new Schedule
         {
@@ -84,7 +84,7 @@ public class ScheduleService : IScheduleService
         foreach (var order in orders)
         {
             if (order.ScheduleId != null)
-                throw new Exception($"Order {order.OrderId} already assigned to a schedule");
+                throw new Exception($"Đơn {order.OrderId} đã có lịch giao hàng");
 
             order.ScheduleId = schedule.ScheduleId;
         }
