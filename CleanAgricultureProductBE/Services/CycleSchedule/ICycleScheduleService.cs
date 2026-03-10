@@ -1,9 +1,10 @@
-﻿using CleanAgricultureProductBE.DTOs.CycleSchedule;
+﻿using CleanAgricultureProductBE.DTOs.ApiResponse;
+using CleanAgricultureProductBE.DTOs.CycleSchedule;
 
 namespace CleanAgricultureProductBE.Services.CycleSchedule
 {
     public interface ICycleScheduleService
     {
-        public Task<List<CycleScheduleResponseDto>> GetCycleSchedules();
+        public Task<ResponseDtoWithPagination<List<CycleScheduleResponseDto>>> GetCycleSchedules(int? page, int? size, string? keyword);
     }
 }
