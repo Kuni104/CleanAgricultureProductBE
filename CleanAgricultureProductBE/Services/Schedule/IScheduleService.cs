@@ -9,5 +9,9 @@ namespace CleanAgricultureProductBE.Services.Schedule
         Task AssignOrdersAsync(Guid scheduleId, List<Guid> orderIds);
         public Task<ResponseDtoWithPagination<List<ScheduleResponseDto>>> GetSchedulesOfDeliveryPerson(string accountEmail, int? page, int? size, string? keyword);
         public Task<ScheduleResponseDto> GetSchedulesOfDeliveryPersonToday(string accountEmail);
+
+        //Admin
+        public Task<ResultStatusWithData<ScheduleResponseDto>> GetSchedulesTodayByDeliveryPerson(Guid deliveryPersonId);
+        public Task<ResponseDtoWithPagination<List<ScheduleResponseDto>>> GetSchedulesToday(int? page, int? size);
     }
 }
