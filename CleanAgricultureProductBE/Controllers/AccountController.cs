@@ -60,6 +60,17 @@ namespace CleanAgricultureProductBE.Controllers
         [SwaggerOperation(Summary = "Tạo tài khoản mới (Role: 1.Admin | 2.Customer | 3.Staff | 4.DeliveryPerson)")]
         public async Task<IActionResult> CreateAccount([FromBody] CreateAccountRequestDto request)
         {
+            var emailRegex = new Regex(@"^[^\s@]+@[^\s@]+\.[^\s@]+$");
+
+            if (!emailRegex.IsMatch(request.Email))
+            {
+                return BadRequest(new ResponseObject<string>
+                {
+                    Success = "false",
+                    Message = "Email không đúng định dạng"
+                });
+            }
+
             if (request.PhoneNumber != null && request.PhoneNumber.Trim() != "")
             {
                 var isValidPhoneNumber = Regex.IsMatch(request.PhoneNumber, @"^(?:\+84|0)\d{9}$");
@@ -75,7 +86,35 @@ namespace CleanAgricultureProductBE.Controllers
                 }
             }
 
-            var result = await accountService.CreateAccount(request);
+            if (request.RoleId != 1 && request.RoleId != 2 && request.RoleId != 3 && request.RoleId != 4)
+            {
+                return BadRequest(new ResponseObject<string>
+                {
+                    Success = "false",
+                    Message = "RoleId không hợp lệ. Phải là 1/2/3/4"
+                });
+            }
+
+            if (string.IsNullOrEmpty(request.FirstName) || string.IsNullOrEmpty(request.LastName))
+            {
+                return BadRequest(new ResponseObject<string>
+                {
+                    Success = "false",
+                    Message = "Không được để trống tên"
+                });
+            }
+
+            var passwordRegex = new Regex(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$");
+            if (!passwordRegex.IsMatch(request.Password))
+            {
+                return BadRequest(new ResponseObject<string>
+                {
+                    Success = "false",
+                    Message = "Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt"
+                });
+            }
+
+                var result = await accountService.CreateAccount(request);
 
             if (result == null)
             {
@@ -85,6 +124,7 @@ namespace CleanAgricultureProductBE.Controllers
                     Message = "Email đã được sử dụng!"
                 });
             }
+
 
             return base.Ok(new ResponseObject<AccountResponseDto>
             {
@@ -107,7 +147,7 @@ namespace CleanAgricultureProductBE.Controllers
                     Message = "Trạng thái không được để trống!"
                 });
             }
-            if(request.Status.Trim().ToLower() != "active" || request.Status.Trim().ToLower() != "inactive")
+            if(request.Status.Trim().ToLower() != "active" && request.Status.Trim().ToLower() != "inactive")
             {
                 return BadRequest(new ResponseObject<string>
                 {
