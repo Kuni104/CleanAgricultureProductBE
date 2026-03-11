@@ -330,5 +330,10 @@ namespace CleanAgricultureProductBE.Services
             if (otpRecord.ExpiredAt < DateTime.UtcNow)
                 throw new Exception("OTP đã hết hạn");
         }
+
+        public async Task<bool> IsTokenBlacklistedAsync(string token)
+        {
+            return await _tokenBlacklistRepo.IsBlacklistedAsync(token);
+        }
     }
 }

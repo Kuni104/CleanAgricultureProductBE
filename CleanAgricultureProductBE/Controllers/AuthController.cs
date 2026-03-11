@@ -27,6 +27,7 @@ namespace CleanAgricultureProductBE.Controllers
         }
 
         [HttpPost("send-otp")]
+        [SwaggerOperation(Summary = "Gửi OTP qua Email")]
         public async Task<IActionResult> SendOtp([FromBody] SendOtpDto request)
         {
             if (string.IsNullOrWhiteSpace(request.Email))
@@ -145,16 +146,20 @@ namespace CleanAgricultureProductBE.Controllers
                 return BadRequest(new ResponseObject<string>
                 {
                     Success = "false",
-                    Message = "Phải có token",
+                    Message = "Phải có token"
                 });
 
             await _authService.LogoutAsync(token);
 
-            return NoContent();
+            return Ok(new ResponseObject<string>
+            {
+                Success = "true",
+                Message = "Đăng xuất thành công"
+            });
         }
 
         [HttpPost("forgotpassword")]
-        [SwaggerOperation(Summary = "Đặt lại mật khẩu bằng OTP")]
+        [SwaggerOperation(Summary = "Đặt lại mật khẩu bằng Email")]
         public async Task<IActionResult> ForgotPassword([FromBody] FotgotPasswordDto dto)
         {
             try
@@ -179,6 +184,7 @@ namespace CleanAgricultureProductBE.Controllers
 
         [Authorize]
         [HttpPost("change-password")]
+        [SwaggerOperation(Summary = "Đặt lại mật khẩu từ mật khẩu cũ")]
         public async Task<IActionResult> ChangePassword([FromBody] ResetPasswordDto dto)
         {
             try
