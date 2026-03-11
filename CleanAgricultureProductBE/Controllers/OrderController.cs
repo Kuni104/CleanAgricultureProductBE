@@ -115,14 +115,6 @@ namespace CleanAgricultureProductBE.Controllers
                     Message = "Không có hàng nào trong vỏ hàng"
                 });
             }
-            else if (result.Status == "Delivery Fee 404")
-            {
-                return NotFound(new ResponseObject<string>
-                {
-                    Success = "false",
-                    Message = "Phí vận chuyển không tồn tại"
-                });
-            }
             else if (result.Status == "Address 404")
             {
                 return NotFound(new ResponseObject<string>

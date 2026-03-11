@@ -29,15 +29,6 @@ namespace CleanAgricultureProductBE.Services.Order
         public async Task<ResultStatusWithData<PlaceOrderResponseDto>> PlaceOrder(string accountEmail, OrderRequestDto request)
         {
             //var timeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
-            var deliveryFee = await deliveryFeeRepository.GetDeliveryFeeById(request.DeliveryFeeId);
-            if (deliveryFee == null)
-            {
-                return new ResultStatusWithData<PlaceOrderResponseDto>
-                {
-                    Status = "Delivery Fee 404",
-                    Data = null
-                };
-            }
 
             var account = await accountRepository.GetByEmailAsync(accountEmail);
             var address = account!.UserProfile.Addresses.FirstOrDefault(a => a.AddressId == request.AddressId);
@@ -48,6 +39,15 @@ namespace CleanAgricultureProductBE.Services.Order
                     Status = "Address 404",
                     Data = null
                 };
+            }
+
+            var addressWard = address.Ward;
+
+            var deliveryFee = await deliveryFeeRepository.GetDeliveryFeeByWard(addressWard);
+
+            if (deliveryFee == null)
+            {
+                deliveryFee = await deliveryFeeRepository.GetHighestDeliveryFee();
             }
 
             var isCycleSchedule = false;
@@ -93,7 +93,7 @@ namespace CleanAgricultureProductBE.Services.Order
                 OrderId = Guid.NewGuid(),
                 CustomerId = cart.CustomerId,
                 AddressId = request.AddressId,
-                DeliveryFeeId = request.DeliveryFeeId,
+                DeliveryFeeId = deliveryFee.DeliveryFeeId,
                 PaymentId = payment.PaymentId,
                 OrderDate = DateTime.UtcNow,
                 OrderStatus = "Pending"
@@ -118,14 +118,15 @@ namespace CleanAgricultureProductBE.Services.Order
             }
 
             await orderDetailRepository.AddOrderDetails(orderDetails);
-            await cartRepository.DeleteAllCartItems(cart.CartId);
 
-            foreach (var items in orderDetails ) 
+            foreach (var items in cartItems ) 
             {
                 var product = items.Product;
                 product.Stock = product.Stock - items.Quantity;
                 await productRepository.UpdateAsync(product);
             }
+
+            await cartRepository.DeleteAllCartItems(cart.CartId);
 
             order = await orderRepository.GetOrderByOrderId(order.OrderId);
 
