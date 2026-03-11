@@ -45,6 +45,15 @@ namespace CleanAgricultureProductBE.Controllers
         [SwaggerOperation(Summary = "Tạo phương thức thanh toán mới (Admin/Staff)")]
         public async Task<IActionResult> CreatePaymentMethod([FromBody]PaymentMethodRequestDto request)
         {
+            if (string.IsNullOrEmpty(request.MethodName))
+            {
+                return BadRequest(new ResponseObject<string>
+                {
+                    Success = "false",
+                    Message = "Không được để trống tên phương thức",
+                });
+            }
+
             var success = "";
             var message = "";
 
