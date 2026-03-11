@@ -16,14 +16,14 @@ namespace CleanAgricultureProductBE.Services.Category
         public async Task<CategoryResponseDto> CreateCategoryAsync(CreateCategoryDto dto)
         {
             if (string.IsNullOrWhiteSpace(dto.Name))
-                throw new Exception("Category name is required");
+                throw new Exception("Tên danh mục không được để trống");
 
             if (dto.Name.Trim().Length > 100)
-                throw new Exception("Category name must not exceed 100 characters");
+                throw new Exception("Tên danh mục không được vượt quá 100 ký tự");
 
             var existing = await _categoryRepo.GetByNameAsync(dto.Name.Trim());
             if (existing != null)
-                throw new Exception("Category name already exists");
+                throw new Exception("Tên danh mục đã tồn tại");
 
             var category = new CategoryModel
             {
@@ -59,7 +59,7 @@ namespace CleanAgricultureProductBE.Services.Category
         {
             var category = await _categoryRepo.GetByIdAsync(id);
             if (category == null || category.Status == "Inactive")
-                throw new Exception("Category not found");
+                throw new Exception("Không tìm thấy danh mục");
 
             return new CategoryResponseDto
             {
@@ -74,16 +74,16 @@ namespace CleanAgricultureProductBE.Services.Category
         {
             var category = await _categoryRepo.GetByIdAsync(id);
             if (category == null || category.Status == "Inactive")
-                throw new Exception("Category not found");
+                throw new Exception("Không tìm thấy danh mục");
 
             if (!string.IsNullOrWhiteSpace(dto.Name))
             {
                 if (dto.Name.Trim().Length > 100)
-                    throw new Exception("Category name must not exceed 100 characters");
+                    throw new Exception("Tên danh mục không được vượt quá 100 ký tự");
 
                 var existing = await _categoryRepo.GetByNameAsync(dto.Name.Trim());
                 if (existing != null && existing.CategoryId != id)
-                    throw new Exception("Category name already exists");
+                    throw new Exception("Tên danh mục đã tồn tại");
                 category.Name = dto.Name.Trim();
             }
             if (!string.IsNullOrWhiteSpace(dto.Description))
@@ -103,14 +103,14 @@ namespace CleanAgricultureProductBE.Services.Category
         public async Task<bool> DeleteCategoryAsync(Guid id, bool confirm)
         {
             if (!confirm)
-                throw new Exception("Delete confirmation required");
+                throw new Exception("Yêu cầu xác nhận xóa");
 
             var category = await _categoryRepo.GetByIdAsync(id);
             if (category == null)
-                throw new Exception("Category not found");
+                throw new Exception("Không tìm thấy danh mục");
 
             if (category.Products != null && category.Products.Any())
-                throw new Exception("Cannot delete category that still has products");
+                throw new Exception("Không thể xóa danh mục đang có sản phẩm");
 
             return await _categoryRepo.DeleteAsync(id);
         }
@@ -119,10 +119,10 @@ namespace CleanAgricultureProductBE.Services.Category
         {
             var category = await _categoryRepo.GetByIdAsync(id);
             if (category == null)
-                throw new Exception("Category not found");
+                throw new Exception("Không tìm thấy danh mục");
 
             if (status != "Active" && status != "Inactive")
-                throw new Exception("Status must be 'Active' or 'Inactive'");
+                throw new Exception("Trạng thái phải là 'Active' hoặc 'Inactive'");
 
             category.Status = status;
             var updated = await _categoryRepo.UpdateAsync(category);

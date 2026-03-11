@@ -1,5 +1,6 @@
 ﻿using CleanAgricultureProductBE.Models;
 using CleanAgricultureProductBE.Repositories.Image;
+using CleanAgricultureProductBE.Repositories.Product;
 
 namespace CleanAgricultureProductBE.Services.Image
 {
@@ -7,6 +8,7 @@ namespace CleanAgricultureProductBE.Services.Image
     {
         private readonly IProductImageRepository _imageRepo;
         private readonly ICloudinaryService _cloudinaryService;
+        private readonly IProductRepository _productRepo;
 
         private readonly string[] allowedTypes =
         {
@@ -20,14 +22,20 @@ namespace CleanAgricultureProductBE.Services.Image
 
         public ProductImageService(
             IProductImageRepository imageRepo,
-            ICloudinaryService cloudinaryService)
+            ICloudinaryService cloudinaryService,
+            IProductRepository productRepo)
         {
             _imageRepo = imageRepo;
             _cloudinaryService = cloudinaryService;
+            _productRepo = productRepo;
         }
 
         public async Task<List<string>> UploadProductImagesAsync(Guid productId, List<IFormFile> images)
         {
+            var product = await _productRepo.GetByIdAsync(productId);
+            if (product == null || product.Status == "Inactive")
+                throw new Exception("Không tìm thấy sản phẩm hoặc sản phẩm đã bị xóa.");
+
             if (images == null || images.Count == 0)
                 throw new Exception("Không có file nào được gửi lên.");
 

@@ -21,6 +21,8 @@ namespace CleanAgricultureProductBE.Controllers
         [SwaggerOperation(Summary = "Lấy danh sách tất cả đơn hàng (Admin,Staff)")]
         public async Task<IActionResult> GetOrders([FromQuery] int? page, [FromQuery] int? size, [FromQuery] string? keyword)
         {
+            try
+            {
             var success = "";
             var message = "";
 
@@ -46,6 +48,11 @@ namespace CleanAgricultureProductBE.Controllers
             };
 
             return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ResponseObject<string> { Success = "false", Message = ex.Message });
+            }
         }
 
         [Authorize(Roles = "Admin,Staff,DeliveryPerson")]
@@ -53,6 +60,8 @@ namespace CleanAgricultureProductBE.Controllers
         [SwaggerOperation(Summary = "Lấy danh sách tất cả đơn hàng theo lịch giao hàng (Admin,Staff,DeliveryPerson)")]
         public async Task<IActionResult> GetOrdersInSchedule([FromRoute] Guid scheduleId ,[FromQuery] int? page, [FromQuery] int? size, [FromQuery] string? keyword)
         {
+            try
+            {
             var success = "";
             var message = "";
 
@@ -78,6 +87,11 @@ namespace CleanAgricultureProductBE.Controllers
             };
 
             return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ResponseObject<string> { Success = "false", Message = ex.Message });
+            }
         }
 
         [Authorize(Roles = "Admin,Staff,DeliveryPerson")]
@@ -85,6 +99,8 @@ namespace CleanAgricultureProductBE.Controllers
         [SwaggerOperation(Summary = "Lấy chi tiết đơn hàng theo ID (Admin/Staff)")]
         public async Task<IActionResult> GetOrderDetails([FromRoute] Guid orderId, [FromQuery] int? page, [FromQuery] int? size, [FromQuery] string? keyword)
         {
+            try
+            {
             var accountEmail = User.FindFirstValue(ClaimTypes.Email);
 
             var result = await orderService.GetOrderDetailsAdmin(orderId, page, size, keyword);
@@ -110,6 +126,11 @@ namespace CleanAgricultureProductBE.Controllers
             };
 
             return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ResponseObject<string> { Success = "false", Message = ex.Message });
+            }
         }
 
 

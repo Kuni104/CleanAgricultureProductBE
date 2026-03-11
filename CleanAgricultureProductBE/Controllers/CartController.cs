@@ -62,6 +62,8 @@ namespace CleanAgricultureProductBE.Controllers
         [SwaggerOperation(Summary = "Lấy danh sách sản phẩm trong giỏ hàng")]
         public async Task<IActionResult> GetCartItems([FromQuery] int? page, [FromQuery] int? size, [FromQuery] string? keyword)
         {
+            try
+            {
             var success = "";
             var message = "";
 
@@ -98,6 +100,11 @@ namespace CleanAgricultureProductBE.Controllers
 
 
             return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ResponseObject<string> { Success = "false", Message = ex.Message });
+            }
         }
 
         [HttpPatch("me/cart/items/{productId}")]

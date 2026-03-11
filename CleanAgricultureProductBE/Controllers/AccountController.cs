@@ -21,6 +21,8 @@ namespace CleanAgricultureProductBE.Controllers
         [SwaggerOperation(Summary = "Lấy danh sách tất cả tài khoản (Admin)")]
         public async Task<IActionResult> GetAllAccount([FromQuery] int? page, [FromQuery] int? size, [FromQuery] string? keyword)
         {
+            try
+            {
             var success = "";
             var message = "";
 
@@ -46,7 +48,11 @@ namespace CleanAgricultureProductBE.Controllers
             };
 
             return Ok(response);
-
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ResponseObject<string> { Success = "false", Message = ex.Message });
+            }
         }
 
         [Authorize(Roles = "Admin")]

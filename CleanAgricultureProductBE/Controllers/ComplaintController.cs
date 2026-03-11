@@ -51,15 +51,22 @@ namespace CleanAgricultureProductBE.Controllers
         [SwaggerOperation(Summary = "Lấy danh sách khiếu nại của tôi (Customer)")]
         public async Task<IActionResult> GetMyComplaints([FromQuery] int? page, [FromQuery] int? size)
         {
-            var email = User.FindFirstValue(ClaimTypes.Email)!;
-            var result = await complaintService.GetMyComplaintsAsync(email, page, size);
-            return base.Ok(new ResponseObjectWithPagination<List<ComplaintResponseDto>>
+            try
             {
-                Success = "true",
-                Message = result.ResultObject?.Count == 0 ? "Không có khiếu nại nào" : "Lấy các khiếu nại thành công",
-                Data = result.ResultObject,
-                Pagination = result.Pagination
-            });
+                var email = User.FindFirstValue(ClaimTypes.Email)!;
+                var result = await complaintService.GetMyComplaintsAsync(email, page, size);
+                return base.Ok(new ResponseObjectWithPagination<List<ComplaintResponseDto>>
+                {
+                    Success = "true",
+                    Message = result.ResultObject?.Count == 0 ? "Không có khiếu nại nào" : "Lấy các khiếu nại thành công",
+                    Data = result.ResultObject,
+                    Pagination = result.Pagination
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new DTOs.ApiResponse.ResponseObject<string> { Success = "false", Message = ex.Message });
+            }
         }
 
         // Staff: xem tất cả complaints
@@ -68,14 +75,21 @@ namespace CleanAgricultureProductBE.Controllers
         [SwaggerOperation(Summary = "Lấy tất cả khiếu nại (Staff/Admin)")]
         public async Task<IActionResult> GetAllComplaints([FromQuery] int? page, [FromQuery] int? size, [FromQuery] string? keyword)
         {
-            var result = await complaintService.GetAllComplaintsAsync(page, size, keyword);
-            return base.Ok(new ResponseObjectWithPagination<List<ComplaintResponseDto>>
+            try
             {
-                Success = "true",
-                Message = result.ResultObject?.Count == 0 ? "Không có khiếu nại nào" : "Lấy các khiếu nại thành công",
-                Data = result.ResultObject,
-                Pagination = result.Pagination
-            });
+                var result = await complaintService.GetAllComplaintsAsync(page, size, keyword);
+                return base.Ok(new ResponseObjectWithPagination<List<ComplaintResponseDto>>
+                {
+                    Success = "true",
+                    Message = result.ResultObject?.Count == 0 ? "Không có khiếu nại nào" : "Lấy các khiếu nại thành công",
+                    Data = result.ResultObject,
+                    Pagination = result.Pagination
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new DTOs.ApiResponse.ResponseObject<string> { Success = "false", Message = ex.Message });
+            }
         }
 
         // Staff: xem chi tiết 1 complaint

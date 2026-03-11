@@ -141,7 +141,6 @@ namespace CleanAgricultureProductBE.Services.Order
                 });
             }
 
-
             //Cycle Schedule Here
             if (isCycleSchedule)
             {
@@ -187,6 +186,11 @@ namespace CleanAgricultureProductBE.Services.Order
             int pageSize = 0;
             if (page != null && size != null)
             {
+                if (page <= 0)
+                    throw new ArgumentException("Số trang (page) phải lớn hơn 0");
+                if (size <= 0)
+                    throw new ArgumentException("Kích thước trang (size) phải lớn hơn 0");
+
                 pageSize = (int)size;
                 offset = (int)((page - 1) * size);
                 isPagination = true;
@@ -258,6 +262,11 @@ namespace CleanAgricultureProductBE.Services.Order
             int pageSize = 0;
             if (page != null && size != null)
             {
+                if (page <= 0)
+                    throw new ArgumentException("Số trang (page) phải lớn hơn 0");
+                if (size <= 0)
+                    throw new ArgumentException("Kích thước trang (size) phải lớn hơn 0");
+
                 pageSize = (int)size;
                 offset = (int)((page - 1) * size);
                 isPagination = true;
@@ -327,6 +336,11 @@ namespace CleanAgricultureProductBE.Services.Order
             int pageSize = 0;
             if (page != null && size != null)
             {
+                if (page <= 0)
+                    throw new ArgumentException("Số trang (page) phải lớn hơn 0");
+                if (size <= 0)
+                    throw new ArgumentException("Kích thước trang (size) phải lớn hơn 0");
+
                 pageSize = (int)size;
                 offset = (int)((page - 1) * size);
                 isPagination = true;
@@ -396,6 +410,11 @@ namespace CleanAgricultureProductBE.Services.Order
             int pageSize = 0;
             if (page != null && size != null)
             {
+                if (page <= 0)
+                    throw new ArgumentException("Số trang (page) phải lớn hơn 0");
+                if (size <= 0)
+                    throw new ArgumentException("Kích thước trang (size) phải lớn hơn 0");
+
                 pageSize = (int)size;
                 offset = (int)((page - 1) * size);
                 isPagination = true;
@@ -512,6 +531,11 @@ namespace CleanAgricultureProductBE.Services.Order
             int pageSize = 0;
             if (page != null && size != null)
             {
+                if (page <= 0)
+                    throw new ArgumentException("Số trang (page) phải lớn hơn 0");
+                if (size <= 0)
+                    throw new ArgumentException("Kích thước trang (size) phải lớn hơn 0");
+
                 pageSize = (int)size;
                 offset = (int)((page - 1) * size);
                 isPagination = true;
