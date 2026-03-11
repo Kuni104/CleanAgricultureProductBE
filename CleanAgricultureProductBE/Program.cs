@@ -38,7 +38,6 @@ using CleanAgricultureProductBE.Services.VnPay;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Identity.Client.Extensibility;
 using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
 using System.IdentityModel.Tokens.Jwt;
@@ -197,36 +196,34 @@ namespace CleanAgricultureProductBE
                         ValidAudience = builder.Configuration["Jwt:Audience"],
                         IssuerSigningKey = new SymmetricSecurityKey(
                             Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!)
-                        )
+                        ),
+
+                        ClockSkew = TimeSpan.Zero
                     };
 
-                    // Reject blacklisted tokens on validation
-                    // Comment from here for temporary fix the JWT error
-                    //options.Events = new JwtBearerEvents
-                    //{
-                    //   OnTokenValidated = async context =>
-                    //   {
-                    //       var token = context.SecurityToken as JwtSecurityToken;
-                    //       if (token == null)
-                    //       {
-                    //           context.Fail("Invalid token");
-                    //           return;
-                    //       }
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnTokenValidated = async context =>
+                        {
+                            var authHeader = context.HttpContext.Request.Headers["Authorization"]
+                                .FirstOrDefault();
 
-                    //       var tokenString = token.RawData;
-                    //       // Resolve repository from DI
-                    //       var repo = context.HttpContext.RequestServices.GetService<ITokenBlacklistRepository>();
-                    //       if (repo != null)
-                    //       {
-                    //           var isBlacklisted = await repo.IsBlacklistedAsync(tokenString);
-                    //           if (isBlacklisted)
-                    //           {
-                    //               context.Fail("Token revoked");
-                    //           }
-                    //       }
-                    //   }
-                    //};
-                    // Comment End Here
+                            if (string.IsNullOrWhiteSpace(authHeader))
+                                return;
+
+                            var token = authHeader.Replace("Bearer ", "");
+
+                            var repo = context.HttpContext.RequestServices
+                                .GetRequiredService<ITokenBlacklistRepository>();
+
+                            var isBlacklisted = await repo.IsBlacklistedAsync(token);
+
+                            if (isBlacklisted)
+                            {
+                                context.Fail("Token đã bị vô hiệu hóa (đã logout)");
+                            }
+                        }
+                    };
                 });
 
             // Thêm CORS

@@ -12,16 +12,17 @@ namespace CleanAgricultureProductBE.Repositories
         {
             _context = context;
         }
+
         public async Task AddAsync(BlackListedToken token)
         {
-            _context.Set<BlackListedToken>().Add(token);
+            await _context.BlacklistedTokens.AddAsync(token);
             await _context.SaveChangesAsync();
         }
 
-        public Task<bool> IsBlacklistedAsync(string token)
+        public async Task<bool> IsBlacklistedAsync(string token)
         {
-            return _context.Set<BlackListedToken>()
-                .AnyAsync(t => t.Token == token);
+            return await _context.BlacklistedTokens
+                .AnyAsync(x => x.Token == token);
         }
     }
 }

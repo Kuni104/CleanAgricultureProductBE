@@ -12,5 +12,6 @@ namespace CleanAgricultureProductBE.Services
         Task ForgotPasswordAsync(FotgotPasswordDto dto);
         Task ChangePasswordAsync(Guid accountId, ResetPasswordDto dto);
         Task ValidateRegisterAsync(RegisterRequestDto dto);
+        Task<bool> IsTokenBlacklistedAsync(string token);
     }
 }
