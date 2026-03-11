@@ -174,7 +174,7 @@ namespace CleanAgricultureProductBE.Controllers
 
         [Authorize(Roles = "Admin,Staff")]
         [HttpGet("today/{deliveryPersonId}")]
-        [SwaggerOperation(Summary = "Lấy tất cả lịch giao hàng hôm nay theo người vận chuyển (Admin/Staff)")]
+        [SwaggerOperation(Summary = "Lấy lịch giao hàng hôm nay theo người vận chuyển (Admin/Staff)")]
         public async Task<IActionResult> GetAllScheduleOfDeliveryPersonTodayAdmin([FromRoute] Guid deliveryPersonId)
         {
             var success = "";
