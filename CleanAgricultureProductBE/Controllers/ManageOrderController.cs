@@ -80,7 +80,7 @@ namespace CleanAgricultureProductBE.Controllers
             return Ok(response);
         }
 
-        [Authorize(Roles = "Admin,Staff,DeliveryPerson")]
+        [Authorize(Roles = "Admin,Staff")]
         [HttpGet("{orderId}")]
         [SwaggerOperation(Summary = "Lấy chi tiết đơn hàng theo ID (Admin/Staff)")]
         public async Task<IActionResult> GetOrderDetails([FromRoute] Guid orderId, [FromQuery] int? page, [FromQuery] int? size, [FromQuery] string? keyword)
