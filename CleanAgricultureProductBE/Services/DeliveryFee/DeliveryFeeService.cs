@@ -84,12 +84,17 @@ namespace CleanAgricultureProductBE.Services.DeliveryFee
 
             var checkValidRequest = await deliveryFeeRepository.CheckDeliveryFee(existingDeliveryFee.City, existingDeliveryFee.Ward, existingDeliveryFee.District);
 
-            if (!checkValidRequest)
+            if (checkValidRequest)
             {
                 return new ResultStatusWithData<DeliveryFeeResponseDto>
                 {
                     Status = "Invalid Request",
-                    Data = null,
+                    Data = new DeliveryFeeResponseDto
+                    {
+                        City = existingDeliveryFee.City,
+                        Ward = existingDeliveryFee.Ward,
+                        District = existingDeliveryFee.District,
+                    },
                 };
             }
 
