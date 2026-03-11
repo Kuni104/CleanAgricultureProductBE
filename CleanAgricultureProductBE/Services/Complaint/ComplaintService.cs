@@ -66,6 +66,7 @@ namespace CleanAgricultureProductBE.Services.Complaint
             var order = await orderRepository.GetOrderByOrderId(request.OrderId)
                 ?? throw new Exception("Không tìm thấy đơn hàng");
 
+ 
             if (order.CustomerId != account.UserProfile.UserProfileId)
                 throw new UnauthorizedAccessException("Đơn hàng này không thuộc về bạn");
 
@@ -74,6 +75,7 @@ namespace CleanAgricultureProductBE.Services.Complaint
 
             var existing = await complaintRepository.GetByOrderIdAsync(request.OrderId);
             if (existing != null)
+
                 throw new InvalidOperationException("Đơn hàng này đã có khiếu nại");
 
             var complaint = new Models.Complaint
@@ -82,22 +84,20 @@ namespace CleanAgricultureProductBE.Services.Complaint
                 OrderId = request.OrderId,
                 Subject = request.Subject.Trim(),
                 Description = request.Description.Trim(),
-                Evidence = request.Evidence ?? string.Empty,
+                Evidence = request.Evidence.Trim(),
                 Status = "Pending",
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
+                Images = new List<ComplaintImage>()
             };
 
-            if (request.ProductIds != null && request.ProductIds.Count > 0)
+            foreach (var productId in request.ProductIds.Distinct())
             {
-                foreach (var productId in request.ProductIds.Distinct())
+                complaint.ProductComplaints.Add(new ProductComplaint
                 {
-                    complaint.ProductComplaints.Add(new ProductComplaint
-                    {
-                        ProductComplaintId = Guid.NewGuid(),
-                        ProductId = productId,
-                        ComplaintId = complaint.ComplaintId
-                    });
-                }
+                    ProductComplaintId = Guid.NewGuid(),
+                    ProductId = productId,
+                    ComplaintId = complaint.ComplaintId
+                });
             }
 
             if (request.Images != null && request.Images.Any())
@@ -116,8 +116,6 @@ namespace CleanAgricultureProductBE.Services.Complaint
                         });
                     }
                 }
-
-                complaint.Evidence = string.Empty;
             }
 
             await complaintRepository.AddAsync(complaint);
@@ -226,13 +224,22 @@ namespace CleanAgricultureProductBE.Services.Complaint
             Resolution = c.Resolution,
             CreatedAt = c.CreatedAt,
             ResolveAt = c.ResolveAt,
-            StaffName = c.Staff != null ? $"{c.Staff.UserProfile?.FirstName} {c.Staff.UserProfile?.LastName}".Trim() : null,
+            StaffName = c.Staff != null
+        ? $"{c.Staff.UserProfile?.FirstName} {c.Staff.UserProfile?.LastName}".Trim()
+        : null,
+
             ProductComplaints = c.ProductComplaints.Select(pc => new ProductComplaintResponseDto
             {
                 ProductComplaintId = pc.ProductComplaintId,
                 ProductId = pc.ProductId,
                 ProductName = pc.Product?.Name ?? string.Empty
-            }).ToList()
+            }).ToList(),
+
+            Images = c.Images?.Select(i => new ComplaintImageResponseDto
+            {
+                Id = i.Id,
+                ImageUrl = i.ImageUrl
+            }).ToList() ?? new List<ComplaintImageResponseDto>()
         };
     }
 }
