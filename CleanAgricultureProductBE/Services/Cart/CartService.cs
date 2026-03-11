@@ -8,10 +8,11 @@ using CleanAgricultureProductBE.DTOs.Response;
 using CleanAgricultureProductBE.DTOs;
 using CleanAgricultureProductBE.DTOs.ApiResponse;
 using CleanAgricultureProductBE.Services.Product;
+using CleanAgricultureProductBE.Repositories.Product;
 
 namespace CleanAgricultureProductBE.Services.Cart
 {
-    public class CartService(IAccountRepository accountRepository,IProductService productService, ICartRepository cartRepository) : ICartService
+    public class CartService(IAccountRepository accountRepository,IProductRepository productRepository, ICartRepository cartRepository) : ICartService
     {
 
         public async Task<ResultStatusWithData<AddToCartResponseDto>> AddToCart(string accountEmail, Guid productId, CartRequestDto request)
@@ -19,7 +20,16 @@ namespace CleanAgricultureProductBE.Services.Cart
             var cart = await GetCartByAccoutEmail(accountEmail);
 
             //var product = await productRepository.GetByIdAsync(productId);
-            var product = await productService.GetProductByIdAsync(productId);
+            var product = await productRepository.GetByIdAsync(productId);
+
+            if (product == null)
+            {
+                return new ResultStatusWithData<AddToCartResponseDto>
+                {
+                    Status = "Product 404",
+                    Data = null
+                };
+            }
 
             var cartItem = await cartRepository.GetCartItemByCartIdAndProductId(cart!.CartId, product!.ProductId);
 
@@ -169,9 +179,18 @@ namespace CleanAgricultureProductBE.Services.Cart
             var cart = await GetCartByAccoutEmail(accountEmail);
 
             var cartItem = await cartRepository.GetCartItemByCartIdAndProductIdIncludeProduct(cart!.CartId, productId);
-            var product = await productService.GetProductByIdAsync(productId);
+            var product = await productRepository.GetByIdAsync(productId);
 
-            if(product.Stock < request.Quantity)
+            if (product == null)
+            {
+                return new ResultStatusWithData<UpdateCartResponseDto>
+                {
+                    Status = "Product 404",
+                    Data = null
+                };
+            }
+
+            if (product.Stock < request.Quantity)
             {
                 return new ResultStatusWithData<UpdateCartResponseDto>
                 {
@@ -213,6 +232,16 @@ namespace CleanAgricultureProductBE.Services.Cart
         public async Task<ResultStatusWithData<decimal>> DeleteCartItem(string accountEmail, Guid productId)
         {
             var cart = await GetCartByAccoutEmail(accountEmail);
+            var product = await productRepository.GetByIdAsync(productId);
+
+            if (product == null)
+            {
+                return new ResultStatusWithData<decimal>
+                {
+                    Status = "Product 404"
+                };
+            }
+
             var cartItem = await cartRepository.GetCartItemByCartIdAndProductId(cart!.CartId, productId);
 
             if (cartItem == null)

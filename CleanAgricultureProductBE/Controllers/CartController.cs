@@ -38,6 +38,15 @@ namespace CleanAgricultureProductBE.Controllers
 
             var result = await cartService.AddToCart(accountEmail!, productId, request);
 
+            if (result.Status == "Product 404")
+            {
+                return NotFound(new ResponseObject<string>
+                {
+                    Success = "false",
+                    Message = $"Không tìm thấy sản phẩm nào với ID: {productId}"
+                });
+            }
+
             if(result.Status == "Stock Error")
             {
                 success = "false";
@@ -125,6 +134,15 @@ namespace CleanAgricultureProductBE.Controllers
 
             var result = await cartService.UpdateCartItemQuantity(accountEmail!, productId, request);
 
+            if (result.Status == "Product 404")
+            {
+                return NotFound(new ResponseObject<string>
+                {
+                    Success = "false",
+                    Message = $"Không tìm thấy sản phẩm nào với ID: {productId}"
+                });
+            }
+
             if (result.Status == "Stock Error")
             {
                 return NotFound(new ResponseObject<string>
@@ -147,11 +165,20 @@ namespace CleanAgricultureProductBE.Controllers
 
         [HttpDelete("me/cart/items/{productId}")]
         [SwaggerOperation(Summary = "Xóa một sản phẩm khỏi giỏ hàng")]
-        public async Task<IActionResult> DeleteCartItems([FromRoute] Guid productId)
+        public async Task<IActionResult> DeleteCartItem([FromRoute] Guid productId)
         {
             var accountEmail = User.FindFirstValue(ClaimTypes.Email);
 
             var result = await cartService.DeleteCartItem(accountEmail!, productId);
+
+            if (result.Status == "Product 404")
+            {
+                return NotFound(new ResponseObject<string>
+                {
+                    Success = "false",
+                    Message = $"Không tìm thấy sản phẩm nào với ID: {productId}"
+                });
+            }
 
             if (result.Status == "ID 404")
             {
