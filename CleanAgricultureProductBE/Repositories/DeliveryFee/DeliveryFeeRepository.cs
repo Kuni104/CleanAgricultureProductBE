@@ -1,4 +1,5 @@
 ﻿using CleanAgricultureProductBE.Data;
+using CloudinaryDotNet.Actions;
 using Microsoft.EntityFrameworkCore;
 
 namespace CleanAgricultureProductBE.Repositories.DeliveryFee
@@ -36,6 +37,22 @@ namespace CleanAgricultureProductBE.Repositories.DeliveryFee
         {
             context.DeliveryFees.Remove(deliveryFeeToRemove);
             await context.SaveChangesAsync();
+        }
+
+        public async Task<Models.DeliveryFee?> GetDeliveryFeeByWard(string ward)
+        {
+            return await context.DeliveryFees
+                                .Where(df => df.Ward.ToLower() == ward.Trim().ToLower())
+                                .OrderByDescending(df => df.FeeAmount)
+                                .ThenBy(df => df.DeliveryFeeId)
+                                .FirstOrDefaultAsync();
+        }
+
+        public async Task<Models.DeliveryFee?> GetHighestDeliveryFee()
+        {
+            return await context.DeliveryFees
+                        .OrderByDescending(df => df.FeeAmount)
+                        .FirstOrDefaultAsync();
         }
     }
 }
