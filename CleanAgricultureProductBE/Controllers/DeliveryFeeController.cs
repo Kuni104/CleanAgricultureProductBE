@@ -55,7 +55,7 @@ namespace CleanAgricultureProductBE.Controllers
                 return BadRequest(new ResponseObject<string>
                 {
                     Success = "false",
-                    Message = "Không được để trống thành phố, xã, phường"
+                    Message = "Không được để trống city, ward, district"
                 });
             }
 
@@ -102,7 +102,7 @@ namespace CleanAgricultureProductBE.Controllers
                 return base.BadRequest(new ResponseObject<string>
                 {
                     Success = "false",
-                    Message = "Request không hợp lệ (có thể km nằm giữa km đã có)"
+                    Message = $"Đã có phí giao hàng với City: {result.Data!.City}, Ward: {result.Data.Ward}, District: {result.Data.District}"
                 });
             }
 
