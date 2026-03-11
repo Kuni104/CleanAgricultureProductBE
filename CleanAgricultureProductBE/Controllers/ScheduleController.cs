@@ -78,14 +78,16 @@ namespace CleanAgricultureProductBE.Controllers
         }
 
         [Authorize(Roles = "DeliveryPerson")]
-        [HttpGet("delivery-person-schedules")]
-        [SwaggerOperation(Summary = "Lấy tất cả lịch giao hàng của người vận chuyển")]
-        public async Task<IActionResult> GetAllScheduleOfDeliveryPerson([FromQuery] int? page, [FromQuery] int? size, [FromQuery] string? keyword)
+        [HttpGet("delivery-person")]
+        [SwaggerOperation(Summary = "Lấy tất cả lịch giao hàng của người vận chuyển (DeliveryPerson)")]
+        public async Task<IActionResult> GetAllScheduleOfDeliveryPerson([FromQuery] int? page, [FromQuery] int? size)
         {
             var success = "";
             var message = "";
 
             var accountEmail = User.FindFirstValue(ClaimTypes.Email);
+
+            var keyword = "";
 
             var schedules = await _service.GetSchedulesOfDeliveryPerson(accountEmail!, page, size, keyword);
 
@@ -110,8 +112,8 @@ namespace CleanAgricultureProductBE.Controllers
         }
 
         [Authorize(Roles = "DeliveryPerson")]
-        [HttpGet("delivery-person-schedules/today")]
-        [SwaggerOperation(Summary = "Lấy lịch giao hàng của người vận chuyển hôm nay")]
+        [HttpGet("delivery-person/today")]
+        [SwaggerOperation(Summary = "Lấy lịch giao hàng của người vận chuyển hôm nay (DeliveryPerson)")]
         public async Task<IActionResult> GetAllScheduleOfDeliveryPersonToday()
         {
             var success = "";
@@ -137,6 +139,74 @@ namespace CleanAgricultureProductBE.Controllers
                 Success = success,
                 Message = message,
                 Data = schedule
+            });
+        }
+
+        [Authorize(Roles = "Admin,Staff")]
+        [HttpGet("today")]
+        [SwaggerOperation(Summary = "Lấy tất cả lịch giao hàng hôm nay (Admin/Staff)")]
+        public async Task<IActionResult> GetAllSchedulesTodayAdmin([FromQuery] int? page, [FromQuery] int? size)
+        {
+            var success = "";
+            var message = "";
+
+            var schedules = await _service.GetSchedulesToday(page, size);
+
+            if (schedules.ResultObject == null || schedules.ResultObject.Count <= 0)
+            {
+                success = "true";
+                message = "Không có lịch nào";
+            }
+            else
+            {
+                success = "true";
+                message = "Lấy lịch thành công";
+            }
+
+            return Ok(new ResponseObjectWithPagination<List<ScheduleResponseDto>>
+            {
+                Success = success,
+                Message = message,
+                Data = schedules.ResultObject,
+                Pagination = schedules.Pagination
+            });
+        }
+
+        [Authorize(Roles = "Admin,Staff")]
+        [HttpGet("today/{deliveryPersonId}")]
+        [SwaggerOperation(Summary = "Lấy tất cả lịch giao hàng hôm nay theo người vận chuyển (Admin/Staff)")]
+        public async Task<IActionResult> GetAllScheduleOfDeliveryPersonTodayAdmin([FromRoute] Guid deliveryPersonId)
+        {
+            var success = "";
+            var message = "";
+
+            var result = await _service.GetSchedulesTodayByDeliveryPerson(deliveryPersonId);
+
+            if (result.Status == "Schedule 404")
+            {
+                success = "true";
+                message = $"Không có lịch nào vào ngày hôm nay của người vận chuyển với ID: {deliveryPersonId}";
+            }else if (result.Status == "Account 404")
+            {
+                success = "false";
+                message = $"Không có người vận chuyển với ID: {deliveryPersonId}";
+                return BadRequest(new ResponseObject<string>
+                {
+                    Success = success,
+                    Message = message,
+                });
+            }
+            else
+            {
+                success = "true";
+                message = "Lấy lịch thành công";
+            }
+
+            return Ok(new ResponseObject<ScheduleResponseDto>
+            {
+                Success = success,
+                Message = message,
+                Data = result!.Data
             });
         }
     }

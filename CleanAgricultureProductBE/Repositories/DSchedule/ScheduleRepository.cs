@@ -2,6 +2,7 @@
 using CleanAgricultureProductBE.Models;
 using CleanAgricultureProductBE.Repositories.DSchedule;
 using Microsoft.EntityFrameworkCore;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 public class ScheduleRepository : IScheduleRepository
 {
@@ -59,6 +60,16 @@ public class ScheduleRepository : IScheduleRepository
             .Where(s => s.DeliveryPersonId == deliveryPersonId)
             .Skip(offset)
             .Take(pageSize)
+            .ToListAsync();
+    }
+
+    public async Task<List<Schedule>> GetSchedulesToday()
+    {
+        return await _context.Schedules
+            .Include(s => s.Orders)
+            .Where(x =>
+                x.ScheduledDate.Date == DateTime.UtcNow.Date)
+            .OrderByDescending(s => s.ScheduledDate)
             .ToListAsync();
     }
 }

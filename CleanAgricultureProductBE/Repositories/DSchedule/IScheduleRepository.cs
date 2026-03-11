@@ -10,6 +10,7 @@ namespace CleanAgricultureProductBE.Repositories.DSchedule
         Task SaveChangesAsync();
         Task<Schedule?> GetByDeliveryPersonAndDateAsync(Guid deliveryPersonId, DateTime date);
         public Task<List<Schedule>> GetByDeliveryPerson(Guid deliveryPersonId);
+        public Task<List<Schedule>> GetSchedulesToday();
         public Task<List<Schedule>> GetByDeliveryPersonWithPagination(Guid deliveryPersonId, int offset, int pageSize);
     }
 }
