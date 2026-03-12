@@ -2,7 +2,6 @@
 using CleanAgricultureProductBE.DTOs.ApiResponse;
 using CleanAgricultureProductBE.DTOs.Order;
 using CleanAgricultureProductBE.DTOs.Response;
-using CleanAgricultureProductBE.Migrations;
 using CleanAgricultureProductBE.Models;
 using CleanAgricultureProductBE.Repositories;
 using CleanAgricultureProductBE.Repositories.Order;
