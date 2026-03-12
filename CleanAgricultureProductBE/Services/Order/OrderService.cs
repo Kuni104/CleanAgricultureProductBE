@@ -47,7 +47,11 @@ namespace CleanAgricultureProductBE.Services.Order
 
             if (deliveryFee == null)
             {
-                deliveryFee = await deliveryFeeRepository.GetHighestDeliveryFee();
+                return new ResultStatusWithData<PlaceOrderResponseDto>
+                {
+                    Status = "Delivery Fee 404",
+                    Data = null
+                };
             }
 
             var isCycleSchedule = false;

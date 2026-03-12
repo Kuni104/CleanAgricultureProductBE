@@ -1,4 +1,5 @@
 ﻿using CleanAgricultureProductBE.DTOs.ApiResponse;
+using CleanAgricultureProductBE.DTOs.DeliveryFee;
 using CleanAgricultureProductBE.DTOs.Order;
 using CleanAgricultureProductBE.DTOs.OrderDetail;
 using CleanAgricultureProductBE.DTOs.Response;
@@ -122,7 +123,16 @@ namespace CleanAgricultureProductBE.Controllers
                     Success = "false",
                     Message = "Địa chỉ không tồn tại"
                 });
-            }else if (result.Status == "Day Cycle Error")
+            }
+            else if (result.Status == "Delivery Fee 404")
+            {
+                return BadRequest(new ResponseObject<GetDeliveryFeeByAddressResponseDto>
+                {
+                    Success = "false",
+                    Message = "Địa chỉ không hợp lệ",
+                });
+            }
+            else if (result.Status == "Day Cycle Error")
             {
                 return BadRequest(new ResponseObject<string>
                 {

@@ -1,11 +1,12 @@
 ﻿using CleanAgricultureProductBE.DTOs.ApiResponse;
 using CleanAgricultureProductBE.DTOs.DeliveryFee;
+using CleanAgricultureProductBE.Repositories.Address;
 using CleanAgricultureProductBE.Repositories.DeliveryFee;
 using System.Management;
 
 namespace CleanAgricultureProductBE.Services.DeliveryFee
 {
-    public class DeliveryFeeService(IDeliveryFeeRepository deliveryFeeRepository) : IDeliveryFeeService
+    public class DeliveryFeeService(IDeliveryFeeRepository deliveryFeeRepository, IAddressRepository addressRepository) : IDeliveryFeeService
     {
         public async Task<List<DeliveryFeeResponseDto>> GetDeliveryFeeList()
         {
@@ -129,6 +130,42 @@ namespace CleanAgricultureProductBE.Services.DeliveryFee
                 await deliveryFeeRepository.DeleteDeliveryFee(existingDeliveryFee);
                 return true;
             }
+        }
+
+        public async Task<ResultStatusWithData<GetDeliveryFeeByAddressResponseDto>> GetDeliveryFeeByAddress(Guid addressId)
+        {
+            var address = await addressRepository.GetByIdAsync(addressId);
+
+            if (address == null)
+            {
+                return new ResultStatusWithData<GetDeliveryFeeByAddressResponseDto>
+                {
+                    Status = "Address 404"
+                };
+            }
+
+            var addressWard = address.Ward;
+
+            var deliveryFee = await deliveryFeeRepository.GetDeliveryFeeByWard(addressWard);
+
+            if (deliveryFee == null)
+            {
+                return new ResultStatusWithData<GetDeliveryFeeByAddressResponseDto>
+                {
+                    Status = "Delivery Fee 404"
+                };
+            }
+
+            var deliveryFeeForAddress = new GetDeliveryFeeByAddressResponseDto
+            {
+                FeeAmount = deliveryFee.FeeAmount
+            };
+
+            return new ResultStatusWithData<GetDeliveryFeeByAddressResponseDto>
+            {
+                Data = deliveryFeeForAddress,
+                Status = "ok"
+            };
         }
     }
 }

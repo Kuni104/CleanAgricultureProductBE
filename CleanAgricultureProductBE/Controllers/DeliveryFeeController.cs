@@ -10,11 +10,11 @@ using Swashbuckle.AspNetCore.Annotations;
 
 namespace CleanAgricultureProductBE.Controllers
 {
-    [Authorize(Roles = "Admin")]
     [Route("api/v1/delivery-fee")]
     [ApiController]
     public class DeliveryFeeController(IDeliveryFeeService deliveryFeeService) : ControllerBase
     {
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         [SwaggerOperation(Summary = "Lấy danh sách phí giao hàng (Admin)")]
         public async Task<IActionResult> GetDeliveryFeeList()
@@ -46,6 +46,38 @@ namespace CleanAgricultureProductBE.Controllers
             return Ok(response);
         }
 
+        [Authorize(Roles = "Admin,Customer")]
+        [HttpGet("{addressId}")]
+        [SwaggerOperation(Summary = "Lấy phí giao hàng theo địa chỉ (Customer,Admin)")]
+        public async Task<IActionResult> GetDeliveryFeeByAddress([FromRoute] Guid addressId)
+        {
+            var deliveryFee = await deliveryFeeService.GetDeliveryFeeByAddress(addressId);
+            if (deliveryFee.Status == "Address 404")
+            {
+                return BadRequest(new ResponseObject<GetDeliveryFeeByAddressResponseDto>
+                {
+                    Success = "false",
+                    Message = $"Không tìm thấy địa chỉ với ID: {addressId}",
+                });
+            }
+            if (deliveryFee.Status == "Delivery Fee 404")
+            {
+                return BadRequest(new ResponseObject<GetDeliveryFeeByAddressResponseDto>
+                {
+                    Success = "false",
+                    Message = "Địa chỉ không hợp lệ",
+                });
+            }
+
+            return Ok(new ResponseObject<GetDeliveryFeeByAddressResponseDto>
+            {
+                Success = "true",
+                Message = "Lấy phí thành công",
+                Data = deliveryFee.Data
+            });
+        }
+
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [SwaggerOperation(Summary = "Thêm phí giao hàng mới (Admin)")]
         public async Task<IActionResult> AddDeliveryFee([FromBody] CreateDeliveryFeeRequestDto request)
@@ -85,6 +117,7 @@ namespace CleanAgricultureProductBE.Controllers
             return Ok(response);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPatch("{deliveryFeeId}")]
         [SwaggerOperation(Summary = "Cập nhật phí giao hàng (Admin)")]
         public async Task<IActionResult> UpdateDeliveryFee([FromRoute]Guid deliveryFeeId, [FromBody]UpdateDeliveryFeeRequestDto request)
@@ -116,6 +149,8 @@ namespace CleanAgricultureProductBE.Controllers
             return Ok(response);
         }
 
+
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{deliveryFeeId}")]
         [SwaggerOperation(Summary = "Xóa phí giao hàng (Admin)")]
         public async Task<IActionResult> DeleteDeliveryFeeById([FromRoute]Guid deliveryFeeId)
