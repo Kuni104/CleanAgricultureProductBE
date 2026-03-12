@@ -3,15 +3,18 @@ using CleanAgricultureProductBE.Models;
 using CleanAgricultureProductBE.Repositories;
 using CleanAgricultureProductBE.Repositories.Cart;
 using CleanAgricultureProductBE.Repositories.OTP;
+using Google.Apis.Auth;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net;
+using System.Net.Mail;
 using System.Security.Claims;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace CleanAgricultureProductBE.Services
+namespace CleanAgricultureProductBE.Services.Auth
 {
     public class AuthService : IAuthService
     {
@@ -334,6 +337,147 @@ namespace CleanAgricultureProductBE.Services
         public async Task<bool> IsTokenBlacklistedAsync(string token)
         {
             return await _tokenBlacklistRepo.IsBlacklistedAsync(token);
+        }
+
+        public async Task<LoginResponseDto> LoginWithGoogleAsync(string idToken)
+        {
+            var clientId = _config["Authentication:Google:ClientId"];
+
+            var settings = new GoogleJsonWebSignature.ValidationSettings()
+            {
+                Audience = new List<string> { clientId }
+            };
+
+            var payload = await GoogleJsonWebSignature.ValidateAsync(idToken, settings);
+
+            var email = payload.Email;
+            var googleId = payload.Subject;
+            var fullName = payload.Name;
+
+            var account = await _accountRepo.GetByEmailAsync(email);
+
+            if (account == null)
+            {
+                var password = GenerateRandomPassword();
+
+                var hasher = new PasswordHasher<Models.Account>();
+
+                account = new Models.Account
+                {
+                    AccountId = Guid.NewGuid(),
+                    Email = email,
+                    GoogleId = googleId,
+                    PhoneNumber = "",
+                    Status = "Active",
+                    RoleId = 2,
+                    UserProfile = new Models.UserProfile
+                    {
+                        UserProfileId = Guid.NewGuid(),
+                        FirstName = fullName?.Split(' ')[0] ?? "User",
+                        LastName = fullName?.Split(' ').Length > 1 ? string.Join(" ", fullName.Split(' ').Skip(1)) : ""
+                    }
+                };
+
+                account.PasswordHash = hasher.HashPassword(account, password);
+
+                await _accountRepo.CreateAsync(account);
+
+                var newCart = new Models.Cart
+                {
+                    CartId = Guid.NewGuid(),
+                    Customer = account.UserProfile,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                };
+
+                await _cartRepo.CreateCart(newCart);
+
+                await SendPasswordEmail(email, password);
+            }
+            else
+            {
+                if (string.IsNullOrEmpty(account.GoogleId))
+                {
+                    account.GoogleId = googleId;
+
+                    await _accountRepo.UpdateAsync(account);
+                }
+            }
+
+            var token = GenerateJwt(account);
+
+            return new LoginResponseDto
+            {
+                AccessToken = token,
+                User = new LoginResponseUserDto
+                {
+                    AccountId = account.AccountId,
+                    Email = account.Email,
+                    Name = account.UserProfile.FirstName + " " + account.UserProfile.LastName,
+                    Role = account.Role.RoleName
+                }
+            };
+        }
+
+        private async Task SendPasswordEmail(string email, string password)
+        {
+            var subject = "Tài khoản Clean Agriculture";
+
+            var body = $@"Bạn đã đăng nhập bằng Google.
+
+                        Hệ thống đã tạo tài khoản cho bạn.
+
+                        Email: {email}
+                        Password: {password}
+
+                        Bạn có thể đổi mật khẩu sau khi đăng nhập.";
+
+            try
+            {
+                string senderEmail = "trungvnse182447@fpt.edu.vn";
+                string appPassword = "gksozymnhlifkmuw";
+
+                using (MailMessage mail = new MailMessage())
+                {
+                    mail.From = new MailAddress(senderEmail);
+                    mail.To.Add(email);
+                    mail.Subject = subject;
+                    mail.Body = body;
+
+                    using (SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587))
+                    {
+                        smtp.Credentials = new NetworkCredential(senderEmail, appPassword);
+                        smtp.EnableSsl = true;
+
+                        await smtp.SendMailAsync(mail);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Không thể gửi mật khẩu qua email: {ex.Message}");
+            }
+        }
+
+        private string GenerateRandomPassword()
+        {
+            const string validChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
+            var random = new Random();
+            var password = new StringBuilder();
+
+            // Ensure password has at least one lowercase, uppercase, digit, and special character
+            password.Append(validChars[random.Next(26)]); // lowercase
+            password.Append(validChars[random.Next(26, 52)]); // uppercase
+            password.Append(validChars[random.Next(52, 62)]); // digit
+            password.Append(validChars[random.Next(62)]); // special char
+
+            // Fill the rest with random characters
+            for (int i = 4; i < 12; i++)
+            {
+                password.Append(validChars[random.Next(validChars.Length)]);
+            }
+
+            return password.ToString();
         }
     }
 }
