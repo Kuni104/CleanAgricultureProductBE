@@ -1,6 +1,7 @@
 ﻿using CleanAgricultureProductBE.DTOs;
 using CleanAgricultureProductBE.DTOs.ApiResponse;
-using CleanAgricultureProductBE.Services;
+using CleanAgricultureProductBE.DTOs.Google;
+using CleanAgricultureProductBE.Services.Auth;
 using CleanAgricultureProductBE.Services.OTP;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
@@ -200,6 +201,31 @@ namespace CleanAgricultureProductBE.Controllers
                 {
                     Success = "true",
                     Message = "Đổi mật khẩu thành công"
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ResponseObject<string>
+                {
+                    Success = "false",
+                    Message = ex.Message
+                });
+            }
+        }
+
+        [HttpPost("google-login")]
+        [SwaggerOperation(Summary = "Đăng nhập bằng Google")]
+        public async Task<IActionResult> GoogleLogin([FromBody] GoogleLoginRequestDto request)
+        {
+            try
+            {
+                var result = await _authService.LoginWithGoogleAsync(request.IdToken);
+
+                return Ok(new ResponseObject<LoginResponseDto>
+                {
+                    Success = "true",
+                    Message = "Đăng nhập Google thành công",
+                    Data = result
                 });
             }
             catch (Exception ex)

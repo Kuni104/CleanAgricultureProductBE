@@ -1,7 +1,7 @@
 ﻿using CleanAgricultureProductBE.DTOs;
 using Microsoft.AspNetCore.Identity.Data;
 
-namespace CleanAgricultureProductBE.Services
+namespace CleanAgricultureProductBE.Services.Auth
 {
     public interface IAuthService
     {
@@ -13,5 +13,6 @@ namespace CleanAgricultureProductBE.Services
         Task ChangePasswordAsync(Guid accountId, ResetPasswordDto dto);
         Task ValidateRegisterAsync(RegisterRequestDto dto);
         Task<bool> IsTokenBlacklistedAsync(string token);
+        Task<LoginResponseDto> LoginWithGoogleAsync(string idToken);
     }
 }
