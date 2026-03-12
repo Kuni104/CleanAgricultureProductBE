@@ -137,10 +137,10 @@ namespace CleanAgricultureProductBE.Data
                                                         .FirstOrDefault(),
                     RecipientName = "John Doe",
                     RecipientPhone = "1023456789",
-                    Ward = "A",
-                    District = "A",
-                    City = "A",
-                    AddressDetail = "AAA",
+                    Ward = "Quận 8",
+                    District = "Ba Đình",
+                    City = "HCM",
+                    AddressDetail = "Ba Đình TP.HCM Quận 8",
                     IsDefault = true
                 };
 
@@ -278,30 +278,54 @@ namespace CleanAgricultureProductBE.Data
             }
 
             //DeliveryFee Seeding
-            if (!await context.Set<DeliveryFee>().AnyAsync())
+            if (true)
             {
                 var deliveryFees = new List<DeliveryFee>
                 {
-                    new DeliveryFee
-                    {
-                        DeliveryFeeId = Guid.NewGuid(),
-                        City = "HCM",
-                        Ward = "A",
-                        District = "A",
-                        FeeAmount = 5000,
-                    },
-                    new DeliveryFee
-                    {
-                        DeliveryFeeId = Guid.NewGuid(),
-                        City = "HCM",
-                        Ward = "B",
-                        District = "B",
-                        FeeAmount = 10000,
-                    }
+                    new DeliveryFee { DeliveryFeeId = Guid.NewGuid(), City = "HCM", Ward = "Quận 1", District = "Any", FeeAmount = 5000 },
+                    new DeliveryFee { DeliveryFeeId = Guid.NewGuid(), City = "HCM", Ward = "Quận 2", District = "Any", FeeAmount = 10000 },
+                    new DeliveryFee { DeliveryFeeId = Guid.NewGuid(), City = "HCM", Ward = "Quận 3", District = "Any", FeeAmount = 15000 },
+                    new DeliveryFee { DeliveryFeeId = Guid.NewGuid(), City = "HCM", Ward = "Quận 4", District = "Any", FeeAmount = 20000 },
+                    new DeliveryFee { DeliveryFeeId = Guid.NewGuid(), City = "HCM", Ward = "Quận 5", District = "Any", FeeAmount = 25000 },
+                    new DeliveryFee { DeliveryFeeId = Guid.NewGuid(), City = "HCM", Ward = "Quận 6", District = "Any", FeeAmount = 30000 },
+                    new DeliveryFee { DeliveryFeeId = Guid.NewGuid(), City = "HCM", Ward = "Quận 7", District = "Any", FeeAmount = 35000 },
+                    new DeliveryFee { DeliveryFeeId = Guid.NewGuid(), City = "HCM", Ward = "Quận 8", District = "Any", FeeAmount = 40000 },
+                    new DeliveryFee { DeliveryFeeId = Guid.NewGuid(), City = "HCM", Ward = "Quận 9", District = "Any", FeeAmount = 45000 },
+                    new DeliveryFee { DeliveryFeeId = Guid.NewGuid(), City = "HCM", Ward = "Quận 10", District = "Any", FeeAmount = 50000 },
+                    new DeliveryFee { DeliveryFeeId = Guid.NewGuid(), City = "HCM", Ward = "Quận 11", District = "Any", FeeAmount = 55000 },
+                    new DeliveryFee { DeliveryFeeId = Guid.NewGuid(), City = "HCM", Ward = "Quận 12", District = "Any", FeeAmount = 60000 },
+
+                    new DeliveryFee { DeliveryFeeId = Guid.NewGuid(), City = "HCM", Ward = "Quận Bình Thạnh", District = "Any", FeeAmount = 65000 },
+                    new DeliveryFee { DeliveryFeeId = Guid.NewGuid(), City = "HCM", Ward = "Quận Gò Vấp", District = "Any", FeeAmount = 70000 },
+                    new DeliveryFee { DeliveryFeeId = Guid.NewGuid(), City = "HCM", Ward = "Quận Phú Nhuận", District = "Any", FeeAmount = 75000 },
+                    new DeliveryFee { DeliveryFeeId = Guid.NewGuid(), City = "HCM", Ward = "Quận Tân Bình", District = "Any", FeeAmount = 80000 },
+                    new DeliveryFee { DeliveryFeeId = Guid.NewGuid(), City = "HCM", Ward = "Quận Tân Phú", District = "Any", FeeAmount = 85000 },
+                    new DeliveryFee { DeliveryFeeId = Guid.NewGuid(), City = "HCM", Ward = "Quận Bình Tân", District = "Any", FeeAmount = 90000 },
+
+                    new DeliveryFee { DeliveryFeeId = Guid.NewGuid(), City = "HCM", Ward = "Huyện Bình Chánh", District = "Any", FeeAmount = 95000 },
+                    new DeliveryFee { DeliveryFeeId = Guid.NewGuid(), City = "HCM", Ward = "Huyện Củ Chi", District = "Any", FeeAmount = 100000 },
+                    new DeliveryFee { DeliveryFeeId = Guid.NewGuid(), City = "HCM", Ward = "Huyện Hóc Môn", District = "Any", FeeAmount = 105000 },
+                    new DeliveryFee { DeliveryFeeId = Guid.NewGuid(), City = "HCM", Ward = "Huyện Nhà Bè", District = "Any", FeeAmount = 110000 },
+                    new DeliveryFee { DeliveryFeeId = Guid.NewGuid(), City = "HCM", Ward = "Huyện Cần Giờ", District = "Any", FeeAmount = 115000 },
+
+                    new DeliveryFee { DeliveryFeeId = Guid.NewGuid(), City = "HCM", Ward = "Thành phố Thủ Đức", District = "Any", FeeAmount = 120000 }
                 };
 
-                context.DeliveryFees.AddRange(deliveryFees);
-                await context.SaveChangesAsync();
+                // get wards already in database
+                var existingWards = await context.DeliveryFees
+                    .Select(x => x.Ward)
+                    .ToHashSetAsync();
+
+                // keep only rows that don't exist
+                var feesToInsert = deliveryFees
+                    .Where(x => !existingWards.Contains(x.Ward))
+                    .ToList();
+
+                if (feesToInsert.Any())
+                {
+                    context.DeliveryFees.AddRange(feesToInsert);
+                    await context.SaveChangesAsync();
+                }
             }
 
             //Schedule Seeding
@@ -351,13 +375,13 @@ namespace CleanAgricultureProductBE.Data
 
                     AddressId = await context.Set<Account>()
                                             .Where(a => a.Email == "user@gmail.com")
-                                            .Select(a => a.UserProfile.Addresses.Where(a => a.AddressDetail == "AAA")
+                                            .Select(a => a.UserProfile.Addresses.Where(a => a.AddressDetail == "Ba Đình TP.HCM Quận 8")
                                                                                 .Select(a => a.AddressId)
                                                                                 .FirstOrDefault())
                                             .FirstOrDefaultAsync(),
 
                     DeliveryFeeId = await context.Set<DeliveryFee>()
-                                                .Where(df => df.City == "HCM")
+                                                .Where(df => df.Ward == "Quận 8")
                                                 .Select(df => df.DeliveryFeeId)
                                                 .FirstOrDefaultAsync(),
 
