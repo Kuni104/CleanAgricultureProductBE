@@ -5,6 +5,7 @@
         public Guid AccountId { get; set; }
         public int RoleId { get; set; }
         public string Email { get; set; } = string.Empty;
+        public string? GoogleId { get; set; }
         public string PasswordHash { get; set; } = string.Empty;
         public string Status { get; set; } = string.Empty;
         public string PhoneNumber { get; set; } = string.Empty;
