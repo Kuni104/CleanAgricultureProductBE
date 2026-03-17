@@ -56,5 +56,31 @@ namespace CleanAgricultureProductBE.Repositories.Category
             await _context.SaveChangesAsync();
             return true;
         }
+
+        public async Task<List<CategoryModel>> GetAllWithPaginationAsync(int offset, int pageSize, string? status)
+        {
+            var query = _context.Categories.AsQueryable();
+
+            // Filter by status
+            if (!string.IsNullOrWhiteSpace(status))
+                query = query.Where(c => c.Status == status);
+
+            return await query
+                    .OrderByDescending(c => c.CategoryId)
+                .Skip(offset)
+                .Take(pageSize)
+                .ToListAsync();
+        }
+
+        public async Task<int> CountAllAsync(string? status)
+        {
+            var query = _context.Categories.AsQueryable();
+
+            // Filter by status
+            if (!string.IsNullOrWhiteSpace(status))
+                query = query.Where(c => c.Status == status);
+
+            return await query.CountAsync();
+        }
     }
 }

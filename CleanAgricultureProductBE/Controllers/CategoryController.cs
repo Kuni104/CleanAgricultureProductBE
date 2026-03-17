@@ -23,17 +23,20 @@ namespace CleanAgricultureProductBE.Controllers
         [HttpGet]
         [AllowAnonymous]
         [SwaggerOperation(Summary = "Lấy danh sách tất cả danh mục")]
-        public async Task<IActionResult> GetAllCategories()
+        public async Task<IActionResult> GetAllCategories(
+            [FromQuery] int? page,
+            [FromQuery] int? size,
+            [FromQuery] string? status)
         {
             try
             {
-                var categories = await _categoryService.GetAllCategoriesAsync();
+                var result = await _categoryService.GetAllCategoriesWithPaginationAsync(page, size, status);
                 return base.Ok(new ResponseObjectWithPagination<List<CategoryResponseDto>>
                 {
                     Success = "true",
                     Message = "Lấy danh sách danh mục thành công!",
-                    Data = categories,
-                    Pagination = null
+                    Data = result.ResultObject,
+                    Pagination = result.Pagination
                 });
             }
             catch (Exception ex)

@@ -1,4 +1,6 @@
 using CleanAgricultureProductBE.DTOs;
+using CleanAgricultureProductBE.DTOs.ApiResponse;
+using CleanAgricultureProductBE.DTOs.Response;
 using CleanAgricultureProductBE.Repositories.Product;
 using ProductModel = CleanAgricultureProductBE.Models.Product;
 
@@ -174,6 +176,50 @@ namespace CleanAgricultureProductBE.Services.Product
             await _productRepo.UpdateAsync(product);
 
             return true;
+        }
+
+        public async Task<ResponseDtoWithPagination<List<ProductResponseDto>>> GetAllProductsWithPaginationAsync(
+            int? page, int? size, Guid? categoryId, string? keyword, decimal? minPrice, decimal? maxPrice)
+        {
+            int pageSize = size ?? 10;
+            int pageNumber = page ?? 1;
+
+            if (pageNumber <= 0)
+                throw new ArgumentException("Số trang (page) phải lớn hơn 0");
+            if (pageSize <= 0)
+                throw new ArgumentException("Kích thước trang (size) phải lớn hơn 0");
+
+            int offset = (pageNumber - 1) * pageSize;
+
+            var products = await _productRepo.GetAllWithPaginationAsync(offset, pageSize, categoryId, keyword, minPrice, maxPrice);
+            var total = await _productRepo.CountAllAsync(categoryId, keyword, minPrice, maxPrice);
+
+            var result = new ResponseDtoWithPagination<List<ProductResponseDto>>
+            {
+                ResultObject = products
+                    .Where(p => p.Status == ProductStatus.Active)
+                    .Select(p => new ProductResponseDto
+                    {
+                        ProductId = p.ProductId,
+                        CategoryId = p.CategoryId,
+                        CategoryName = p.Category?.Name,
+                        Name = p.Name,
+                        Description = p.Description,
+                        Price = p.Price,
+                        Unit = p.Unit,
+                        Stock = p.Stock,
+                        Status = p.Status
+                    }).ToList(),
+                Pagination = new Pagination
+                {
+                    PageNumber = pageNumber,
+                    PageSize = pageSize,
+                    TotalItems = total,
+                    TotalPages = (int)Math.Ceiling((double)total / pageSize)
+                }
+            };
+
+            return result;
         }
     }
 }

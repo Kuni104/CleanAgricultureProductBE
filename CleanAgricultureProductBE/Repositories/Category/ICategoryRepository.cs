@@ -10,5 +10,7 @@ namespace CleanAgricultureProductBE.Repositories.Category
         Task<CategoryModel?> GetByNameAsync(string name);
         Task<CategoryModel> UpdateAsync(CategoryModel category);
         Task<bool> DeleteAsync(Guid id);
+        Task<List<CategoryModel>> GetAllWithPaginationAsync(int offset, int pageSize, string? status);
+        Task<int> CountAllAsync(string? status);
     }
 }

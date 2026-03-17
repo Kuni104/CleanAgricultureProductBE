@@ -1,4 +1,6 @@
 using CleanAgricultureProductBE.DTOs;
+using CleanAgricultureProductBE.DTOs.ApiResponse;
+using CleanAgricultureProductBE.DTOs.Response;
 using CleanAgricultureProductBE.Repositories.Category;
 using CategoryModel = CleanAgricultureProductBE.Models.Category;
 
@@ -134,6 +136,43 @@ namespace CleanAgricultureProductBE.Services.Category
                 Description = updated.Description,
                 Status = updated.Status
             };
+        }
+
+        public async Task<ResponseDtoWithPagination<List<CategoryResponseDto>>> GetAllCategoriesWithPaginationAsync(int? page, int? size, string? status)
+        {
+            int pageSize = size ?? 10;
+            int pageNumber = page ?? 1;
+
+            if (pageNumber <= 0)
+                throw new ArgumentException("Số trang (page) phải lớn hơn 0");
+            if (pageSize <= 0)
+                throw new ArgumentException("Kích thước trang (size) phải lớn hơn 0");
+
+            int offset = (pageNumber - 1) * pageSize;
+
+            var categories = await _categoryRepo.GetAllWithPaginationAsync(offset, pageSize, status);
+            var total = await _categoryRepo.CountAllAsync(status);
+
+            var result = new ResponseDtoWithPagination<List<CategoryResponseDto>>
+            {
+                ResultObject = categories
+                    .Select(c => new CategoryResponseDto
+                    {
+                        CategoryId = c.CategoryId,
+                        Name = c.Name,
+                        Description = c.Description,
+                        Status = c.Status
+                    }).ToList(),
+                Pagination = new Pagination
+                {
+                    PageNumber = pageNumber,
+                    PageSize = pageSize,
+                    TotalItems = total,
+                    TotalPages = (int)Math.Ceiling((double)total / pageSize)
+                }
+            };
+
+            return result;
         }
     }
 }

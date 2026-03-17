@@ -52,5 +52,53 @@ namespace CleanAgricultureProductBE.Repositories.Product
             await _context.SaveChangesAsync();
             return true;
         }
+
+        public async Task<List<ProductModel>> GetAllWithPaginationAsync(int offset, int pageSize, Guid? categoryId, string? keyword, decimal? minPrice, decimal? maxPrice)
+        {
+            var query = _context.Products
+                .Include(p => p.Category)
+                .AsQueryable();
+
+            // Filter by category
+            if (categoryId.HasValue && categoryId != Guid.Empty)
+                query = query.Where(p => p.CategoryId == categoryId);
+
+            // Search by keyword (product name)
+            if (!string.IsNullOrWhiteSpace(keyword))
+                query = query.Where(p => p.Name.Contains(keyword));
+
+            // Filter by price range
+            if (minPrice.HasValue)
+                query = query.Where(p => p.Price >= minPrice);
+            if (maxPrice.HasValue)
+                query = query.Where(p => p.Price <= maxPrice);
+
+            return await query
+                    .OrderByDescending(p => p.ProductId)
+                .Skip(offset)
+                .Take(pageSize)
+                .ToListAsync();
+        }
+
+        public async Task<int> CountAllAsync(Guid? categoryId, string? keyword, decimal? minPrice, decimal? maxPrice)
+        {
+            var query = _context.Products.AsQueryable();
+
+            // Filter by category
+            if (categoryId.HasValue && categoryId != Guid.Empty)
+                query = query.Where(p => p.CategoryId == categoryId);
+
+            // Search by keyword (product name)
+            if (!string.IsNullOrWhiteSpace(keyword))
+                query = query.Where(p => p.Name.Contains(keyword));
+
+            // Filter by price range
+            if (minPrice.HasValue)
+                query = query.Where(p => p.Price >= minPrice);
+            if (maxPrice.HasValue)
+                query = query.Where(p => p.Price <= maxPrice);
+
+            return await query.CountAsync();
+        }
     }
 }
