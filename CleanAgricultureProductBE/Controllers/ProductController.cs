@@ -25,18 +25,24 @@ namespace CleanAgricultureProductBE.Controllers
         // GET: api/Product - Tất cả user có thể xem
         [HttpGet]
         [AllowAnonymous]
-        [SwaggerOperation(Summary = "Lấy danh sách tất cả sản phẩm")]
-        public async Task<IActionResult> GetAllProducts()
+        [SwaggerOperation(Summary = "Lấy danh sách tất cả sản phẩm ")]
+        public async Task<IActionResult> GetAllProducts(
+            [FromQuery] int? page,
+            [FromQuery] int? size,
+            [FromQuery] Guid? categoryId,
+            [FromQuery] string? keyword,
+            [FromQuery] decimal? minPrice,
+            [FromQuery] decimal? maxPrice)
         {
             try
             {
-                var products = await _productService.GetAllProductsAsync();
+                var result = await _productService.GetAllProductsWithPaginationAsync(page, size, categoryId, keyword, minPrice, maxPrice);
                 return Ok(new ResponseObjectWithPagination<List<ProductResponseDto>>
                 {
                     Success = "true",
                     Message = "Lấy danh sách sản phẩm thành công",
-                    Data = products,
-                    Pagination = null
+                    Data = result.ResultObject,
+                    Pagination = result.Pagination
                 });
             }
             catch (Exception ex)

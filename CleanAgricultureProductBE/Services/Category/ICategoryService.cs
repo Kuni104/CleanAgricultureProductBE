@@ -1,4 +1,5 @@
 using CleanAgricultureProductBE.DTOs;
+using CleanAgricultureProductBE.DTOs.ApiResponse;
 
 namespace CleanAgricultureProductBE.Services.Category
 {
@@ -10,5 +11,6 @@ namespace CleanAgricultureProductBE.Services.Category
         Task<CategoryResponseDto> UpdateCategoryAsync(Guid id, UpdateCategoryDto dto);
         Task<bool> DeleteCategoryAsync(Guid id, bool confirm);
         Task<CategoryResponseDto> UpdateCategoryStatusAsync(Guid id, string status);
+        Task<ResponseDtoWithPagination<List<CategoryResponseDto>>> GetAllCategoriesWithPaginationAsync(int? page, int? size, string? status);
     }
 }
