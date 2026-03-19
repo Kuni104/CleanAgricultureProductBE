@@ -8,133 +8,144 @@ namespace CleanAgricultureProductBE.Data
     {
         public static async Task SeedAsync(AppDbContext context)
         {
-            
+            // Account + UserProfile seeding
 
-            //Account seeding
-            if (!await context.Set<Account>().AnyAsync())
+            var hasher = new PasswordHasher<Account>();
+
+            // ---- ACCOUNTS ----
+            var accountList = new List<Account>
+{
+            // Admin
+            new Account
             {
-                var hasher = new PasswordHasher<Account>();
+                AccountId = Guid.NewGuid(),
+                RoleId = 1,
+                Email = "admin@gmail.com",
+                PasswordHash = "12345",
+                Status = "Active",
+                PhoneNumber = "0123456789"
+            },
 
-                var accountList = new List<Account>
-                {
-                    new Account
-                    {
-                        AccountId = Guid.NewGuid(),
-                        RoleId = 1,
-                        Email = "admin@gmail.com",
-                        PasswordHash = "12345",
-                        Status = "Active",
-                        PhoneNumber = "0123456789"
-                    },
+            // Customers
+            new Account { AccountId = Guid.NewGuid(), RoleId = 2, Email = "user@gmail.com", PasswordHash = "12345", Status = "Active" },
+            new Account { AccountId = Guid.NewGuid(), RoleId = 2, Email = "user2@gmail.com", PasswordHash = "12345", Status = "Active" },
+            new Account { AccountId = Guid.NewGuid(), RoleId = 2, Email = "user3@gmail.com", PasswordHash = "12345", Status = "Active" },
+            new Account { AccountId = Guid.NewGuid(), RoleId = 2, Email = "user4@gmail.com", PasswordHash = "12345", Status = "Active" },
+            new Account { AccountId = Guid.NewGuid(), RoleId = 2, Email = "user5@gmail.com", PasswordHash = "12345", Status = "Active" },
+            new Account { AccountId = Guid.NewGuid(), RoleId = 2, Email = "user6@gmail.com", PasswordHash = "12345", Status = "Active" },
+            new Account { AccountId = Guid.NewGuid(), RoleId = 2, Email = "user7@gmail.com", PasswordHash = "12345", Status = "Active" },
+            new Account { AccountId = Guid.NewGuid(), RoleId = 2, Email = "user8@gmail.com", PasswordHash = "12345", Status = "Active" },
+            new Account { AccountId = Guid.NewGuid(), RoleId = 2, Email = "user9@gmail.com", PasswordHash = "12345", Status = "Active" },
+            new Account { AccountId = Guid.NewGuid(), RoleId = 2, Email = "user10@gmail.com", PasswordHash = "12345", Status = "Active" },
+            new Account { AccountId = Guid.NewGuid(), RoleId = 2, Email = "user11@gmail.com", PasswordHash = "12345", Status = "Active" },
 
-                    new Account
-                    {
-                        AccountId = Guid.NewGuid(),
-                        RoleId = 2,
-                        Email = "user@gmail.com",
-                        PasswordHash = "12345",
-                        Status = "Active",
-                    },
+            // Staff
+            new Account { AccountId = Guid.NewGuid(), RoleId = 3, Email = "staff@gmail.com", PasswordHash = "12345", Status = "Active" },
+            new Account { AccountId = Guid.NewGuid(), RoleId = 3, Email = "staff2@gmail.com", PasswordHash = "12345", Status = "Active" },
+            new Account { AccountId = Guid.NewGuid(), RoleId = 3, Email = "staff3@gmail.com", PasswordHash = "12345", Status = "Active" },
+            new Account { AccountId = Guid.NewGuid(), RoleId = 3, Email = "staff4@gmail.com", PasswordHash = "12345", Status = "Active" },
 
-                    new Account
-                    {
-                        AccountId = Guid.NewGuid(),
-                        RoleId = 3,
-                        Email = "staff@gmail.com",
-                        PasswordHash = "12345",
-                        Status = "Active",
-                    },
+            // Delivery
+            new Account { AccountId = Guid.NewGuid(), RoleId = 4, Email = "delivery@gmail.com", PasswordHash = "12345", Status = "Active" },
+            new Account { AccountId = Guid.NewGuid(), RoleId = 4, Email = "delivery2@gmail.com", PasswordHash = "12345", Status = "Active" },
+            new Account { AccountId = Guid.NewGuid(), RoleId = 4, Email = "delivery3@gmail.com", PasswordHash = "12345", Status = "Active" },
+            new Account { AccountId = Guid.NewGuid(), RoleId = 4, Email = "delivery4@gmail.com", PasswordHash = "12345", Status = "Active" },
+            };
 
-                    new Account
-                    {
-                        AccountId = Guid.NewGuid(),
-                        RoleId = 4,
-                        Email = "delivery@gmail.com",
-                        PasswordHash = "12345",
-                        Status = "Active",
-                    }
-                };
-
-                foreach (var account in accountList)
-                {
-                    account.PasswordHash = hasher.HashPassword(account, account.PasswordHash);
-                }
-
-                context.Accounts.AddRange(accountList);
-                await context.SaveChangesAsync();
-
+            // Hash passwords
+            foreach (var acc in accountList)
+            {
+                acc.PasswordHash = hasher.HashPassword(acc, acc.PasswordHash);
             }
 
-            //UserProfile seeding
-            //if (!await context.Set<UserProfile>().AnyAsync())
-            if(true)
+            // Get existing emails
+            var existingEmails = await context.Set<Account>()
+                .Select(a => a.Email)
+                .ToListAsync();
+
+            // Insert only new accounts
+            var newAccounts = accountList
+                .Where(a => !existingEmails.Contains(a.Email))
+                .ToList();
+
+            if (newAccounts.Any())
             {
-                var userProfileList = new List<UserProfile>
-                {
-                    new UserProfile
-                    {
-                        UserProfileId = Guid.NewGuid(),
-                        AccountId = context.Set<Account>()
-                                        .Where(a => a.Email == "admin@gmail.com")
-                                        .Select(a => a.AccountId)
-                                        .FirstOrDefault(),
-                        FirstName = "John",
-                        LastName = "Admin"
-                    },
-                    new UserProfile
-                    {
-                        UserProfileId = Guid.NewGuid(),
-                        AccountId = context.Set<Account>()
-                                        .Where(a => a.Email == "user@gmail.com")
-                                        .Select(a => a.AccountId)
-                                        .FirstOrDefault(),
-                        FirstName = "John",
-                        LastName = "Doe"
-                    },
-                    new UserProfile
-                    {
-                        UserProfileId = Guid.NewGuid(),
-                        AccountId = context.Set<Account>()
-                                        .Where(a => a.Email == "staff@gmail.com")
-                                        .Select(a => a.AccountId)
-                                        .FirstOrDefault(),
-                        FirstName = "John",
-                        LastName = "Staff"
-                    },
-                    new UserProfile
-                    {
-                        UserProfileId = Guid.NewGuid(),
-                        AccountId = context.Set<Account>()
-                                        .Where(a => a.Email == "delivery@gmail.com")
-                                        .Select(a => a.AccountId)
-                                        .FirstOrDefault(),
-                        FirstName = "John",
-                        LastName = "Deliverer"
-                    }
-                };
-                
-                var existUserProfiles = await context.Set<UserProfile>()
-                                            .Where(up => userProfileList.Select(u => u.AccountId).Contains(up.AccountId))
-                                            .ToListAsync();
-
-                var newUserProfiles = userProfileList
-                                    .Where(up => !existUserProfiles.Any(eup => eup.AccountId == up.AccountId))
-                                    .ToList();
-
-                context.Set<UserProfile>().AddRange(newUserProfiles);
+                context.Accounts.AddRange(newAccounts);
                 await context.SaveChangesAsync();
             }
 
-            //Address Seeding
-            if (!await context.Set<Address>().AnyAsync())
+            // ---- USER PROFILES ----
+
+            // Always rebuild dictionary from DB (safe even if partial insert happened)
+            var accountDict = await context.Set<Account>()
+                .ToDictionaryAsync(a => a.Email, a => a.AccountId);
+
+            var userProfileList = new List<UserProfile>
+        {
+            new UserProfile { UserProfileId = Guid.NewGuid(), AccountId = accountDict["admin@gmail.com"], FirstName = "John", LastName = "Admin" },
+
+            // Customers
+            new UserProfile { UserProfileId = Guid.NewGuid(), AccountId = accountDict["user@gmail.com"], FirstName = "John", LastName = "Doe" },
+            new UserProfile { UserProfileId = Guid.NewGuid(), AccountId = accountDict["user2@gmail.com"], FirstName = "User", LastName = "2" },
+            new UserProfile { UserProfileId = Guid.NewGuid(), AccountId = accountDict["user3@gmail.com"], FirstName = "User", LastName = "3" },
+            new UserProfile { UserProfileId = Guid.NewGuid(), AccountId = accountDict["user4@gmail.com"], FirstName = "User", LastName = "4" },
+            new UserProfile { UserProfileId = Guid.NewGuid(), AccountId = accountDict["user5@gmail.com"], FirstName = "User", LastName = "5" },
+            new UserProfile { UserProfileId = Guid.NewGuid(), AccountId = accountDict["user6@gmail.com"], FirstName = "User", LastName = "6" },
+            new UserProfile { UserProfileId = Guid.NewGuid(), AccountId = accountDict["user7@gmail.com"], FirstName = "User", LastName = "7" },
+            new UserProfile { UserProfileId = Guid.NewGuid(), AccountId = accountDict["user8@gmail.com"], FirstName = "User", LastName = "8" },
+            new UserProfile { UserProfileId = Guid.NewGuid(), AccountId = accountDict["user9@gmail.com"], FirstName = "User", LastName = "9" },
+            new UserProfile { UserProfileId = Guid.NewGuid(), AccountId = accountDict["user10@gmail.com"], FirstName = "User", LastName = "10" },
+            new UserProfile { UserProfileId = Guid.NewGuid(), AccountId = accountDict["user11@gmail.com"], FirstName = "User", LastName = "11" },
+
+            // Staff
+            new UserProfile { UserProfileId = Guid.NewGuid(), AccountId = accountDict["staff@gmail.com"], FirstName = "John", LastName = "Staff1" },
+            new UserProfile { UserProfileId = Guid.NewGuid(), AccountId = accountDict["staff2@gmail.com"], FirstName = "John", LastName = "Staff2" },
+            new UserProfile { UserProfileId = Guid.NewGuid(), AccountId = accountDict["staff3@gmail.com"], FirstName = "John", LastName = "Staff3" },
+            new UserProfile { UserProfileId = Guid.NewGuid(), AccountId = accountDict["staff4@gmail.com"], FirstName = "John", LastName = "Staff4" },
+
+            // Delivery
+            new UserProfile { UserProfileId = Guid.NewGuid(), AccountId = accountDict["delivery@gmail.com"], FirstName = "John", LastName = "Delivery1" },
+            new UserProfile { UserProfileId = Guid.NewGuid(), AccountId = accountDict["delivery2@gmail.com"], FirstName = "John", LastName = "Delivery2" },
+            new UserProfile { UserProfileId = Guid.NewGuid(), AccountId = accountDict["delivery3@gmail.com"], FirstName = "John", LastName = "Delivery3" },
+            new UserProfile { UserProfileId = Guid.NewGuid(), AccountId = accountDict["delivery4@gmail.com"], FirstName = "John", LastName = "Delivery4" },
+};
+
+            // Get existing AccountIds in UserProfile
+            var existingProfileAccountIds = await context.Set<UserProfile>()
+                .Select(up => up.AccountId)
+                .ToListAsync();
+
+            // Insert only profiles that don’t exist
+            var newProfiles = userProfileList
+                .Where(up => !existingProfileAccountIds.Contains(up.AccountId))
+                .ToList();
+
+            if (newProfiles.Any())
             {
-                var useraddress = new Address
+                context.Set<UserProfile>().AddRange(newProfiles);
+                await context.SaveChangesAsync();
+            }
+
+            // ---- ADDRESS SEEDING ----
+
+            // Get all customer profiles (RoleId = 2)
+            var customerProfiles = await context.UserProfiles
+                .Include(up => up.Account)
+                .Where(up => up.Account.RoleId == 2)
+                .ToListAsync();
+
+            // Get existing addresses (by UserProfileId)
+            var existingAddressProfileIds = await context.Addresses
+                .Select(a => a.UserProfileId)
+                .ToListAsync();
+
+            // Prepare new addresses (same info for all)
+            var newAddresses = customerProfiles
+                .Where(up => !existingAddressProfileIds.Contains(up.UserProfileId))
+                .Select(up => new Address
                 {
                     AddressId = Guid.NewGuid(),
-                    UserProfileId = context.UserProfiles.Include(uf => uf.Account)
-                                                        .Where(a => a.Account.Email == "user@gmail.com")
-                                                        .Select(a => a.UserProfileId)
-                                                        .FirstOrDefault(),
+                    UserProfileId = up.UserProfileId,
                     RecipientName = "John Doe",
                     RecipientPhone = "1023456789",
                     Ward = "Quận 8",
@@ -142,13 +153,17 @@ namespace CleanAgricultureProductBE.Data
                     City = "HCM",
                     AddressDetail = "Ba Đình TP.HCM Quận 8",
                     IsDefault = true
-                };
+                })
+                .ToList();
 
-                context.Addresses.Add(useraddress);
+            // Insert only missing ones
+            if (newAddresses.Any())
+            {
+                context.Addresses.AddRange(newAddresses);
                 await context.SaveChangesAsync();
             }
 
-            //Cart seeding
+            //CART SEEDING
             if (!await context.Set<Cart>().AnyAsync())
             {
 
@@ -169,84 +184,108 @@ namespace CleanAgricultureProductBE.Data
                 await context.SaveChangesAsync();
             }
 
-            //Category seeding
-            if (!await context.Set<Category>().AnyAsync())
-            {
-                var categories = new List<Category>
-                {
-                    new Category { CategoryId = Guid.NewGuid(), Name = "Fruits", Description = "Fresh fruits", Status = "Active" },
-                    new Category { CategoryId = Guid.NewGuid(), Name = "Vegetables", Description = "Fresh vegetables", Status = "Active" },
-                    new Category { CategoryId = Guid.NewGuid(), Name = "Grains", Description = "Healthy grains", Status = "Active" }
-                };
+            // ---- AGRICULTURE CATEGORY SEEDING ----
 
-                context.Set<Category>().AddRange(categories);
+            var categories = new List<Category>
+            {
+            new Category { CategoryId = Guid.NewGuid(), Name = "Fruits", Description = "Fresh fruits from farms", Status = "Active" },
+            new Category { CategoryId = Guid.NewGuid(), Name = "Vegetables", Description = "Fresh vegetables from farms", Status = "Active" },
+            new Category { CategoryId = Guid.NewGuid(), Name = "Grains", Description = "Cereal crops like wheat, corn, rice", Status = "Active" },
+
+            new Category { CategoryId = Guid.NewGuid(), Name = "Seeds", Description = "Seeds for planting crops", Status = "Active" },
+            new Category { CategoryId = Guid.NewGuid(), Name = "Seedlings", Description = "Young plants ready for transplanting", Status = "Active" },
+            new Category { CategoryId = Guid.NewGuid(), Name = "Fertilizers", Description = "Soil nutrients and fertilizers", Status = "Active" },
+            new Category { CategoryId = Guid.NewGuid(), Name = "Pesticides", Description = "Crop protection chemicals", Status = "Active" },
+            new Category { CategoryId = Guid.NewGuid(), Name = "Herbicides", Description = "Weed control products", Status = "Active" },
+
+            new Category { CategoryId = Guid.NewGuid(), Name = "Animal Feed", Description = "Feed for livestock", Status = "Active" },
+            new Category { CategoryId = Guid.NewGuid(), Name = "Livestock", Description = "Farm animals like cattle, pigs, poultry", Status = "Active" },
+
+            new Category { CategoryId = Guid.NewGuid(), Name = "Dairy Products", Description = "Milk and dairy from farms", Status = "Active" },
+            new Category { CategoryId = Guid.NewGuid(), Name = "Eggs", Description = "Fresh farm eggs", Status = "Active" },
+
+            new Category { CategoryId = Guid.NewGuid(), Name = "Organic Produce", Description = "Certified organic agricultural products", Status = "Active" },
+            new Category { CategoryId = Guid.NewGuid(), Name = "Aquaculture", Description = "Fish and aquatic farming products", Status = "Active" },
+
+            new Category { CategoryId = Guid.NewGuid(), Name = "Farm Equipment", Description = "Tools and machinery for farming", Status = "Active" },
+            new Category { CategoryId = Guid.NewGuid(), Name = "Irrigation", Description = "Water supply and irrigation systems", Status = "Active" },
+
+            new Category { CategoryId = Guid.NewGuid(), Name = "Soil Amendments", Description = "Materials to improve soil quality", Status = "Active" },
+            new Category { CategoryId = Guid.NewGuid(), Name = "Compost", Description = "Organic compost and waste recycling", Status = "Active" },
+
+            new Category { CategoryId = Guid.NewGuid(), Name = "Spices and Herbs", Description = "Cultivated herbs and spices", Status = "Active" },
+            new Category { CategoryId = Guid.NewGuid(), Name = "Plantation Crops", Description = "Coffee, tea, rubber and similar crops", Status = "Active" }
+            };
+
+            // Get existing category names
+            var existingNames = await context.Set<Category>()
+                .Select(c => c.Name)
+                .ToListAsync();
+
+            // Insert only missing ones
+            var newCategories = categories
+                .Where(c => !existingNames.Contains(c.Name))
+                .ToList();
+
+            if (newCategories.Any())
+            {
+                context.Set<Category>().AddRange(newCategories);
                 await context.SaveChangesAsync();
             }
 
-            //Product seeding
-            if (!await context.Set<Product>().AnyAsync())
-            {
-                var products = new List<Product>
-                {
-                    new Product
-                    {
-                        ProductId = Guid.NewGuid(),
-                        CategoryId = context.Set<Category>()
-                                            .Where(c => c.Name == "Fruits")
-                                            .Select(c => c.CategoryId)
-                                            .FirstOrDefault(),
-                        Name = "Apple",
-                        Description = "Fresh red apples",
-                        Price = 10000,
-                        Unit = "kg",
-                        Stock = 100,
-                        Status = "Active",
-                    },
-                    new Product
-                    {
-                        ProductId = Guid.NewGuid(),
-                        CategoryId = context.Set<Category>()
-                                            .Where(c => c.Name == "Fruits")
-                                            .Select(c => c.CategoryId)
-                                            .FirstOrDefault(),
-                        Name = "Peach",
-                        Description = "Fresh Peach Made In Heaven",
-                        Price = 10400,
-                        Unit = "kg",
-                        Stock = 104,
-                        Status = "Active"
-                    },
-                    new Product
-                    {
-                        ProductId = Guid.NewGuid(),
-                        CategoryId = context.Set<Category>()
-                                            .Where(c => c.Name == "Vegetables")
-                                            .Select(c => c.CategoryId)
-                                            .FirstOrDefault(),
-                        Name = "Carrot",
-                        Description = "Organic carrots",
-                        Price = 8000,
-                        Unit = "kg",
-                        Stock = 150,
-                        Status = "Active"
-                    },
-                    new Product
-                    {
-                        ProductId = Guid.NewGuid(),
-                        CategoryId = context.Set<Category>()
-                                            .Where(c => c.Name == "Grains")
-                                            .Select(c => c.CategoryId)
-                                            .FirstOrDefault(),
-                        Name = "Rice",
-                        Description = "Brown rice",
-                        Price = 25000,
-                        Unit = "kg",
-                        Stock = 200,
-                        Status = "Active"
-                    }
-                };
+            // ---- PRODUCT SEEDING ----
 
-                context.Set<Product>().AddRange(products);
+            // Build category lookup once
+            var categoryDict = await context.Set<Category>()
+                .ToDictionaryAsync(c => c.Name, c => c.CategoryId);
+
+            var products = new List<Product>
+            {
+            // Existing
+            new Product { ProductId = Guid.NewGuid(), CategoryId = categoryDict["Fruits"], Name = "Apple", Description = "Fresh red apples", Price = 10000, Unit = "kg", Stock = 100, Status = "Active" },
+            new Product { ProductId = Guid.NewGuid(), CategoryId = categoryDict["Fruits"], Name = "Peach", Description = "Fresh peaches", Price = 10400, Unit = "kg", Stock = 104, Status = "Active" },
+            new Product { ProductId = Guid.NewGuid(), CategoryId = categoryDict["Vegetables"], Name = "Carrot", Description = "Organic carrots", Price = 8000, Unit = "kg", Stock = 150, Status = "Active" },
+            new Product { ProductId = Guid.NewGuid(), CategoryId = categoryDict["Grains"], Name = "Rice", Description = "Brown rice", Price = 25000, Unit = "kg", Stock = 200, Status = "Active" },
+
+            // Additional 16 (1 product per category)
+            new Product { ProductId = Guid.NewGuid(), CategoryId = categoryDict["Seeds"], Name = "Corn Seeds", Description = "High yield corn seeds", Price = 50000, Unit = "bag", Stock = 50, Status = "Active" },
+            new Product { ProductId = Guid.NewGuid(), CategoryId = categoryDict["Seedlings"], Name = "Tomato Seedlings", Description = "Healthy tomato plants", Price = 3000, Unit = "plant", Stock = 200, Status = "Active" },
+            new Product { ProductId = Guid.NewGuid(), CategoryId = categoryDict["Fertilizers"], Name = "NPK Fertilizer", Description = "Balanced fertilizer", Price = 200000, Unit = "bag", Stock = 80, Status = "Active" },
+            new Product { ProductId = Guid.NewGuid(), CategoryId = categoryDict["Pesticides"], Name = "Insecticide A", Description = "Protect crops from pests", Price = 120000, Unit = "bottle", Stock = 60, Status = "Active" },
+            new Product { ProductId = Guid.NewGuid(), CategoryId = categoryDict["Herbicides"], Name = "Weed Killer", Description = "Effective weed control", Price = 110000, Unit = "bottle", Stock = 70, Status = "Active" },
+
+            new Product { ProductId = Guid.NewGuid(), CategoryId = categoryDict["Animal Feed"], Name = "Chicken Feed", Description = "Nutritional poultry feed", Price = 180000, Unit = "bag", Stock = 90, Status = "Active" },
+            new Product { ProductId = Guid.NewGuid(), CategoryId = categoryDict["Livestock"], Name = "Young Pig", Description = "Healthy piglet", Price = 1500000, Unit = "unit", Stock = 20, Status = "Active" },
+
+            new Product { ProductId = Guid.NewGuid(), CategoryId = categoryDict["Dairy Products"], Name = "Fresh Milk", Description = "Raw cow milk", Price = 30000, Unit = "liter", Stock = 120, Status = "Active" },
+            new Product { ProductId = Guid.NewGuid(), CategoryId = categoryDict["Eggs"], Name = "Chicken Eggs", Description = "Farm fresh eggs", Price = 25000, Unit = "dozen", Stock = 200, Status = "Active" },
+
+            new Product { ProductId = Guid.NewGuid(), CategoryId = categoryDict["Organic Produce"], Name = "Organic Lettuce", Description = "Certified organic lettuce", Price = 15000, Unit = "kg", Stock = 100, Status = "Active" },
+            new Product { ProductId = Guid.NewGuid(), CategoryId = categoryDict["Aquaculture"], Name = "Tilapia Fish", Description = "Fresh farmed fish", Price = 60000, Unit = "kg", Stock = 70, Status = "Active" },
+
+            new Product { ProductId = Guid.NewGuid(), CategoryId = categoryDict["Farm Equipment"], Name = "Hand Tractor", Description = "Small farming tractor", Price = 15000000, Unit = "unit", Stock = 10, Status = "Active" },
+            new Product { ProductId = Guid.NewGuid(), CategoryId = categoryDict["Irrigation"], Name = "Water Pump", Description = "Irrigation water pump", Price = 2500000, Unit = "unit", Stock = 25, Status = "Active" },
+
+            new Product { ProductId = Guid.NewGuid(), CategoryId = categoryDict["Soil Amendments"], Name = "Lime Powder", Description = "Improve soil pH", Price = 90000, Unit = "bag", Stock = 60, Status = "Active" },
+            new Product { ProductId = Guid.NewGuid(), CategoryId = categoryDict["Compost"], Name = "Organic Compost", Description = "Natural compost fertilizer", Price = 70000, Unit = "bag", Stock = 100, Status = "Active" },
+
+            new Product { ProductId = Guid.NewGuid(), CategoryId = categoryDict["Spices and Herbs"], Name = "Black Pepper", Description = "Dried pepper seeds", Price = 120000, Unit = "kg", Stock = 40, Status = "Active" },
+            new Product { ProductId = Guid.NewGuid(), CategoryId = categoryDict["Plantation Crops"], Name = "Coffee Beans", Description = "Raw coffee beans", Price = 130000, Unit = "kg", Stock = 80, Status = "Active" }
+            };
+
+            // Get existing product names
+            var existingNamesProduct = await context.Set<Product>()
+                .Select(p => p.Name)
+                .ToListAsync();
+
+            // Insert only new ones
+            var newProducts = products
+                .Where(p => !existingNamesProduct.Contains(p.Name))
+                .ToList();
+
+            if (newProducts.Any())
+            {
+                context.Set<Product>().AddRange(newProducts);
                 await context.SaveChangesAsync();
             }
 
