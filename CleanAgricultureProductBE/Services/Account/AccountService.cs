@@ -2,6 +2,7 @@
 using CleanAgricultureProductBE.DTOs.ApiResponse;
 using CleanAgricultureProductBE.DTOs.Order;
 using CleanAgricultureProductBE.DTOs.Response;
+using CleanAgricultureProductBE.Enum;
 using CleanAgricultureProductBE.Models;
 using CleanAgricultureProductBE.Repositories;
 using CleanAgricultureProductBE.Repositories.Order;
@@ -11,7 +12,7 @@ namespace CleanAgricultureProductBE.Services.Account
 {
     public class AccountService(IAccountRepository accountRepository) : IAccountService
     {
-        public async Task<ResponseDtoWithPagination<List<AccountResponseDto>>> GetAllAccounts(int? page, int? size, string? keyword)
+        public async Task<ResponseDtoWithPagination<List<AccountResponseDto>>> GetAllAccounts(int? page, int? size, string? keyword, AccountRoleEnum accountRole)
         {
             bool isPagination = false;
             int offset = 0;
@@ -28,13 +29,13 @@ namespace CleanAgricultureProductBE.Services.Account
                 isPagination = true;
             }
 
-            var accounts = await accountRepository.GetAllAccountsAsync();
+            var accounts = await accountRepository.GetAllAccountsAsync(accountRole);
 
             int totalItems = accounts.Count;
 
             if (isPagination)
             {
-                accounts = await accountRepository.GetAllAccountsWithPaginationAsync(offset, pageSize, keyword);
+                accounts = await accountRepository.GetAllAccountsWithPaginationAsync(offset, pageSize, keyword, accountRole);
             }
 
             var accountResponseList = new List<AccountResponseDto>();

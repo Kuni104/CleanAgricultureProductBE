@@ -316,7 +316,7 @@ namespace CleanAgricultureProductBE.Services.Auth
                 if (dto.PhoneNumber.Length != 10)
                     throw new Exception("Số điện thoại phải có 10 chữ số");
 
-                var allAccounts = await _accountRepo.GetAllAccountsAsync();
+                var allAccounts = await _accountRepo.GetAllAccountsAsync(Enum.AccountRoleEnum.All);
                 var existingPhone = allAccounts.Any(x => x.PhoneNumber == dto.PhoneNumber);
                 if (existingPhone)
                     throw new Exception("Số điện thoại đã được sử dụng");
