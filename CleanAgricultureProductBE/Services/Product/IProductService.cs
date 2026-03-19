@@ -1,5 +1,6 @@
 using CleanAgricultureProductBE.DTOs;
 using CleanAgricultureProductBE.DTOs.ApiResponse;
+using CleanAgricultureProductBE.Enum;
 
 namespace CleanAgricultureProductBE.Services.Product
 {
@@ -12,6 +13,6 @@ namespace CleanAgricultureProductBE.Services.Product
         Task<bool> DeleteProductAsync(Guid id, bool confirm);
         Task<bool> UpdateProductStatusAsync(Guid productId, string status);
         Task<ResponseDtoWithPagination<List<ProductResponseDto>>> GetAllProductsWithPaginationAsync(
-            int? page, int? size, Guid? categoryId, string? keyword, decimal? minPrice, decimal? maxPrice);
+            int? page, int? size, Guid? categoryId, string? keyword, decimal? minPrice, decimal? maxPrice, ProductStatusEnum productStatus);
     }
 }

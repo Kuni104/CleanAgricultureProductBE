@@ -1,6 +1,7 @@
 using CleanAgricultureProductBE.DTOs;
 using CleanAgricultureProductBE.DTOs.ApiResponse;
 using CleanAgricultureProductBE.DTOs.Response;
+using CleanAgricultureProductBE.Enum;
 using CleanAgricultureProductBE.Repositories.Product;
 using ProductModel = CleanAgricultureProductBE.Models.Product;
 
@@ -179,7 +180,7 @@ namespace CleanAgricultureProductBE.Services.Product
         }
 
         public async Task<ResponseDtoWithPagination<List<ProductResponseDto>>> GetAllProductsWithPaginationAsync(
-            int? page, int? size, Guid? categoryId, string? keyword, decimal? minPrice, decimal? maxPrice)
+            int? page, int? size, Guid? categoryId, string? keyword, decimal? minPrice, decimal? maxPrice, ProductStatusEnum productStatus)
         {
             int pageSize = size ?? 10;
             int pageNumber = page ?? 1;
@@ -191,13 +192,13 @@ namespace CleanAgricultureProductBE.Services.Product
 
             int offset = (pageNumber - 1) * pageSize;
 
-            var products = await _productRepo.GetAllWithPaginationAsync(offset, pageSize, categoryId, keyword, minPrice, maxPrice);
+            var products = await _productRepo.GetAllWithPaginationAsync(offset, pageSize, categoryId, keyword, minPrice, maxPrice, productStatus);
             var total = await _productRepo.CountAllAsync(categoryId, keyword, minPrice, maxPrice);
 
             var result = new ResponseDtoWithPagination<List<ProductResponseDto>>
             {
                 ResultObject = products
-                    .Where(p => p.Status == ProductStatus.Active)
+                    //.Where(p => p.Status == ProductStatus.Active)
                     .Select(p => new ProductResponseDto
                     {
                         ProductId = p.ProductId,
