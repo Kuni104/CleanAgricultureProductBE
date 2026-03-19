@@ -22,13 +22,26 @@ namespace CleanAgricultureProductBE.Repositories
 
         public async Task<List<Account>> GetAllAccountsWithPaginationAsync(int offset, int pageSize, string keyword)
         {
-            return await _context.Accounts.Where(a => a.Email.Contains(keyword) || a.UserProfile.FirstName.Contains(keyword) || a.UserProfile.LastName.Contains(keyword))
+            if (string.IsNullOrEmpty(keyword))
+            {
+                return await _context.Accounts
                                           .Include(a => a.UserProfile)
                                           .Include(a => a.Role)
                                           .OrderBy(a => a.RoleId)
                                           .Skip(offset)
                                           .Take(pageSize)
                                           .ToListAsync();
+            }
+            else
+            {
+                return await _context.Accounts.Where(a => a.Email.Contains(keyword) || a.UserProfile.FirstName.Contains(keyword) || a.UserProfile.LastName.Contains(keyword))
+                                              .Include(a => a.UserProfile)
+                                              .Include(a => a.Role)
+                                              .OrderBy(a => a.RoleId)
+                                              .Skip(offset)
+                                              .Take(pageSize)
+                                              .ToListAsync();
+            }
         }
 
         public async Task<Account> CreateAsync(Account account)
