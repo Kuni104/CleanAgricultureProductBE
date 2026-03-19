@@ -73,7 +73,19 @@ namespace CleanAgricultureProductBE.Controllers
         {
             try
             {
-            var success = "";
+
+            if (!string.IsNullOrEmpty(keyword))
+            {
+                if (page == null || page <= 0 || size == null || size <= 0)
+                {
+                    return BadRequest(new ResponseObject<string>
+                    {
+                        Success = "false",
+                        Message = "Nếu có keyword không được để trống page và size"
+                    });
+                }
+            }
+                var success = "";
             var message = "";
 
             var accountEmail = User.FindFirstValue(ClaimTypes.Email);

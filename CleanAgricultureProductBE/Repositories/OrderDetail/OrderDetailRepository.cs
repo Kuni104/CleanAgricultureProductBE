@@ -21,7 +21,7 @@ namespace CleanAgricultureProductBE.Repositories.OrderDetail
 
         public async Task<List<Models.OrderDetail>> GetOrderDetailsByOrderIdWithPagination(Guid orderId, int offset, int pageSize, string? keyword)
         {
-            if (string.IsNullOrEmpty(keyword))
+            if (!string.IsNullOrEmpty(keyword))
             {
                 return await context.OrderDetails
                                             .Where(od => od.Product.Name.Trim().ToLower().Contains(keyword.Trim().ToLower()))

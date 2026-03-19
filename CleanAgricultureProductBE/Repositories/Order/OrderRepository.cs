@@ -25,7 +25,7 @@ namespace CleanAgricultureProductBE.Repositories.Order
 
         public async Task<List<Models.Order>> GetAllOrdersWithPagination(int offset, int pageSize, string keyword)
         {
-            if (string.IsNullOrEmpty(keyword))
+            if (!string.IsNullOrEmpty(keyword))
             {
                 return await context.Orders
                                        .Where(o => o.OrderDetails.Any(od => od.Product.Name.Trim().ToLower().Contains(keyword.Trim().ToLower())))
@@ -91,7 +91,7 @@ namespace CleanAgricultureProductBE.Repositories.Order
 
         public async Task<List<Models.Order>> GetOrdersByCustomerIdWithPagination(Guid customerId, int offset, int pageSize, string keyword)
         {
-            if (string.IsNullOrEmpty(keyword))
+            if (!string.IsNullOrEmpty(keyword))
             {
                 return await context.Orders
                                        .Where(o => o.OrderDetails.Any(od => od.Product.Name.Trim().ToLower().Contains(keyword.Trim().ToLower())))
@@ -136,7 +136,7 @@ namespace CleanAgricultureProductBE.Repositories.Order
 
         public async Task<List<Models.Order>> GetAllOrdersInScheduleWithPagination(Guid scheduleId, int offset, int pageSize, string keyword)
         {
-            if (string.IsNullOrEmpty(keyword))
+            if (!string.IsNullOrEmpty(keyword))
             {
                 return await context.Orders
                                            .Where(o => o.OrderDetails.Any(od => od.Product.Name.Trim().ToLower().Contains(keyword.Trim().ToLower())))
