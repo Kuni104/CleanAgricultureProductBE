@@ -43,7 +43,7 @@ namespace CleanAgricultureProductBE.Repositories
 
         public async Task<List<Account>> GetAllAccountsWithPaginationAsync(int offset, int pageSize, string keyword, AccountRoleEnum accountRoleEnum)
         {
-            if (!string.IsNullOrEmpty(keyword))
+            if (string.IsNullOrEmpty(keyword))
             {
                 var query = _context.Accounts
                 .Include(a => a.UserProfile)
