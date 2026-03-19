@@ -14,11 +14,31 @@ namespace CleanAgricultureProductBE.Repositories
             _context = context;
         }
 
-        public async Task<List<Account>> GetAllAccountsAsync()
+        public async Task<List<Account>> GetAllAccountsAsync(AccountRoleEnum accountRoleEnum)
         {
-            return await _context.Accounts.Include(a => a.UserProfile)
-                                          .Include(a => a.Role)
-                                          .ToListAsync();
+            var query = _context.Accounts
+                .Include(a => a.UserProfile)
+                .Include(a => a.Role)
+                .AsQueryable();
+
+            if (accountRoleEnum == AccountRoleEnum.Admin)
+            {
+                query = query.Where(a => a.RoleId == 1);
+            }
+            else if (accountRoleEnum == AccountRoleEnum.Customer)
+            {
+                query = query.Where(a => a.RoleId == 2);
+            }
+            else if (accountRoleEnum == AccountRoleEnum.Staff)
+            {
+                query = query.Where(a => a.RoleId == 3);
+            }
+            else if (accountRoleEnum == AccountRoleEnum.DeliveryPerson)
+            {
+                query = query.Where(a => a.RoleId == 4);
+            }
+
+            return await query.ToListAsync();
         }
 
         public async Task<List<Account>> GetAllAccountsWithPaginationAsync(int offset, int pageSize, string keyword, AccountRoleEnum accountRoleEnum)

@@ -5,7 +5,7 @@ namespace CleanAgricultureProductBE.Repositories
 {
     public interface IAccountRepository
     {
-        public Task<List<Account>> GetAllAccountsAsync();
+        public Task<List<Account>> GetAllAccountsAsync(AccountRoleEnum accountRole);
         public Task<List<Account>> GetAllAccountsWithPaginationAsync(int offset, int pageSize, string keyword, AccountRoleEnum accountRole);
         public Task<Account?> GetByIdAsync(Guid accountId);
         public Task<Account?> GetByEmailAsync(string email);

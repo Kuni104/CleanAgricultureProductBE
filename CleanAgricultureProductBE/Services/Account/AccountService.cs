@@ -29,7 +29,7 @@ namespace CleanAgricultureProductBE.Services.Account
                 isPagination = true;
             }
 
-            var accounts = await accountRepository.GetAllAccountsAsync();
+            var accounts = await accountRepository.GetAllAccountsAsync(accountRole);
 
             int totalItems = accounts.Count;
 
