@@ -1,6 +1,7 @@
 using CleanAgricultureProductBE.DTOs;
 using CleanAgricultureProductBE.DTOs.ApiResponse;
 using CleanAgricultureProductBE.DTOs.Response;
+using CleanAgricultureProductBE.Enum;
 using CleanAgricultureProductBE.Services.Image;
 using CleanAgricultureProductBE.Services.Product;
 using Microsoft.AspNetCore.Authorization;
@@ -32,11 +33,22 @@ namespace CleanAgricultureProductBE.Controllers
             [FromQuery] Guid? categoryId,
             [FromQuery] string? keyword,
             [FromQuery] decimal? minPrice,
-            [FromQuery] decimal? maxPrice)
+            [FromQuery] decimal? maxPrice,
+            [FromQuery] ProductStatusEnum productStatus)
         {
             try
             {
-                var result = await _productService.GetAllProductsWithPaginationAsync(page, size, categoryId, keyword, minPrice, maxPrice);
+                if (productStatus != ProductStatusEnum.Inactive && productStatus != ProductStatusEnum.Active && productStatus != ProductStatusEnum.All)
+                {
+                    return BadRequest(new ResponseObject<string>
+                    {
+                        Success = "false",
+                        Message = "Trạng thái không hợp lệ"
+                    });
+                }
+
+
+                var result = await _productService.GetAllProductsWithPaginationAsync(page, size, categoryId, keyword, minPrice, maxPrice, productStatus);
                 return Ok(new ResponseObjectWithPagination<List<ProductResponseDto>>
                 {
                     Success = "true",

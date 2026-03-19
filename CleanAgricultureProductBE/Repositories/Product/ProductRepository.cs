@@ -1,4 +1,5 @@
 using CleanAgricultureProductBE.Data;
+using CleanAgricultureProductBE.Enum;
 using Microsoft.EntityFrameworkCore;
 using ProductModel = CleanAgricultureProductBE.Models.Product;
 
@@ -53,11 +54,17 @@ namespace CleanAgricultureProductBE.Repositories.Product
             return true;
         }
 
-        public async Task<List<ProductModel>> GetAllWithPaginationAsync(int offset, int pageSize, Guid? categoryId, string? keyword, decimal? minPrice, decimal? maxPrice)
+        public async Task<List<ProductModel>> GetAllWithPaginationAsync(int offset, int pageSize, Guid? categoryId, string? keyword, decimal? minPrice, decimal? maxPrice, ProductStatusEnum productStatus)
         {
             var query = _context.Products
                 .Include(p => p.Category)
                 .AsQueryable();
+
+            if (productStatus == ProductStatusEnum.Inactive)
+                query = query.Where(p => p.Status == "Inactive");
+
+            if (productStatus == ProductStatusEnum.Active)
+                query = query.Where(p => p.Status == "Active");
 
             // Filter by category
             if (categoryId.HasValue && categoryId != Guid.Empty)
