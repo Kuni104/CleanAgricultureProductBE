@@ -2,6 +2,7 @@
 using CleanAgricultureProductBE.DTOs.ApiResponse;
 using CleanAgricultureProductBE.DTOs.Response;
 using CleanAgricultureProductBE.DTOs.UserProfile;
+using CleanAgricultureProductBE.Enum;
 using CleanAgricultureProductBE.Services.Account;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -16,15 +17,25 @@ namespace CleanAgricultureProductBE.Controllers
     [ApiController]
     public class AccountController(IAccountService accountService) : ControllerBase
     {
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,Staff")]
         [HttpGet]
-        [SwaggerOperation(Summary = "Lấy danh sách tất cả tài khoản (Admin)")]
-        public async Task<IActionResult> GetAllAccount([FromQuery] int? page, [FromQuery] int? size, [FromQuery] string? keyword)
+        [SwaggerOperation(Summary = "Lấy danh sách tất cả tài khoản (Admin,Staff)")]
+        public async Task<IActionResult> GetAllAccount([FromQuery] int? page, [FromQuery] int? size, [FromQuery] string? keyword, [FromQuery] AccountRoleEnum accountRole)
         {
             try
             {
             var success = "";
             var message = "";
+
+
+            if (accountRole != AccountRoleEnum.Staff && accountRole != AccountRoleEnum.Admin && accountRole != AccountRoleEnum.Customer && accountRole != AccountRoleEnum.DeliveryPerson && accountRole != AccountRoleEnum.All)
+            {
+                    return BadRequest(new ResponseObject<string>
+                    {
+                        Success = "false",
+                        Message = "Vai trò không hợp lệ"
+                    });
+            }
 
             if (!string.IsNullOrEmpty(keyword))
             {
@@ -37,7 +48,7 @@ namespace CleanAgricultureProductBE.Controllers
                 }
             }
 
-                var result = await accountService.GetAllAccounts(page, size, keyword);
+                var result = await accountService.GetAllAccounts(page, size, keyword, accountRole);
             if (result.ResultObject == null || result.ResultObject.Count == 0)
             {
                 success = "true";

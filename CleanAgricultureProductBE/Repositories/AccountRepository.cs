@@ -1,4 +1,5 @@
 ﻿using CleanAgricultureProductBE.Data;
+using CleanAgricultureProductBE.Enum;
 using CleanAgricultureProductBE.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,27 +21,68 @@ namespace CleanAgricultureProductBE.Repositories
                                           .ToListAsync();
         }
 
-        public async Task<List<Account>> GetAllAccountsWithPaginationAsync(int offset, int pageSize, string keyword)
+        public async Task<List<Account>> GetAllAccountsWithPaginationAsync(int offset, int pageSize, string keyword, AccountRoleEnum accountRoleEnum)
         {
             if (!string.IsNullOrEmpty(keyword))
             {
-                return await _context.Accounts
-                                          .Include(a => a.UserProfile)
-                                          .Include(a => a.Role)
-                                          .OrderBy(a => a.RoleId)
-                                          .Skip(offset)
-                                          .Take(pageSize)
-                                          .ToListAsync();
+                var query = _context.Accounts
+                .Include(a => a.UserProfile)
+                .Include(a => a.Role)
+                .AsQueryable();
+
+                if (accountRoleEnum == AccountRoleEnum.Admin)
+                {
+                    query = query.Where(a => a.RoleId == 1);
+                }
+                else if (accountRoleEnum == AccountRoleEnum.Customer)
+                {
+                    query = query.Where(a => a.RoleId == 2);
+                }
+                else if (accountRoleEnum == AccountRoleEnum.Staff)
+                {
+                    query = query.Where(a => a.RoleId == 3);
+                }
+                else if (accountRoleEnum == AccountRoleEnum.DeliveryPerson)
+                {
+                    query = query.Where(a => a.RoleId == 4);
+                }
+
+                return await query
+                                .OrderBy(a => a.RoleId)
+                                .Skip(offset)
+                                .Take(pageSize)
+                                .ToListAsync();
             }
             else
             {
-                return await _context.Accounts.Where(a => a.Email.Trim().ToLower().Contains(keyword.Trim().ToLower()) || a.UserProfile.FirstName.Trim().ToLower().Contains(keyword.Trim().ToLower()) || a.UserProfile.LastName.Trim().ToLower().Contains(keyword.Trim().ToLower()))
+
+                var query = _context.Accounts.Where(a => a.Email.Trim().ToLower().Contains(keyword.Trim().ToLower()) || a.UserProfile.FirstName.Trim().ToLower().Contains(keyword.Trim().ToLower()) || a.UserProfile.LastName.Trim().ToLower().Contains(keyword.Trim().ToLower()))
                                               .Include(a => a.UserProfile)
                                               .Include(a => a.Role)
-                                              .OrderBy(a => a.RoleId)
-                                              .Skip(offset)
-                                              .Take(pageSize)
-                                              .ToListAsync();
+                                              .AsQueryable();
+
+                if (accountRoleEnum == AccountRoleEnum.Admin)
+                {
+                    query = query.Where(a => a.RoleId == 1);
+                }
+                else if (accountRoleEnum == AccountRoleEnum.Customer)
+                {
+                    query = query.Where(a => a.RoleId == 2);
+                }
+                else if (accountRoleEnum == AccountRoleEnum.Staff)
+                {
+                    query = query.Where(a => a.RoleId == 3);
+                }
+                else if (accountRoleEnum == AccountRoleEnum.DeliveryPerson)
+                {
+                    query = query.Where(a => a.RoleId == 4);
+                }
+
+                return await query
+                                .OrderBy(a => a.RoleId)
+                                .Skip(offset)
+                                .Take(pageSize)
+                                .ToListAsync();
             }
         }
 
