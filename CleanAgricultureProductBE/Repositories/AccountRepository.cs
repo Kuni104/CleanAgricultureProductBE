@@ -34,7 +34,7 @@ namespace CleanAgricultureProductBE.Repositories
             }
             else
             {
-                return await _context.Accounts.Where(a => a.Email.Contains(keyword) || a.UserProfile.FirstName.Contains(keyword) || a.UserProfile.LastName.Contains(keyword))
+                return await _context.Accounts.Where(a => a.Email.Trim().ToLower().Contains(keyword.Trim().ToLower()) || a.UserProfile.FirstName.Trim().ToLower().Contains(keyword.Trim().ToLower()) || a.UserProfile.LastName.Trim().ToLower().Contains(keyword.Trim().ToLower()))
                                               .Include(a => a.UserProfile)
                                               .Include(a => a.Role)
                                               .OrderBy(a => a.RoleId)

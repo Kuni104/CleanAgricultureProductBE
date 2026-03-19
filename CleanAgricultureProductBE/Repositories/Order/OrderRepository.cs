@@ -23,9 +23,13 @@ namespace CleanAgricultureProductBE.Repositories.Order
             await context.SaveChangesAsync();
         }
 
-        public async Task<List<Models.Order>> GetAllOrdersWithPagination(int offset, int pageSize)
+        public async Task<List<Models.Order>> GetAllOrdersWithPagination(int offset, int pageSize, string keyword)
         {
-            return await context.Orders.Include(o => o.Address)
+            if (string.IsNullOrEmpty(keyword))
+            {
+                return await context.Orders
+                                       .Where(o => o.OrderDetails.Any(od => od.Product.Name.Trim().ToLower().Contains(keyword.Trim().ToLower())))
+                                       .Include(o => o.Address)
                                        .Include(o => o.Payment)
                                        .Include(o => o.Schedule)
                                        .Include(o => o.Customer)
@@ -34,6 +38,19 @@ namespace CleanAgricultureProductBE.Repositories.Order
                                        .Skip(offset)
                                        .Take(pageSize)
                                        .ToListAsync();
+            }
+            else
+            {
+                return await context.Orders.Include(o => o.Address)
+                                       .Include(o => o.Payment)
+                                       .Include(o => o.Schedule)
+                                       .Include(o => o.Customer)
+                                       .ThenInclude(c => c.Account)
+                                       .OrderByDescending(o => o.OrderDate)
+                                       .Skip(offset)
+                                       .Take(pageSize)
+                                       .ToListAsync();
+            }
         }
 
         public async Task<Models.Order?> GetOrderByOrderId(Guid orderId)
@@ -72,9 +89,13 @@ namespace CleanAgricultureProductBE.Repositories.Order
                                        .ToListAsync();
         }
 
-        public async Task<List<Models.Order>> GetOrdersByCustomerIdWithPagination(Guid customerId, int offset, int pageSize)
+        public async Task<List<Models.Order>> GetOrdersByCustomerIdWithPagination(Guid customerId, int offset, int pageSize, string keyword)
         {
-            return await context.Orders.Where(o => o.CustomerId == customerId)
+            if (string.IsNullOrEmpty(keyword))
+            {
+                return await context.Orders
+                                       .Where(o => o.OrderDetails.Any(od => od.Product.Name.Trim().ToLower().Contains(keyword.Trim().ToLower())))
+                                       .Where(o => o.CustomerId == customerId)
                                        .Include(o => o.Payment)
                                        .Include(o => o.Schedule)
                                        .Include(o => o.Address)
@@ -82,6 +103,18 @@ namespace CleanAgricultureProductBE.Repositories.Order
                                        .Skip(offset)
                                        .Take(pageSize)
                                        .ToListAsync();
+            }
+            else
+            {
+                return await context.Orders.Where(o => o.CustomerId == customerId)
+                                       .Include(o => o.Payment)
+                                       .Include(o => o.Schedule)
+                                       .Include(o => o.Address)
+                                       .OrderByDescending(o => o.OrderDate)
+                                       .Skip(offset)
+                                       .Take(pageSize)
+                                       .ToListAsync();
+            }
         }
 
         public async Task TestUpdateOrderWithPayment(Models.Order order)
@@ -101,18 +134,36 @@ namespace CleanAgricultureProductBE.Repositories.Order
                                        .ToListAsync();
         }
 
-        public async Task<List<Models.Order>> GetAllOrdersInScheduleWithPagination(Guid scheduleId, int offset, int pageSize)
+        public async Task<List<Models.Order>> GetAllOrdersInScheduleWithPagination(Guid scheduleId, int offset, int pageSize, string keyword)
         {
-            return await context.Orders.Include(o => o.Address)
-                                       .Include(o => o.Payment)
-                                       .Include(o => o.Schedule)
-                                       .Include(o => o.Customer)
-                                       .ThenInclude(c => c.Account)
-                                       .Where(o => o.ScheduleId == scheduleId)
-                                       .OrderByDescending(o => o.OrderDate)
-                                       .Skip(offset)
-                                       .Take(pageSize)
-                                       .ToListAsync();
+            if (string.IsNullOrEmpty(keyword))
+            {
+                return await context.Orders
+                                           .Where(o => o.OrderDetails.Any(od => od.Product.Name.Trim().ToLower().Contains(keyword.Trim().ToLower())))
+                                           .Include(o => o.Address)
+                                           .Include(o => o.Payment)
+                                           .Include(o => o.Schedule)
+                                           .Include(o => o.Customer)
+                                           .ThenInclude(c => c.Account)
+                                           .Where(o => o.ScheduleId == scheduleId)
+                                           .OrderByDescending(o => o.OrderDate)
+                                           .Skip(offset)
+                                           .Take(pageSize)
+                                           .ToListAsync();
+            }
+            else
+            {
+                return await context.Orders.Include(o => o.Address)
+                                           .Include(o => o.Payment)
+                                           .Include(o => o.Schedule)
+                                           .Include(o => o.Customer)
+                                           .ThenInclude(c => c.Account)
+                                           .Where(o => o.ScheduleId == scheduleId)
+                                           .OrderByDescending(o => o.OrderDate)
+                                           .Skip(offset)
+                                           .Take(pageSize)
+                                           .ToListAsync();
+            }
         }
     }
 }
