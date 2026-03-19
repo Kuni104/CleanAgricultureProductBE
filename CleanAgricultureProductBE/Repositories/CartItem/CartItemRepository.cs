@@ -35,13 +35,24 @@ namespace CleanAgricultureProductBE.Repositories.CartItem
             await context.SaveChangesAsync();
         }
 
-        public async Task<List<Models.CartItem>> GetCartItemsByCartIdWithPagination(Guid cartId, int offset, int pageSize)
+        public async Task<List<Models.CartItem>> GetCartItemsByCartIdWithPagination(Guid cartId, int offset, int pageSize, string keyword)
         {
-            return await context.CartItems.Where(ci => ci.CartId == cartId)
-                                          .OrderByDescending(ci => ci.CreatedAt)
-                                          .Skip(offset)
-                                          .Take(pageSize)
-                                          .ToListAsync();
+            if (!string.IsNullOrEmpty(keyword))
+            {
+                return await context.CartItems.Where(ci => ci.CartId == cartId && ci.Product.Name.Trim().ToLower().Contains(keyword.Trim().ToLower()))
+                                              .OrderByDescending(ci => ci.CreatedAt)
+                                              .Skip(offset)
+                                              .Take(pageSize)
+                                              .ToListAsync();
+            }
+            else
+            {
+                return await context.CartItems.Where(ci => ci.CartId == cartId)
+                                              .OrderByDescending(ci => ci.CreatedAt)
+                                              .Skip(offset)
+                                              .Take(pageSize)
+                                              .ToListAsync();
+            }
         }
 
         public async Task DeleteCartItem(Models.CartItem cartItem)

@@ -20,14 +20,28 @@ namespace CleanAgricultureProductBE.Repositories
                                           .ToListAsync();
         }
 
-        public async Task<List<Account>> GetAllAccountsWithPaginationAsync(int offset, int pageSize)
+        public async Task<List<Account>> GetAllAccountsWithPaginationAsync(int offset, int pageSize, string keyword)
         {
-            return await _context.Accounts.Include(a => a.UserProfile)
+            if (!string.IsNullOrEmpty(keyword))
+            {
+                return await _context.Accounts
+                                          .Include(a => a.UserProfile)
                                           .Include(a => a.Role)
                                           .OrderBy(a => a.RoleId)
                                           .Skip(offset)
                                           .Take(pageSize)
                                           .ToListAsync();
+            }
+            else
+            {
+                return await _context.Accounts.Where(a => a.Email.Trim().ToLower().Contains(keyword.Trim().ToLower()) || a.UserProfile.FirstName.Trim().ToLower().Contains(keyword.Trim().ToLower()) || a.UserProfile.LastName.Trim().ToLower().Contains(keyword.Trim().ToLower()))
+                                              .Include(a => a.UserProfile)
+                                              .Include(a => a.Role)
+                                              .OrderBy(a => a.RoleId)
+                                              .Skip(offset)
+                                              .Take(pageSize)
+                                              .ToListAsync();
+            }
         }
 
         public async Task<Account> CreateAsync(Account account)

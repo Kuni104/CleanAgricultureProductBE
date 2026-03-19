@@ -34,7 +34,7 @@ namespace CleanAgricultureProductBE.Services.Account
 
             if (isPagination)
             {
-                accounts = await accountRepository.GetAllAccountsWithPaginationAsync(offset, pageSize);
+                accounts = await accountRepository.GetAllAccountsWithPaginationAsync(offset, pageSize, keyword);
             }
 
             var accountResponseList = new List<AccountResponseDto>();

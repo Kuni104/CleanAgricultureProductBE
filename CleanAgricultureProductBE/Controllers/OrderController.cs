@@ -24,6 +24,18 @@ namespace CleanAgricultureProductBE.Controllers
         {
             try
             {
+
+            if (!string.IsNullOrEmpty(keyword))
+            {
+                if (page == null || page <= 0 || size == null || size <= 0)
+                {
+                    return BadRequest(new ResponseObject<string>
+                    {
+                        Success = "false",
+                        Message = "Nếu có keyword không được để trống page và size"
+                    });
+                }
+            }
             var success = "";
             var message = "";
 
@@ -65,7 +77,20 @@ namespace CleanAgricultureProductBE.Controllers
         {
             try
             {
-            var accountEmail = User.FindFirstValue(ClaimTypes.Email);
+
+            if (!string.IsNullOrEmpty(keyword))
+            {
+                if (page == null || page <= 0 || size == null || size <= 0)
+                {
+                    return BadRequest(new ResponseObject<string>
+                    {
+                        Success = "false",
+                        Message = "Nếu có keyword không được để trống page và size"
+                    });
+                }
+            }
+
+                var accountEmail = User.FindFirstValue(ClaimTypes.Email);
 
             var result = await orderService.GetOrderDetails(accountEmail!, orderId, page, size, keyword);
 

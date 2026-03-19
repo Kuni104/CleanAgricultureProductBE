@@ -209,7 +209,7 @@ namespace CleanAgricultureProductBE.Services.Order
             int totalItems = orders.Count;
 
             if (isPagination) {
-                orders = await orderRepository.GetOrdersByCustomerIdWithPagination(customerId, offset, pageSize);
+                orders = await orderRepository.GetOrdersByCustomerIdWithPagination(customerId, offset, pageSize, keyword);
             }
 
             var orderResponseList = new List<OrderResponseDto>();
@@ -357,7 +357,7 @@ namespace CleanAgricultureProductBE.Services.Order
 
             if (isPagination)
             {
-                orders = await orderRepository.GetAllOrdersWithPagination(offset, pageSize);
+                orders = await orderRepository.GetAllOrdersWithPagination(offset, pageSize, keyword);
             }
 
             var orderResponseList = new List<OrderResponseDto>();
@@ -552,7 +552,7 @@ namespace CleanAgricultureProductBE.Services.Order
 
             if (isPagination)
             {
-                orders = await orderRepository.GetAllOrdersInScheduleWithPagination(scheduleId, offset, pageSize);
+                orders = await orderRepository.GetAllOrdersInScheduleWithPagination(scheduleId, offset, pageSize, keyword);
             }
 
             var orderResponseList = new List<OrderResponseDto>();

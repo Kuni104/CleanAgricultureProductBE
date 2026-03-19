@@ -21,12 +21,26 @@ namespace CleanAgricultureProductBE.Repositories.OrderDetail
 
         public async Task<List<Models.OrderDetail>> GetOrderDetailsByOrderIdWithPagination(Guid orderId, int offset, int pageSize, string? keyword)
         {
-            return await context.OrderDetails.Where(od => od.OrderId == orderId)
+            if (!string.IsNullOrEmpty(keyword))
+            {
+                return await context.OrderDetails
+                                            .Where(od => od.Product.Name.Trim().ToLower().Contains(keyword.Trim().ToLower()))
+                                            .Where(od => od.OrderId == orderId)
                                             .Include(od => od.Product)
                                             .OrderByDescending(od => od.CreatedAt)
                                             .Skip(offset)
                                             .Take(pageSize)
                                             .ToListAsync();
+            }
+            else
+            {
+                return await context.OrderDetails.Where(od => od.OrderId == orderId)
+                                            .Include(od => od.Product)
+                                            .OrderByDescending(od => od.CreatedAt)
+                                            .Skip(offset)
+                                            .Take(pageSize)
+                                            .ToListAsync();
+            }
         }
     }
 }

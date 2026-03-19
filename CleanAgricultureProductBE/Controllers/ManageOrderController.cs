@@ -23,6 +23,19 @@ namespace CleanAgricultureProductBE.Controllers
         {
             try
             {
+
+            if (!string.IsNullOrEmpty(keyword))
+            {
+                if (page == null || page <= 0 || size == null || size <= 0)
+                {
+                    return BadRequest(new ResponseObject<string>
+                    {
+                        Success = "false",
+                        Message = "Nếu có keyword không được để trống page và size"
+                    });
+                }
+            }
+
             var success = "";
             var message = "";
 
@@ -62,7 +75,20 @@ namespace CleanAgricultureProductBE.Controllers
         {
             try
             {
-            var success = "";
+
+            if (!string.IsNullOrEmpty(keyword))
+            {
+                if (page == null || page <= 0 || size == null || size <= 0)
+                {
+                    return BadRequest(new ResponseObject<string>
+                    {
+                        Success = "false",
+                        Message = "Nếu có keyword không được để trống page và size"
+                    });
+                }
+            }
+
+                var success = "";
             var message = "";
 
             var orders = await orderService.GetAllOrdersInSchedule(scheduleId, page, size, keyword);
@@ -101,7 +127,20 @@ namespace CleanAgricultureProductBE.Controllers
         {
             try
             {
-            var accountEmail = User.FindFirstValue(ClaimTypes.Email);
+
+            if (!string.IsNullOrEmpty(keyword))
+            {
+                if (page == null || page <= 0 || size == null || size <= 0)
+                {
+                    return BadRequest(new ResponseObject<string>
+                    {
+                        Success = "false",
+                        Message = "Nếu có keyword không được để trống page và size"
+                    });
+                }
+            }
+
+                var accountEmail = User.FindFirstValue(ClaimTypes.Email);
 
             var result = await orderService.GetOrderDetailsAdmin(orderId, page, size, keyword);
             if (result.ResultObject == null)
