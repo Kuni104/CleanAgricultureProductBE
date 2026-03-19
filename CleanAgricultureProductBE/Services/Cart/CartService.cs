@@ -116,7 +116,7 @@ namespace CleanAgricultureProductBE.Services.Cart
             int totalItems = cartItemList.Count;
 
             if (isPagination) {
-                cartItemList = await cartRepository.GetCartItemsByCartIdWithPagination(cart!.CartId, offset, pageSize);
+                cartItemList = await cartRepository.GetCartItemsByCartIdWithPagination(cart!.CartId, offset, pageSize, keyword);
             }
 
 
