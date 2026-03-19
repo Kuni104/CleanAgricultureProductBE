@@ -15,7 +15,9 @@ namespace CleanAgricultureProductBE.Services.DeliveryFee
             var deliveryFeeList = deliveryFees.Select(df => new DeliveryFeeResponseDto
             {
                 DeliveryFeeId = df.DeliveryFeeId,
-                
+                City = df.City,
+                District = df.District,
+                Ward = df.Ward,
                 FeeAmount = df.FeeAmount
             }).ToList();
 
