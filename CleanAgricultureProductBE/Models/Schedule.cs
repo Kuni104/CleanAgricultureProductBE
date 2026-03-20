@@ -9,7 +9,7 @@
         public DateTime UpdatedAt { get; set; }
         public string Status { get; set; } = string.Empty; // Pending, Shipping, Delivered, Failed
         /*------------------------------------------------------------------------------------------------------------------------*/
-        public Account DeliveryPerson { get; set; } = null!;
+        public Account? DeliveryPerson { get; set; }
         public ICollection<Order> Orders { get; set; } = new List<Order>();
     }
 }
