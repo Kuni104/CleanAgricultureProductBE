@@ -10,6 +10,8 @@
         public string Unit { get; set; } = string.Empty;
         public int Stock { get; set; }
         public string Status { get; set; } = string.Empty;
+        public DateTime ImportedAt { get; set; }
+        public DateTime ExpiredAt { get; set; }
         public bool IsDeleted { get; set; } = false;
         public DateTime? DeletedAt { get; set; }
         /*------------------------------------------------------------------------------------------------------------------------*/

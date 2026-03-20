@@ -34,7 +34,7 @@ namespace CleanAgricultureProductBE.Controllers
             [FromQuery] string? keyword,
             [FromQuery] decimal? minPrice,
             [FromQuery] decimal? maxPrice,
-            [FromQuery] ProductStatusEnum productStatus)
+            [FromQuery] ProductStatusEnum productStatus = ProductStatusEnum.Active)
         {
             try
             {
@@ -97,7 +97,7 @@ namespace CleanAgricultureProductBE.Controllers
         [HttpPost]
         [Authorize(Roles = "Admin,Staff")]
         [SwaggerOperation(Summary = "Tạo sản phẩm mới (Admin/Staff)")]
-        public async Task<IActionResult> CreateProduct(CreateProductDto dto)
+        public async Task<IActionResult> CreateProduct([FromForm] CreateProductDto dto)
         {
             try
             {
@@ -123,7 +123,7 @@ namespace CleanAgricultureProductBE.Controllers
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin,Staff")]
         [SwaggerOperation(Summary = "Cập nhật sản phẩm (Admin/Staff)")]
-        public async Task<IActionResult> UpdateProduct(Guid id, UpdateProductDto dto)
+        public async Task<IActionResult> UpdateProduct(Guid id, [FromForm] UpdateProductDto dto)
         {
             try
             {

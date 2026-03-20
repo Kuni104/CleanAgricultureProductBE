@@ -24,14 +24,18 @@ namespace CleanAgricultureProductBE.Repositories.Product
         public async Task<List<ProductModel>> GetAllAsync()
         {
             return await _context.Products
+                .Where(p => !p.IsDeleted)
                 .Include(p => p.Category)
+                .Include(p => p.ProductImages)
                 .ToListAsync();
         }
 
         public Task<ProductModel?> GetByIdAsync(Guid id)
         {
             return _context.Products
+                .Where(p => !p.IsDeleted)
                 .Include(p => p.Category)
+                .Include(p => p.ProductImages)
                 .FirstOrDefaultAsync(p => p.ProductId == id);
         }
 
@@ -57,7 +61,9 @@ namespace CleanAgricultureProductBE.Repositories.Product
         public async Task<List<ProductModel>> GetAllWithPaginationAsync(int offset, int pageSize, Guid? categoryId, string? keyword, decimal? minPrice, decimal? maxPrice, ProductStatusEnum productStatus)
         {
             var query = _context.Products
+                .Where(p => !p.IsDeleted)
                 .Include(p => p.Category)
+                .Include(p => p.ProductImages)
                 .AsQueryable();
 
             if (productStatus == ProductStatusEnum.Inactive)
@@ -87,9 +93,17 @@ namespace CleanAgricultureProductBE.Repositories.Product
                 .ToListAsync();
         }
 
-        public async Task<int> CountAllAsync(Guid? categoryId, string? keyword, decimal? minPrice, decimal? maxPrice)
+        public async Task<int> CountAllAsync(Guid? categoryId, string? keyword, decimal? minPrice, decimal? maxPrice, ProductStatusEnum productStatus)
         {
-            var query = _context.Products.AsQueryable();
+            var query = _context.Products
+                .Where(p => !p.IsDeleted)
+                .AsQueryable();
+
+            if (productStatus == ProductStatusEnum.Inactive)
+                query = query.Where(p => p.Status == "Inactive");
+
+            if (productStatus == ProductStatusEnum.Active)
+                query = query.Where(p => p.Status == "Active");
 
             // Filter by category
             if (categoryId.HasValue && categoryId != Guid.Empty)
