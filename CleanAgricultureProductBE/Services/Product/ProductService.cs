@@ -2,6 +2,7 @@ using CleanAgricultureProductBE.DTOs;
 using CleanAgricultureProductBE.DTOs.ApiResponse;
 using CleanAgricultureProductBE.DTOs.Response;
 using CleanAgricultureProductBE.Enum;
+using CleanAgricultureProductBE.Services.Image;
 using CleanAgricultureProductBE.Repositories.Product;
 using ProductModel = CleanAgricultureProductBE.Models.Product;
 
@@ -16,10 +17,12 @@ namespace CleanAgricultureProductBE.Services.Product
     public class ProductService : IProductService
     {
         private readonly IProductRepository _productRepo;
+        private readonly IProductImageService _productImageService;
 
-        public ProductService(IProductRepository productRepo)
+        public ProductService(IProductRepository productRepo, IProductImageService productImageService)
         {
             _productRepo = productRepo;
+            _productImageService = productImageService;
         }
 
         public async Task<ProductResponseDto> CreateProductAsync(CreateProductDto dto)
@@ -39,6 +42,9 @@ namespace CleanAgricultureProductBE.Services.Product
             if (dto.Stock < 0)
                 throw new Exception("Stock must be greater than or equal to 0");
 
+            if (dto.ExpiredAt <= dto.ImportedAt)
+                throw new Exception("ExpiredAt phải lớn hơn ImportedAt");
+
             var product = new ProductModel
             {
                 ProductId = Guid.NewGuid(),
@@ -48,11 +54,19 @@ namespace CleanAgricultureProductBE.Services.Product
                 Price = dto.Price,
                 Unit = dto.Unit,
                 Stock = dto.Stock,
-                Status = ProductStatus.Active
+                Status = ProductStatus.Active,
+                ImportedAt = dto.ImportedAt,
+                ExpiredAt = dto.ExpiredAt
             };
 
             var created = await _productRepo.CreateAsync(product);
             var result = await _productRepo.GetByIdAsync(created.ProductId);
+
+            if (dto.Images != null && dto.Images.Count > 0)
+            {
+                await _productImageService.UploadProductImagesAsync(result!.ProductId, dto.Images);
+                result = await _productRepo.GetByIdAsync(created.ProductId);
+            }
 
             return new ProductResponseDto
             {
@@ -64,7 +78,10 @@ namespace CleanAgricultureProductBE.Services.Product
                 Price = result.Price,
                 Unit = result.Unit,
                 Stock = result.Stock,
-                Status = result.Status
+                Status = result.Status,
+                ImportedAt = result.ImportedAt,
+                ExpiredAt = result.ExpiredAt,
+                ImageUrls = result.ProductImages.Select(pi => pi.ImageUrl).ToList()
             };
         }
 
@@ -83,14 +100,17 @@ namespace CleanAgricultureProductBE.Services.Product
                     Price = p.Price,
                     Unit = p.Unit,
                     Stock = p.Stock,
-                    Status = p.Status
+                    Status = p.Status,
+                    ImportedAt = p.ImportedAt,
+                    ExpiredAt = p.ExpiredAt,
+                    ImageUrls = p.ProductImages.Select(pi => pi.ImageUrl).ToList()
                 }).ToList();
         }
 
         public async Task<ProductResponseDto> GetProductByIdAsync(Guid id)
         {
             var product = await _productRepo.GetByIdAsync(id);
-            if (product == null || product.Status == ProductStatus.Inactive)
+            if (product == null || product.IsDeleted)
                 throw new Exception("Product not found");
 
             return new ProductResponseDto
@@ -103,14 +123,17 @@ namespace CleanAgricultureProductBE.Services.Product
                 Price = product.Price,
                 Unit = product.Unit,
                 Stock = product.Stock,
-                Status = product.Status
+                Status = product.Status,
+                ImportedAt = product.ImportedAt,
+                ExpiredAt = product.ExpiredAt,
+                ImageUrls = product.ProductImages.Select(pi => pi.ImageUrl).ToList()
             };
         }
 
         public async Task<ProductResponseDto> UpdateProductAsync(Guid id, UpdateProductDto dto)
         {
             var product = await _productRepo.GetByIdAsync(id);
-            if (product == null || product.Status == ProductStatus.Inactive)
+            if (product == null || product.IsDeleted)
                 throw new Exception("Product not found");
 
             if (!string.IsNullOrWhiteSpace(dto.Name) && dto.Name.Trim().Length > 200)
@@ -121,6 +144,12 @@ namespace CleanAgricultureProductBE.Services.Product
 
             if (dto.Stock.HasValue && dto.Stock.Value < 0)
                 throw new Exception("Stock must be greater than or equal to 0");
+
+            var effectiveImportedAt = dto.ImportedAt ?? product.ImportedAt;
+            var effectiveExpiredAt = dto.ExpiredAt ?? product.ExpiredAt;
+
+            if (effectiveExpiredAt <= effectiveImportedAt)
+                throw new Exception("ExpiredAt phải lớn hơn ImportedAt");
 
             if (dto.CategoryId.HasValue)
                 product.CategoryId = dto.CategoryId.Value;
@@ -134,9 +163,19 @@ namespace CleanAgricultureProductBE.Services.Product
                 product.Unit = dto.Unit;
             if (dto.Stock.HasValue)
                 product.Stock = dto.Stock.Value;
+            if (dto.ImportedAt.HasValue)
+                product.ImportedAt = dto.ImportedAt.Value;
+            if (dto.ExpiredAt.HasValue)
+                product.ExpiredAt = dto.ExpiredAt.Value;
 
             var updated = await _productRepo.UpdateAsync(product);
             var result = await _productRepo.GetByIdAsync(updated.ProductId);
+
+            if (dto.Images != null && dto.Images.Count > 0)
+            {
+                await _productImageService.UploadProductImagesAsync(result!.ProductId, dto.Images);
+                result = await _productRepo.GetByIdAsync(updated.ProductId);
+            }
 
             return new ProductResponseDto
             {
@@ -148,7 +187,10 @@ namespace CleanAgricultureProductBE.Services.Product
                 Price = result.Price,
                 Unit = result.Unit,
                 Stock = result.Stock,
-                Status = result.Status
+                Status = result.Status,
+                ImportedAt = result.ImportedAt,
+                ExpiredAt = result.ExpiredAt,
+                ImageUrls = result.ProductImages.Select(pi => pi.ImageUrl).ToList()
             };
         }
 
@@ -168,7 +210,7 @@ namespace CleanAgricultureProductBE.Services.Product
         {
             var product = await _productRepo.GetByIdAsync(productId);
 
-            if (product == null)
+            if (product == null || product.IsDeleted)
             {
                 return false;
             }
@@ -193,7 +235,7 @@ namespace CleanAgricultureProductBE.Services.Product
             int offset = (pageNumber - 1) * pageSize;
 
             var products = await _productRepo.GetAllWithPaginationAsync(offset, pageSize, categoryId, keyword, minPrice, maxPrice, productStatus);
-            var total = await _productRepo.CountAllAsync(categoryId, keyword, minPrice, maxPrice);
+            var total = await _productRepo.CountAllAsync(categoryId, keyword, minPrice, maxPrice, productStatus);
 
             var result = new ResponseDtoWithPagination<List<ProductResponseDto>>
             {
@@ -209,7 +251,10 @@ namespace CleanAgricultureProductBE.Services.Product
                         Price = p.Price,
                         Unit = p.Unit,
                         Stock = p.Stock,
-                        Status = p.Status
+                        Status = p.Status,
+                        ImportedAt = p.ImportedAt,
+                        ExpiredAt = p.ExpiredAt,
+                        ImageUrls = p.ProductImages.Select(pi => pi.ImageUrl).ToList()
                     }).ToList(),
                 Pagination = new Pagination
                 {

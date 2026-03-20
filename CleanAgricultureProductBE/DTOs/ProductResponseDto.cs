@@ -11,5 +11,8 @@ namespace CleanAgricultureProductBE.DTOs
         public string Unit { get; set; } = string.Empty;
         public int Stock { get; set; }
         public string Status { get; set; } = string.Empty;
+        public DateTime ImportedAt { get; set; }
+        public DateTime ExpiredAt { get; set; }
+        public List<string> ImageUrls { get; set; } = new();
     }
 }

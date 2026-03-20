@@ -11,6 +11,6 @@ namespace CleanAgricultureProductBE.Repositories.Product
         Task<ProductModel> UpdateAsync(ProductModel product);
         Task<bool> DeleteAsync(Guid id);
         Task<List<ProductModel>> GetAllWithPaginationAsync(int offset, int pageSize, Guid? categoryId, string? keyword, decimal? minPrice, decimal? maxPrice, ProductStatusEnum productStatus);
-        Task<int> CountAllAsync(Guid? categoryId, string? keyword, decimal? minPrice, decimal? maxPrice);
+        Task<int> CountAllAsync(Guid? categoryId, string? keyword, decimal? minPrice, decimal? maxPrice, ProductStatusEnum productStatus);
     }
 }

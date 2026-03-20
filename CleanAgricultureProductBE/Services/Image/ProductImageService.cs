@@ -33,7 +33,7 @@ namespace CleanAgricultureProductBE.Services.Image
         public async Task<List<string>> UploadProductImagesAsync(Guid productId, List<IFormFile> images)
         {
             var product = await _productRepo.GetByIdAsync(productId);
-            if (product == null || product.Status == "Inactive")
+            if (product == null || product.IsDeleted)
                 throw new Exception("Không tìm thấy sản phẩm hoặc sản phẩm đã bị xóa.");
 
             if (images == null || images.Count == 0)
