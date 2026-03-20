@@ -490,8 +490,7 @@ namespace CleanAgricultureProductBE.Services.Order
                 return null!;
             }
 
-            order.OrderStatus = request.Status;
-            await orderRepository.UpdateOrder(order);
+            var newOrderStatus = request.Status;
 
             //Handle Cycle Schedule After Complete Order Here
             if (order.OrderStatus.ToLower() == "completed")
@@ -499,13 +498,31 @@ namespace CleanAgricultureProductBE.Services.Order
                 var isCycleSchedule = await cycleScheduleRepository.CheckOrderIsCycleSchedule(order.OrderId);
                 if (isCycleSchedule == true)
                 {
+                    newOrderStatus = "Pending";
+
                     var cycleSchedule = await cycleScheduleRepository.GetCycleScheduleByOrderId(order.OrderId);
                     cycleSchedule.UpdatedAt = DateTime.UtcNow;
-                    cycleSchedule.DayCycle = cycleSchedule.isMonthly ? DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month) : cycleSchedule.DayCycle;
-                    
+                    int newCycle = cycleSchedule.isMonthly ? DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month) : cycleSchedule.DayCycle;
+                    cycleSchedule.DayCycle = newCycle;
+
                     await cycleScheduleRepository.UpdateCycleSchedule(cycleSchedule);
+
+                    var newSchedule = new Models.Schedule
+                    {
+                        ScheduleId = Guid.NewGuid(),
+                        ScheduledDate = DateTime.UtcNow.AddDays(newCycle),
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow, 
+                        Status = "Pending"
+                    };
+
+                    await scheduleRepository.AddAsync(newSchedule);
+                    order.ScheduleId = newSchedule.ScheduleId;
                 }
             }
+
+            order.OrderStatus = newOrderStatus;
+            await orderRepository.UpdateOrder(order);
 
             return new OrderResponseDto
             {
