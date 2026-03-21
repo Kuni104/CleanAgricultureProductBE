@@ -78,7 +78,7 @@ namespace CleanAgricultureProductBE.Controllers
         }
 
         [Authorize(Roles = "Admin,Staff")]
-        [HttpPatch("assign-deliveryPerson")]
+        [HttpPatch("assign-delivery-person")]
         [SwaggerOperation(Summary = "Gán người giao hàng vào lịch có sắn (Admin,Staff)")]
         public async Task<IActionResult> AssignDeliveryPersonToSchedule([FromQuery] Guid scheduleId, [FromQuery] Guid deliveryPersonId)
         {
