@@ -268,7 +268,7 @@ namespace CleanAgricultureProductBE.Controllers
         }
 
         [Authorize(Roles = "Admin,Staff")]
-        [HttpGet("today/{deliveryPersonId}")]
+        [HttpGet("date/{deliveryPersonId}")]
         [SwaggerOperation(Summary = "Lấy lịch giao hàng theo ngày theo người vận chuyển (Admin/Staff)")]
         public async Task<IActionResult> GetAllScheduleOfDeliveryPersonByDateAdmin([FromRoute] Guid deliveryPersonId, [FromQuery] DateTime dateTime)
         {
