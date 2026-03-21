@@ -485,7 +485,7 @@ namespace CleanAgricultureProductBE.Services.Order
             return result;
         }
 
-        public async Task<OrderResponseDto> UpdateOrderStatus(Guid orderId, UpdateOrderStatusRequestDto request)
+        public async Task<ResultStatusWithData<OrderResponseDto>> UpdateOrderStatus(Guid orderId, UpdateOrderStatusRequestDto request)
         {
             var order = await orderRepository.GetOrderByOrderId(orderId);
             if (order == null)
@@ -494,6 +494,37 @@ namespace CleanAgricultureProductBE.Services.Order
             }
 
             var newOrderStatus = request.Status;
+
+            if (request.Status.ToLower() == "completed")
+            {
+                if (order.OrderStatus.ToLower() == "cancelled")
+                {
+                    return new ResultStatusWithData<OrderResponseDto>
+                    {
+                        Status = "BAD STATUS"
+                    };
+                }
+            }
+            if (request.Status.ToLower() == "cancelled")
+            {
+                if (order.OrderStatus.ToLower() == "completed")
+                {
+                    return new ResultStatusWithData<OrderResponseDto>
+                    {
+                        Status = "BAD STATUS"
+                    };
+                }
+            }
+            if (request.Status.ToLower() == "delivering" || request.Status.ToLower() == "pending")
+            {
+                if (order.OrderStatus.ToLower() == "completed" || order.OrderStatus.ToLower() == "cancelled")
+                {
+                    return new ResultStatusWithData<OrderResponseDto>
+                    {
+                        Status = "BAD STATUS"
+                    };
+                }
+            }
 
             //Handle Cycle Schedule After Complete Order Here
             if (order.OrderStatus.ToLower() == "completed")
@@ -527,17 +558,21 @@ namespace CleanAgricultureProductBE.Services.Order
             order.OrderStatus = newOrderStatus;
             await orderRepository.UpdateOrder(order);
 
-            return new OrderResponseDto
+            return new ResultStatusWithData<OrderResponseDto>
             {
-                OrderId = order.OrderId,
-                CustomerName = order.Address.RecipientName,
-                Address = order.Address.AddressDetail + " " + order.Address.District + " " + order.Address.Ward + " " + order.Address.City,
-                //Payment = (Guid)order.PaymentId,
-                Schedule = order.Schedule != null ? TimeZoneInfo.ConvertTimeFromUtc(order.Schedule.ScheduledDate, timeZone) : null,
-                TotalPrice = order.Payment.TotalAmount,
-                PaymentMethod = order.Payment.PaymentMethodId == 2 ? "VNPay" : "COD",
-                OrderDate = TimeZoneInfo.ConvertTimeFromUtc(order.OrderDate, timeZone),
-                OrderStatus = order.OrderStatus
+                Status = "Ok",
+                Data = new OrderResponseDto
+                {
+                    OrderId = order.OrderId,
+                    CustomerName = order.Address.RecipientName,
+                    Address = order.Address.AddressDetail + " " + order.Address.District + " " + order.Address.Ward + " " + order.Address.City,
+                    //Payment = (Guid)order.PaymentId,
+                    Schedule = order.Schedule != null ? TimeZoneInfo.ConvertTimeFromUtc(order.Schedule.ScheduledDate, timeZone) : null,
+                    TotalPrice = order.Payment.TotalAmount,
+                    PaymentMethod = order.Payment.PaymentMethodId == 2 ? "VNPay" : "COD",
+                    OrderDate = TimeZoneInfo.ConvertTimeFromUtc(order.OrderDate, timeZone),
+                    OrderStatus = order.OrderStatus
+                }
             };
         }
 
