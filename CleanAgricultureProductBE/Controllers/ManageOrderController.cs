@@ -193,7 +193,7 @@ namespace CleanAgricultureProductBE.Controllers
 
             var result = await orderService.UpdateOrderStatus(orderId, request);
 
-            if (request.Status == "BAD STATUS")
+            if (result.Status == "BAD STATUS")
             {
                 return BadRequest(new ResponseObject<OrderResponseDto>
                 {
