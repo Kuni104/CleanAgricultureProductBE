@@ -4,6 +4,7 @@ namespace CleanAgricultureProductBE.DTOs.Complaint
     {
         public Guid ComplaintId { get; set; }
         public Guid OrderId { get; set; }
+        public string ComplaintType { get; set; } = string.Empty;
         public string Subject { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public string Evidence { get; set; } = string.Empty;
