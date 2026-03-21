@@ -15,19 +15,21 @@ namespace CleanAgricultureProductBE.Repositories.Complaint
         public async Task<Models.Complaint?> GetByIdAsync(Guid complaintId)
         {
             return await context.Complaints
-                .Include(c => c.Order)
-                .Include(c => c.Staff)
-                .Include(c => c.ProductComplaints)  
-                    .ThenInclude(pc => pc.Product)
-                .FirstOrDefaultAsync(c => c.ComplaintId == complaintId);
+                        .Include(c => c.Order)
+                        .Include(c => c.Staff)
+                        .Include(c => c.ProductComplaints)
+                            .ThenInclude(pc => pc.Product)
+                        .Include(c => c.Images) 
+                        .FirstOrDefaultAsync(c => c.ComplaintId == complaintId);
         }
 
         public async Task<Models.Complaint?> GetByOrderIdAsync(Guid orderId)
         {
             return await context.Complaints
-                .Include(c => c.ProductComplaints)
-                    .ThenInclude(pc => pc.Product)
-                .FirstOrDefaultAsync(c => c.OrderId == orderId);
+                        .Include(c => c.ProductComplaints)
+                            .ThenInclude(pc => pc.Product)
+                        .Include(c => c.Images) 
+                        .FirstOrDefaultAsync(c => c.OrderId == orderId);
         }
 
         public async Task<List<Models.Complaint>> GetAllAsync(int offset, int pageSize, string? keyword)
@@ -38,6 +40,7 @@ namespace CleanAgricultureProductBE.Repositories.Complaint
                 .Include(c => c.Staff)
                 .Include(c => c.ProductComplaints)
                     .ThenInclude(pc => pc.Product)
+                .Include(c => c.Images) 
                 .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(keyword))
@@ -57,14 +60,15 @@ namespace CleanAgricultureProductBE.Repositories.Complaint
         public async Task<List<Models.Complaint>> GetByCustomerIdAsync(Guid customerId, int offset, int pageSize)
         {
             return await context.Complaints
-                .Include(c => c.Order)
-                .Include(c => c.Staff)
-                .Include(c => c.ProductComplaints)
-                    .ThenInclude(pc => pc.Product)
-                .Where(c => c.Order.CustomerId == customerId)
-                .OrderByDescending(c => c.CreatedAt)
-                .Skip(offset).Take(pageSize)
-                .ToListAsync();
+                        .Include(c => c.Order)
+                        .Include(c => c.Staff)
+                        .Include(c => c.ProductComplaints)
+                            .ThenInclude(pc => pc.Product)
+                        .Include(c => c.Images) 
+                        .Where(c => c.Order.CustomerId == customerId)
+                        .OrderByDescending(c => c.CreatedAt)
+                        .Skip(offset).Take(pageSize)
+                        .ToListAsync();
         }
 
         public async Task<int> CountByCustomerIdAsync(Guid customerId)
@@ -81,6 +85,7 @@ namespace CleanAgricultureProductBE.Repositories.Complaint
         public async Task AddComplaintImageAsync(ComplaintImage image)
         {
             await context.ComplaintImages.AddAsync(image);
+            await context.SaveChangesAsync();
         }
 
         public async Task SaveChangesAsync()
