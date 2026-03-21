@@ -18,6 +18,12 @@ public class ScheduleRepository : IScheduleRepository
         await _context.Schedules.AddAsync(schedule);
     }
 
+    public async Task UpdateAsync(Schedule schedule)
+    {
+        _context.Schedules.Update(schedule);
+        await _context.SaveChangesAsync();
+    }
+
     public async Task<Schedule?> GetByIdAsync(Guid scheduleId)
     {
         return await _context.Schedules
@@ -44,6 +50,16 @@ public class ScheduleRepository : IScheduleRepository
             .FirstOrDefaultAsync(x =>
                 x.DeliveryPersonId == deliveryPersonId &&
                 x.ScheduledDate.Date == date.Date);
+    }
+
+    public async Task<List<Schedule>> GetSchedulesByDate(DateTime date)
+    {
+        return await _context.Schedules
+            .Include(s => s.Orders)
+            .Where(x =>
+                x.ScheduledDate.Date == date.Date)
+            .OrderByDescending(s => s.ScheduledDate)
+            .ToListAsync();
     }
 
     public async Task<List<Schedule>> GetByDeliveryPerson(Guid deliveryPersonId)
