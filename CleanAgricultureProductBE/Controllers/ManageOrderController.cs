@@ -192,6 +192,16 @@ namespace CleanAgricultureProductBE.Controllers
             var message = "";
 
             var result = await orderService.UpdateOrderStatus(orderId, request);
+
+            if (request.Status == "BAD STATUS")
+            {
+                return BadRequest(new ResponseObject<OrderResponseDto>
+                {
+                    Success = "false",
+                    Message = "Không thể đổi sang status này"
+                });
+            }
+
             if (result == null)
             {
                 success = "false";
@@ -207,7 +217,7 @@ namespace CleanAgricultureProductBE.Controllers
             {
                 Success = success,
                 Message = message,
-                Data = result
+                Data = result!.Data
             };
             return Ok(response);
         }

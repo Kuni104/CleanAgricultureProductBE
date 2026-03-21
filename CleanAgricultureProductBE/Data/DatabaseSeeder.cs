@@ -151,7 +151,7 @@ namespace CleanAgricultureProductBE.Data
                     Ward = "Quận 8",
                     District = "Ba Đình",
                     City = "HCM",
-                    AddressDetail = "Ba Đình TP.HCM Quận 8",
+                    AddressDetail = "123",
                     IsDefault = true
                 })
                 .ToList();
