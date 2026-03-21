@@ -77,6 +77,56 @@ namespace CleanAgricultureProductBE.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin,Staff")]
+        [HttpPatch("assign-deliveryPerson")]
+        [SwaggerOperation(Summary = "Gán người giao hàng vào lịch có sắn (Admin,Staff)")]
+        public async Task<IActionResult> AssignDeliveryPersonToSchedule([FromQuery] Guid scheduleId, [FromQuery] Guid deliveryPersonId)
+        {
+            if (string.IsNullOrEmpty(scheduleId.ToString()))
+            {
+                return BadRequest(new ResponseObject<string>
+                {
+                    Success = "false",
+                    Message = "Không thể để trống scheduleId"
+                });
+            }
+            else if (string.IsNullOrEmpty(deliveryPersonId.ToString()))
+            {
+                return BadRequest(new ResponseObject<string>
+                {
+                    Success = "false",
+                    Message = "Không thể để trống deliveryPersonId"
+                });
+            }
+
+            var result = await _service.AssignDeliveryPersonToSchedule(scheduleId, deliveryPersonId);
+
+            if (result.Status == "Schedule 404")
+            {
+                return BadRequest(new ResponseObject<string>
+                {
+                    Success = "false",
+                    Message = "Không có lịch giao hàng"
+                });
+            }
+            else if (result.Status == "Person 404")
+            {
+                return BadRequest(new ResponseObject<string>
+                {
+                    Success = "false",
+                    Message = "Không có người giao hàng"
+                });
+            }
+
+
+            return Ok(new ResponseObject<ScheduleResponseDto>
+            {
+                Success = "true",
+                Message = "Gán người giao hàng vào lich giao hàng thành công",
+                Data = result.Data
+            });
+        }
+
         [Authorize(Roles = "DeliveryPerson")]
         [HttpGet("delivery-person")]
         [SwaggerOperation(Summary = "Lấy tất cả lịch giao hàng của người vận chuyển (DeliveryPerson)")]
@@ -214,6 +264,75 @@ namespace CleanAgricultureProductBE.Controllers
                 Success = success,
                 Message = message,
                 Data = result!.Data
+            });
+        }
+
+        [Authorize(Roles = "Admin,Staff")]
+        [HttpGet("today/{deliveryPersonId}")]
+        [SwaggerOperation(Summary = "Lấy lịch giao hàng theo ngày theo người vận chuyển (Admin/Staff)")]
+        public async Task<IActionResult> GetAllScheduleOfDeliveryPersonByDateAdmin([FromRoute] Guid deliveryPersonId, [FromQuery] DateTime dateTime)
+        {
+            var success = "";
+            var message = "";
+
+            var result = await _service.GetSchedulesByDateByDeliveryPerson(deliveryPersonId, dateTime);
+
+            if (result.Status == "Schedule 404")
+            {
+                success = "true";
+                message = $"Không có lịch nào vào ngày hôm nay của người vận chuyển với ID: {deliveryPersonId}";
+            }
+            else if (result.Status == "Account 404")
+            {
+                success = "false";
+                message = $"Không có người vận chuyển với ID: {deliveryPersonId}";
+                return BadRequest(new ResponseObject<string>
+                {
+                    Success = success,
+                    Message = message,
+                });
+            }
+            else
+            {
+                success = "true";
+                message = "Lấy lịch thành công";
+            }
+
+            return Ok(new ResponseObject<ScheduleResponseDto>
+            {
+                Success = success,
+                Message = message,
+                Data = result!.Data
+            });
+        }
+
+        [Authorize(Roles = "Admin,Staff")]
+        [HttpGet("date")]
+        [SwaggerOperation(Summary = "Lấy lịch giao hàng theo ngày (Admin/Staff)")]
+        public async Task<IActionResult> GetAllScheduleByDateAdmin([FromQuery] DateTime dateTime, int? page, int? size)
+        {
+            var success = "";
+            var message = "";
+
+            var schedules = await _service.GetSchedulesByDate(dateTime, page, size);
+
+            if (schedules.ResultObject == null || schedules.ResultObject.Count <= 0)
+            {
+                success = "true";
+                message = "Không có lịch nào";
+            }
+            else
+            {
+                success = "true";
+                message = "Lấy lịch thành công";
+            }
+
+            return Ok(new ResponseObjectWithPagination<List<ScheduleResponseDto>>
+            {
+                Success = success,
+                Message = message,
+                Data = schedules.ResultObject,
+                Pagination = schedules.Pagination
             });
         }
     }

@@ -5,6 +5,7 @@ using CleanAgricultureProductBE.Models;
 using CleanAgricultureProductBE.Repositories;
 using CleanAgricultureProductBE.Repositories.DSchedule;
 using CleanAgricultureProductBE.Services.Schedule;
+using Google.Api.Gax;
 
 public class ScheduleService : IScheduleService
 {
@@ -285,5 +286,136 @@ public class ScheduleService : IScheduleService
                 Status = schedule.Status
             }
         };
+    }
+
+    public async Task<ResultStatusWithData<ScheduleResponseDto>> AssignDeliveryPersonToSchedule(Guid scheduleId, Guid deliveryPersonId)
+    {
+        var schedule = await _repository.GetByIdAsync(scheduleId);
+        if (schedule == null)
+        {
+            return new ResultStatusWithData<ScheduleResponseDto>
+            {
+                Status = "Schedule 404"
+            };
+        }
+
+        var deliveryPerson = await _accountRepository.GetByIdAsync(deliveryPersonId);
+
+        if (deliveryPerson == null)
+        {
+            return new ResultStatusWithData<ScheduleResponseDto>
+            {
+                Status = "Person 404"
+            };
+        }
+
+        schedule.DeliveryPersonId = deliveryPersonId;
+        await _repository.UpdateAsync(schedule);
+
+        return new ResultStatusWithData<ScheduleResponseDto>
+        {
+            Status = "OK",
+            Data = MapToDto(schedule)
+        };
+    }
+
+    public async Task<ResultStatusWithData<ScheduleResponseDto>> GetSchedulesByDateByDeliveryPerson(Guid deliveryPersonId, DateTime dateTime)
+    {
+        var account = await _accountRepository.GetByIdAsync(deliveryPersonId);
+
+        if (account == null)
+        {
+            return new ResultStatusWithData<ScheduleResponseDto>
+            {
+                Status = "Account 404"
+            };
+        }
+
+        var schedule = await _repository.GetByDeliveryPersonAndDateAsync(account.AccountId, dateTime);
+
+        if (schedule == null)
+        {
+            return new ResultStatusWithData<ScheduleResponseDto>
+            {
+                Status = "Schedule 404"
+            };
+        }
+
+        return new ResultStatusWithData<ScheduleResponseDto>
+        {
+            Status = "ok",
+            Data = new ScheduleResponseDto
+            {
+                ScheduleId = schedule.ScheduleId,
+                DeliveryPersonId = schedule.DeliveryPersonId,
+                ScheduledDate = schedule.ScheduledDate,
+                CreatedAt = schedule.CreatedAt,
+                UpdatedAt = schedule.UpdatedAt,
+                TotalOrders = schedule.Orders.Count,
+                Status = schedule.Status
+            }
+        };
+    }
+
+    public async Task<ResponseDtoWithPagination<List<ScheduleResponseDto>>> GetSchedulesByDate(DateTime dateTime, int? page, int? size)
+    {
+        bool isPagination = false;
+        int offset = 0;
+        int pageSize = 0;
+        if (page != null && size != null)
+        {
+            pageSize = (int)size;
+            offset = (int)((page - 1) * size);
+            isPagination = true;
+        }
+
+        var schedules =  await _repository.GetSchedulesByDate(dateTime);
+
+        var totalItems = schedules.Count();
+
+        if (isPagination)
+        {
+            schedules = schedules.Take(offset).Skip(pageSize).ToList();
+        }
+
+        List<ScheduleResponseDto> scheduleDtos = new List<ScheduleResponseDto>();
+
+        foreach (var schedule in schedules)
+        {
+            scheduleDtos.Add(new ScheduleResponseDto
+            {
+                ScheduleId = schedule.ScheduleId,
+                DeliveryPersonId = schedule.DeliveryPersonId,
+                ScheduledDate = schedule.ScheduledDate,
+                Status = schedule.Status,
+                TotalOrders = schedule.Orders.Count,
+                CreatedAt = schedule.CreatedAt,
+                UpdatedAt = schedule.UpdatedAt
+            });
+        }
+
+        var result = new ResponseDtoWithPagination<List<ScheduleResponseDto>>
+        {
+            ResultObject = scheduleDtos
+        };
+
+        if (isPagination)
+        {
+            int totalPage = totalItems / pageSize + (totalItems % pageSize == 0 ? 1 : 0);
+            if (totalItems < pageSize || page <= size)
+            {
+                totalPage = 1;
+            }
+
+            result.Pagination = new Pagination
+            {
+                PageNumber = (int)page!,
+                PageSize = pageSize,
+                TotalItems = totalItems,
+                TotalPages = totalPage
+            };
+        }
+
+        return result;
     }
 }
