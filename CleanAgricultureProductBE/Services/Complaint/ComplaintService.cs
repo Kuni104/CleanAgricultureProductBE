@@ -17,6 +17,14 @@ namespace CleanAgricultureProductBE.Services.Complaint
     {
         public async Task<ComplaintResponseDto> CreateComplaintAsync(string accountEmail, CreateComplaintRequestDto request)
         {
+            var complaintType = string.IsNullOrWhiteSpace(request.ComplaintType)
+                ? "Order"
+                : request.ComplaintType.Trim();
+
+            var validComplaintTypes = new[] { "Order", "Product" };
+            if (!validComplaintTypes.Contains(complaintType))
+                throw new ArgumentException("ComplaintType không hợp lệ. Chỉ chấp nhận: Order, Product");
+
             if (request.OrderId == Guid.Empty)
                 throw new ArgumentException("Mã đơn hàng không được để trống");
 
@@ -75,22 +83,40 @@ namespace CleanAgricultureProductBE.Services.Complaint
 
             var existing = await complaintRepository.GetByOrderIdAsync(request.OrderId);
             if (existing != null)
-
                 throw new InvalidOperationException("Đơn hàng này đã có khiếu nại");
+
+            var productIds = request.ProductIds?.Where(id => id != Guid.Empty).Distinct().ToList();
+
+            if (complaintType == "Product")
+            {
+                if (productIds == null || productIds.Count == 0)
+                    throw new ArgumentException("ProductIds là bắt buộc cho Product Complaint");
+
+                var orderProductIds = order.OrderDetails.Select(od => od.ProductId).ToHashSet();
+                var invalidProductIds = productIds.Where(id => !orderProductIds.Contains(id)).ToList();
+                if (invalidProductIds.Count > 0)
+                    throw new InvalidOperationException("Danh sách ProductIds phải thuộc về đơn hàng được khiếu nại");
+            }
+            else
+            {
+                // Order complaint: product list optional, normalize to empty
+                productIds ??= new List<Guid>();
+            }
 
             var complaint = new Models.Complaint
             {
                 ComplaintId = Guid.NewGuid(),
                 OrderId = request.OrderId,
+                ComplaintType = complaintType,
                 Subject = request.Subject.Trim(),
                 Description = request.Description.Trim(),
-                Evidence = request.Evidence.Trim(),
+                Evidence = request.Evidence?.Trim() ?? string.Empty,
                 Status = "Pending",
                 CreatedAt = DateTime.UtcNow,
                 Images = new List<ComplaintImage>()
             };
 
-            foreach (var productId in request.ProductIds.Distinct())
+            foreach (var productId in productIds)
             {
                 complaint.ProductComplaints.Add(new ProductComplaint
                 {
@@ -197,10 +223,25 @@ namespace CleanAgricultureProductBE.Services.Complaint
             if (dto.Status == "Resolved")
             {
                 var validResolutions = new[] { "Exchange", "Refund" };
-                if (string.IsNullOrWhiteSpace(dto.Resolution) || !validResolutions.Contains(dto.Resolution))
-                    throw new Exception("Khi xử lý khiếu nại (Resolved), phải chọn hình thức: Exchange (đổi hàng) hoặc Refund (hoàn tiền)");
+                if (complaint.ComplaintType == "Product")
+                {
+                    if (string.IsNullOrWhiteSpace(dto.Resolution) || !validResolutions.Contains(dto.Resolution))
+                        throw new Exception("Với Product Complaint ở trạng thái Resolved, phải chọn Exchange hoặc Refund");
 
-                complaint.Resolution = dto.Resolution;
+                    complaint.Resolution = dto.Resolution;
+                }
+                else
+                {
+                    // Order complaint: resolution optional
+                    if (!string.IsNullOrWhiteSpace(dto.Resolution) && validResolutions.Contains(dto.Resolution))
+                    {
+                        complaint.Resolution = dto.Resolution;
+                    }
+                    else
+                    {
+                        complaint.Resolution = null;
+                    }
+                }
             }
 
             complaint.Status = dto.Status;
@@ -217,6 +258,7 @@ namespace CleanAgricultureProductBE.Services.Complaint
         {
             ComplaintId = c.ComplaintId,
             OrderId = c.OrderId,
+            ComplaintType = c.ComplaintType,
             Subject = c.Subject,
             Description = c.Description,
             Evidence = c.Evidence,

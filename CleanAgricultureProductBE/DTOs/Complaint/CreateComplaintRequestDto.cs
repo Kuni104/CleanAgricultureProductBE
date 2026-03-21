@@ -3,6 +3,8 @@ namespace CleanAgricultureProductBE.DTOs.Complaint
     public class CreateComplaintRequestDto
     {
         public Guid OrderId { get; set; }
+        // Order | Product
+        public string ComplaintType { get; set; } = "Order";
         public string Subject { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public string? Evidence { get; set; }

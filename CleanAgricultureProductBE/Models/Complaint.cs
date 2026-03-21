@@ -5,6 +5,8 @@
         public Guid ComplaintId { get; set; }
         public Guid? StaffId { get; set; }
         public Guid OrderId { get; set; }
+        // Order | Product
+        public string ComplaintType { get; set; } = "Order";
         public string Subject { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public string Status { get; set; } = "Pending"; // Pending | Resolved | Rejected

@@ -61,6 +61,8 @@ namespace CleanAgricultureProductBE.Repositories.Order
                                        .Include(o => o.Schedule)
                                        .Include(o => o.Customer)
                                        .ThenInclude(c => c.Account)
+                                       .Include(o => o.OrderDetails)
+                                           .ThenInclude(od => od.Product)
                                        .FirstOrDefaultAsync();
         }
         public async Task AddOrder(Models.Order order)
