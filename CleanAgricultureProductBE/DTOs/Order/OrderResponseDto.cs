@@ -8,6 +8,7 @@
         public DateTime? Schedule { get; set; }
         //public Guid PaymentId { get; set; }
         public decimal TotalPrice { get; set; }
+        public string PaymentMethod { get; set; } = string.Empty;
         public DateTime OrderDate { get; set; }
         public string OrderStatus {  get; set; } = string.Empty;
     }

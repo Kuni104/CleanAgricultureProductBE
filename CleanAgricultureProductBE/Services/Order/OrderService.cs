@@ -168,11 +168,12 @@ namespace CleanAgricultureProductBE.Services.Order
             {
                 OrderId = order!.OrderId,
                 CustomerName = order.Address.RecipientName,
-                Address = order.Address.AddressDetail,
+                Address = order.Address.AddressDetail + " " + order.Address.District + " " + order.Address.Ward + " " + order.Address.City + order.Address.District + order.Address.Ward + order.Address.City,
                 Schedule = order.Schedule != null ? TimeZoneInfo.ConvertTimeFromUtc(order.Schedule.ScheduledDate, timeZone) : null,
                 TotalPrice = totalOrderPrice,
+                PaymentMethod = request.PaymentMethodId == 2 ? "VNPay" : "COD",
                 OrderDate = TimeZoneInfo.ConvertTimeFromUtc(order.OrderDate, timeZone),
-                OrderStatus = order.OrderStatus,    
+                OrderStatus = order.OrderStatus,
                 PaymentUrl = paymentUrl
             };
 
@@ -219,10 +220,11 @@ namespace CleanAgricultureProductBE.Services.Order
                 {
                     OrderId = order.OrderId,
                     CustomerName = order.Address.RecipientName,
-                    Address = order.Address.AddressDetail,
+                    Address = order.Address.AddressDetail + " " + order.Address.District + " " + order.Address.Ward + " " + order.Address.City,
                     //Payment = (Guid)order.PaymentId,
-                    Schedule = order.Schedule != null ? TimeZoneInfo.ConvertTimeFromUtc(order.Schedule.ScheduledDate, timeZone): null,
+                    Schedule = order.Schedule != null ? TimeZoneInfo.ConvertTimeFromUtc(order.Schedule.ScheduledDate, timeZone) : null,
                     TotalPrice = order.Payment.TotalAmount,
+                    PaymentMethod = order.Payment.PaymentMethodId == 2 ? "VNPay" : "COD",
                     OrderDate = TimeZoneInfo.ConvertTimeFromUtc(order.OrderDate, timeZone),
                     OrderStatus = order.OrderStatus
                 });
@@ -305,7 +307,7 @@ namespace CleanAgricultureProductBE.Services.Order
             {
                 OrderId = order.OrderId,
                 OrderDetails = orderDetailResponseList,
-                Address = order.Address.AddressDetail,
+                Address = order.Address.AddressDetail + " " + order.Address.District + " " + order.Address.Ward + " " + order.Address.City,
                 TotalPrice = order.Payment.TotalAmount
             };
 
@@ -367,10 +369,11 @@ namespace CleanAgricultureProductBE.Services.Order
                 {
                     OrderId = order.OrderId,
                     CustomerName = order.Address.RecipientName,
-                    Address = order.Address.AddressDetail,
+                    Address = order.Address.AddressDetail + " " + order.Address.District + " " + order.Address.Ward + " " + order.Address.City,
                     //Payment = (Guid)order.PaymentId,
                     Schedule = order.Schedule != null ? TimeZoneInfo.ConvertTimeFromUtc(order.Schedule.ScheduledDate, timeZone) : null,
                     TotalPrice = order.Payment.TotalAmount,
+                    PaymentMethod = order.Payment.PaymentMethodId == 2 ? "VNPay" : "COD",
                     OrderDate = TimeZoneInfo.ConvertTimeFromUtc(order.OrderDate, timeZone),
                     OrderStatus = order.OrderStatus
                 });
@@ -453,7 +456,7 @@ namespace CleanAgricultureProductBE.Services.Order
             {
                 OrderId = order.OrderId,
                 OrderDetails = orderDetailResponseList,
-                Address = order.Address.AddressDetail,
+                Address = order.Address.AddressDetail + " " + order.Address.District + " " + order.Address.Ward + " " + order.Address.City,
                 TotalPrice = order.Payment.TotalAmount
             };
 
@@ -528,10 +531,11 @@ namespace CleanAgricultureProductBE.Services.Order
             {
                 OrderId = order.OrderId,
                 CustomerName = order.Address.RecipientName,
-                Address = order.Address.AddressDetail,
+                Address = order.Address.AddressDetail + " " + order.Address.District + " " + order.Address.Ward + " " + order.Address.City,
                 //Payment = (Guid)order.PaymentId,
                 Schedule = order.Schedule != null ? TimeZoneInfo.ConvertTimeFromUtc(order.Schedule.ScheduledDate, timeZone) : null,
                 TotalPrice = order.Payment.TotalAmount,
+                PaymentMethod = order.Payment.PaymentMethodId == 2 ? "VNPay" : "COD",
                 OrderDate = TimeZoneInfo.ConvertTimeFromUtc(order.OrderDate, timeZone),
                 OrderStatus = order.OrderStatus
             };
@@ -579,10 +583,11 @@ namespace CleanAgricultureProductBE.Services.Order
                 {
                     OrderId = order.OrderId,
                     CustomerName = order.Address.RecipientName,
-                    Address = order.Address.AddressDetail,
+                    Address = order.Address.AddressDetail + " " + order.Address.District + " " + order.Address.Ward + " " + order.Address.City,
                     //Payment = (Guid)order.PaymentId,
                     Schedule = order.Schedule != null ? TimeZoneInfo.ConvertTimeFromUtc(order.Schedule.ScheduledDate, timeZone) : null,
                     TotalPrice = order.Payment.TotalAmount,
+                    PaymentMethod = order.Payment.PaymentMethodId == 2 ? "VNPay" : "COD",
                     OrderDate = TimeZoneInfo.ConvertTimeFromUtc(order.OrderDate, timeZone),
                     OrderStatus = order.OrderStatus
                 });
@@ -656,10 +661,11 @@ namespace CleanAgricultureProductBE.Services.Order
                 {
                     OrderId = order.OrderId,
                     CustomerName = order.Address.RecipientName,
-                    Address = order.Address.AddressDetail,
+                    Address = order.Address.AddressDetail + " " + order.Address.District + " " + order.Address.Ward + " " + order.Address.City,
                     //Payment = (Guid)order.PaymentId,
                     Schedule = order.Schedule != null ? TimeZoneInfo.ConvertTimeFromUtc(order.Schedule.ScheduledDate, timeZone) : null,
                     TotalPrice = order.Payment.TotalAmount,
+                    PaymentMethod = order.Payment.PaymentMethodId == 2 ? "VNPay" : "COD",
                     OrderDate = TimeZoneInfo.ConvertTimeFromUtc(order.OrderDate, timeZone),
                     OrderStatus = order.OrderStatus
                 }
@@ -716,10 +722,11 @@ namespace CleanAgricultureProductBE.Services.Order
                 {
                     OrderId = order.OrderId,
                     CustomerName = order.Address.RecipientName,
-                    Address = order.Address.AddressDetail,
+                    Address = order.Address.AddressDetail + " " + order.Address.District + " " + order.Address.Ward + " " + order.Address.City,
                     //Payment = (Guid)order.PaymentId,
                     Schedule = order.Schedule != null ? TimeZoneInfo.ConvertTimeFromUtc(order.Schedule.ScheduledDate, timeZone) : null,
                     TotalPrice = order.Payment.TotalAmount,
+                    PaymentMethod = order.Payment.PaymentMethodId == 2 ? "VNPay" : "COD",
                     OrderDate = TimeZoneInfo.ConvertTimeFromUtc(order.OrderDate, timeZone),
                     OrderStatus = order.OrderStatus
                 }
