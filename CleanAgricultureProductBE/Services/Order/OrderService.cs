@@ -707,6 +707,46 @@ namespace CleanAgricultureProductBE.Services.Order
             };
         }
 
+        public async Task<ResultStatusWithData<OrderResponseDto>> RedeliveryOrder(Guid orderId)
+        {
+            var order = await orderRepository.GetOrderByOrderId(orderId);
+            if (order == null)
+            {
+                return null!;
+            }
+
+            if (order.OrderStatus.ToLower() == "completed" || order.OrderStatus.ToLower() == "cancelled")
+            {
+                return new ResultStatusWithData<OrderResponseDto>
+                {
+                    Status = "BAD STATUS"
+                };
+            }
+
+            order.OrderStatus = "Pending";
+            order.ScheduleId = null;
+            order.Schedule = null;
+            await orderRepository.UpdateAsync(order);
+
+            return new ResultStatusWithData<OrderResponseDto>
+            {
+                Status = "Ok",
+                Data = new OrderResponseDto
+                {
+                    OrderId = order.OrderId,
+                    CustomerName = order.Address.RecipientName,
+                    Address = order.Address.AddressDetail + " " + order.Address.District + " " + order.Address.Ward + " " + order.Address.City,
+                    //Payment = (Guid)order.PaymentId,
+                    Schedule = order.Schedule != null ? TimeZoneInfo.ConvertTimeFromUtc(order.Schedule.ScheduledDate, timeZone) : null,
+                    TotalPrice = order.Payment.TotalAmount,
+                    PaymentMethod = order.Payment.PaymentMethodId == 2 ? "VNPay" : "COD",
+                    OrderDate = TimeZoneInfo.ConvertTimeFromUtc(order.OrderDate, timeZone),
+                    OrderStatus = order.OrderStatus
+                }
+            };
+        }
+
+
         public async Task<ResultStatusWithData<OrderResponseDto>> CancelOrder(string accountEmail, Guid orderId)
         {
             var order = await orderRepository.GetOrderByOrderId(orderId);

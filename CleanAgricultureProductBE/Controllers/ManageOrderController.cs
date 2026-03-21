@@ -193,7 +193,7 @@ namespace CleanAgricultureProductBE.Controllers
 
             var result = await orderService.UpdateOrderStatus(orderId, request);
 
-            if (request.Status == "BAD STATUS")
+            if (result.Status == "BAD STATUS")
             {
                 return BadRequest(new ResponseObject<OrderResponseDto>
                 {
@@ -211,6 +211,47 @@ namespace CleanAgricultureProductBE.Controllers
             {
                 success = "true";
                 message = "Cập nhật trạng thái đơn hàng thành công!";
+            }
+
+            var response = new ResponseObject<OrderResponseDto>
+            {
+                Success = success,
+                Message = message,
+                Data = result!.Data
+            };
+            return Ok(response);
+        }
+
+        [Authorize(Roles = "Admin,Staff,DeliveryPerson")]
+        [HttpPatch("redelivery/{orderId}")]
+        [SwaggerOperation(Summary = "Cập nhật đơn hàng để giao lại")]
+        public async Task<IActionResult> RedeliveryOrder([FromRoute] Guid orderId)
+        {
+            
+
+            var success = "";
+            var message = "";
+
+            var result = await orderService.RedeliveryOrder(orderId);
+
+            if (result.Status == "BAD STATUS")
+            {
+                return BadRequest(new ResponseObject<OrderResponseDto>
+                {
+                    Success = "false",
+                    Message = "Không thể giao hàng lại vì trang thái hiện tại không đúng"
+                });
+            }
+
+            if (result == null)
+            {
+                success = "false";
+                message = "Đơn hàng không tồn tại!";
+            }
+            else
+            {
+                success = "true";
+                message = "Cập nhật đơn hàng cho giao hàng lại!";
             }
 
             var response = new ResponseObject<OrderResponseDto>
