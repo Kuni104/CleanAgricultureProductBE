@@ -23,7 +23,7 @@ namespace CleanAgricultureProductBE.Services.VnPay
             }
             catch (Exception ex)
             {
-                return "Error creating payment URL: " + ex.Message;
+                throw new InvalidOperationException("Khong the tao duong dan thanh toan VNPay.", ex);
             }
         }
     }

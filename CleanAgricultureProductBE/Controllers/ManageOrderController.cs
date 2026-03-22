@@ -175,15 +175,15 @@ namespace CleanAgricultureProductBE.Controllers
 
         [Authorize(Roles = "Admin,Staff,DeliveryPerson")]
         [HttpPatch("{orderId}")]
-        [SwaggerOperation(Summary = "Cập nhật trạng thái đơn hàng (Admin/Staff/DeliveryPerson) | Status: Pending/Delivering/Completed/Cancelled")]
+        [SwaggerOperation(Summary = "Cập nhật trạng thái đơn hàng (Admin/Staff/DeliveryPerson) | Status: Processing/Pending/Delivering/Completed/Cancelled")]
         public async Task<IActionResult> UpdateOrderStatus([FromRoute] Guid orderId, [FromBody] UpdateOrderStatusRequestDto request)
         {
-            if (request.Status.ToLower() != "pending" && request.Status.ToLower() != "delivering" && request.Status.ToLower() != "completed" && request.Status.ToLower() != "cancelled")
+            if (request.Status.ToLower() != "processing" && request.Status.ToLower() != "pending" && request.Status.ToLower() != "delivering" && request.Status.ToLower() != "completed" && request.Status.ToLower() != "cancelled")
             {
                 return BadRequest(new ResponseObject<OrderResponseDto>
                 {
                     Success = "false",
-                    Message = "Trạng thái đơn hàng không hợp lệ! Trạng thái hợp lệ: Pending, Delivering, Completed, Cancelled",
+                    Message = "Trạng thái đơn hàng không hợp lệ! Trạng thái hợp lệ: Processing, Pending, Delivering, Completed, Cancelled",
                     Data = null
                 });
             }

@@ -4,6 +4,6 @@
     {
         public Task CreatePayment();
 
-        public Task HandlePayment(string paymentId, string transactionCode);
+        public Task HandlePaymentResult(string orderId, string? transactionCode, bool isSuccess);
     }
 }
