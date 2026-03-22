@@ -3,10 +3,12 @@ using CleanAgricultureProductBE.DTOs.CycleSchedule;
 using CleanAgricultureProductBE.DTOs.Response;
 using CleanAgricultureProductBE.Repositories;
 using CleanAgricultureProductBE.Repositories.CycleSchedule;
+using CleanAgricultureProductBE.Repositories.DSchedule;
+using CleanAgricultureProductBE.Repositories.Order;
 
 namespace CleanAgricultureProductBE.Services.CycleSchedule
 {
-    public class CycleScheduleService(ICycleScheduleRepository cycleScheduleRepository, IAccountRepository accountRepository) : ICycleScheduleService
+    public class CycleScheduleService(ICycleScheduleRepository cycleScheduleRepository, IAccountRepository accountRepository, IScheduleRepository scheduleRepository, IOrderRepository orderRepository) : ICycleScheduleService
     {
         public async Task<ResponseDtoWithPagination<List<CycleScheduleResponseDto>>> GetCycleSchedulesAdmin(int? page, int? size)
         {
@@ -50,7 +52,7 @@ namespace CleanAgricultureProductBE.Services.CycleSchedule
                     DayCycle = cycleSchedule.DayCycle,
                     isMonthly = cycleSchedule.isMonthly,
                     StartAt = cycleSchedule.StartAt,
-                    NextDeliveryTime = cycleSchedule.Order.Schedule!.ScheduledDate,
+                    NextDeliveryTime = cycleSchedule.Order.Schedule == null ? null : cycleSchedule.Order.Schedule.ScheduledDate,
                     CreatedAt = cycleSchedule.CreatedAt,
                     UpdatedAt = cycleSchedule.UpdatedAt,
                     Status = cycleSchedule.Status
@@ -100,7 +102,7 @@ namespace CleanAgricultureProductBE.Services.CycleSchedule
                 DayCycle = cycleSchedule.DayCycle,
                 isMonthly = cycleSchedule.isMonthly,
                 StartAt = cycleSchedule.StartAt,
-                NextDeliveryTime = cycleSchedule.Order.Schedule!.ScheduledDate,
+                NextDeliveryTime = cycleSchedule.Order.Schedule == null ? null : cycleSchedule.Order.Schedule.ScheduledDate,
                 CreatedAt = cycleSchedule.CreatedAt,
                 UpdatedAt = cycleSchedule.UpdatedAt,
                 Status = cycleSchedule.Status
@@ -115,7 +117,19 @@ namespace CleanAgricultureProductBE.Services.CycleSchedule
             {
                 return null!;
             }
-            
+
+            var order = cycleSchedule.Order;
+            var schedule = order.Schedule;
+
+            if (schedule != null)
+            {
+                schedule.Orders.Remove(order);
+                await scheduleRepository.UpdateAsync(schedule);
+            }
+            order.Schedule = null;
+
+            await orderRepository.UpdateAsync(order);
+
             cycleSchedule.Status = "Inactive";
 
             await cycleScheduleRepository.UpdateCycleSchedule(cycleSchedule);
@@ -127,7 +141,7 @@ namespace CleanAgricultureProductBE.Services.CycleSchedule
                 DayCycle = cycleSchedule.DayCycle,
                 isMonthly = cycleSchedule.isMonthly,
                 StartAt = cycleSchedule.StartAt,
-                NextDeliveryTime = cycleSchedule.Order.Schedule!.ScheduledDate,
+                NextDeliveryTime = cycleSchedule.Order.Schedule == null ? null : cycleSchedule.Order.Schedule.ScheduledDate,
                 CreatedAt = cycleSchedule.CreatedAt,
                 UpdatedAt = cycleSchedule.UpdatedAt,
                 Status = cycleSchedule.Status
@@ -180,7 +194,7 @@ namespace CleanAgricultureProductBE.Services.CycleSchedule
                     DayCycle = cycleSchedule.DayCycle,
                     isMonthly = cycleSchedule.isMonthly,
                     StartAt = cycleSchedule.StartAt,
-                    NextDeliveryTime = cycleSchedule.Order.Schedule!.ScheduledDate,
+                    NextDeliveryTime = cycleSchedule.Order.Schedule == null ? null : cycleSchedule.Order.Schedule.ScheduledDate,
                     CreatedAt = cycleSchedule.CreatedAt,
                     UpdatedAt = cycleSchedule.UpdatedAt,
                     Status = cycleSchedule.Status
@@ -230,7 +244,7 @@ namespace CleanAgricultureProductBE.Services.CycleSchedule
                 DayCycle = cycleSchedule.DayCycle,
                 isMonthly = cycleSchedule.isMonthly,
                 StartAt = cycleSchedule.StartAt,
-                NextDeliveryTime = cycleSchedule.Order.Schedule!.ScheduledDate,
+                NextDeliveryTime = cycleSchedule.Order.Schedule == null ? null : cycleSchedule.Order.Schedule.ScheduledDate,
                 CreatedAt = cycleSchedule.CreatedAt,
                 UpdatedAt = cycleSchedule.UpdatedAt,
                 Status = cycleSchedule.Status
@@ -246,6 +260,18 @@ namespace CleanAgricultureProductBE.Services.CycleSchedule
                 return null!;
             }
 
+            var order = cycleSchedule.Order;
+            var schedule = order.Schedule;
+
+            if (schedule != null)
+            {
+                schedule.Orders.Remove(order);
+                await scheduleRepository.UpdateAsync(schedule);
+            }
+            order.Schedule = null;
+
+            await orderRepository.UpdateAsync(order);
+
             cycleSchedule.Status = "Inactive";
 
             await cycleScheduleRepository.UpdateCycleSchedule(cycleSchedule);
@@ -257,7 +283,7 @@ namespace CleanAgricultureProductBE.Services.CycleSchedule
                 DayCycle = cycleSchedule.DayCycle,
                 isMonthly = cycleSchedule.isMonthly,
                 StartAt = cycleSchedule.StartAt,
-                NextDeliveryTime = cycleSchedule.Order.Schedule!.ScheduledDate,
+                NextDeliveryTime = cycleSchedule.Order.Schedule == null ? null : cycleSchedule.Order.Schedule.ScheduledDate,
                 CreatedAt = cycleSchedule.CreatedAt,
                 UpdatedAt = cycleSchedule.UpdatedAt,
                 Status = cycleSchedule.Status
