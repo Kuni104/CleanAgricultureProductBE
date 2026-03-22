@@ -188,33 +188,17 @@ namespace CleanAgricultureProductBE.Data
 
             var categories = new List<Category>
             {
-            new Category { CategoryId = Guid.NewGuid(), Name = "Fruits", Description = "Fresh fruits from farms", Status = "Active" },
-            new Category { CategoryId = Guid.NewGuid(), Name = "Vegetables", Description = "Fresh vegetables from farms", Status = "Active" },
-            new Category { CategoryId = Guid.NewGuid(), Name = "Grains", Description = "Cereal crops like wheat, corn, rice", Status = "Active" },
+            new Category { CategoryId = Guid.NewGuid(), Name = "Fresh Produce", Description = "Fruits, vegetables, and organic produce", Status = "Active" },
 
-            new Category { CategoryId = Guid.NewGuid(), Name = "Seeds", Description = "Seeds for planting crops", Status = "Active" },
-            new Category { CategoryId = Guid.NewGuid(), Name = "Seedlings", Description = "Young plants ready for transplanting", Status = "Active" },
-            new Category { CategoryId = Guid.NewGuid(), Name = "Fertilizers", Description = "Soil nutrients and fertilizers", Status = "Active" },
-            new Category { CategoryId = Guid.NewGuid(), Name = "Pesticides", Description = "Crop protection chemicals", Status = "Active" },
-            new Category { CategoryId = Guid.NewGuid(), Name = "Herbicides", Description = "Weed control products", Status = "Active" },
+            new Category { CategoryId = Guid.NewGuid(), Name = "Crops & Grains", Description = "Grains, plantation crops, spices, and herbs", Status = "Active" },
 
-            new Category { CategoryId = Guid.NewGuid(), Name = "Animal Feed", Description = "Feed for livestock", Status = "Active" },
-            new Category { CategoryId = Guid.NewGuid(), Name = "Livestock", Description = "Farm animals like cattle, pigs, poultry", Status = "Active" },
+            new Category { CategoryId = Guid.NewGuid(), Name = "Livestock & Aquaculture", Description = "Farm animals, fish, and related products", Status = "Active" },
 
-            new Category { CategoryId = Guid.NewGuid(), Name = "Dairy Products", Description = "Milk and dairy from farms", Status = "Active" },
-            new Category { CategoryId = Guid.NewGuid(), Name = "Eggs", Description = "Fresh farm eggs", Status = "Active" },
+            new Category { CategoryId = Guid.NewGuid(), Name = "Farm Inputs", Description = "Seeds, seedlings, fertilizers, pesticides, and soil amendments", Status = "Active" },
 
-            new Category { CategoryId = Guid.NewGuid(), Name = "Organic Produce", Description = "Certified organic agricultural products", Status = "Active" },
-            new Category { CategoryId = Guid.NewGuid(), Name = "Aquaculture", Description = "Fish and aquatic farming products", Status = "Active" },
+            new Category { CategoryId = Guid.NewGuid(), Name = "Farm Equipment & Irrigation", Description = "Tools, machinery, and irrigation systems", Status = "Active" },
 
-            new Category { CategoryId = Guid.NewGuid(), Name = "Farm Equipment", Description = "Tools and machinery for farming", Status = "Active" },
-            new Category { CategoryId = Guid.NewGuid(), Name = "Irrigation", Description = "Water supply and irrigation systems", Status = "Active" },
-
-            new Category { CategoryId = Guid.NewGuid(), Name = "Soil Amendments", Description = "Materials to improve soil quality", Status = "Active" },
-            new Category { CategoryId = Guid.NewGuid(), Name = "Compost", Description = "Organic compost and waste recycling", Status = "Active" },
-
-            new Category { CategoryId = Guid.NewGuid(), Name = "Spices and Herbs", Description = "Cultivated herbs and spices", Status = "Active" },
-            new Category { CategoryId = Guid.NewGuid(), Name = "Plantation Crops", Description = "Coffee, tea, rubber and similar crops", Status = "Active" }
+            new Category { CategoryId = Guid.NewGuid(), Name = "Farm Products", Description = "Dairy, eggs, and processed farm outputs", Status = "Active" }
             };
 
             // Get existing category names
@@ -242,35 +226,35 @@ namespace CleanAgricultureProductBE.Data
             var products = new List<Product>
             {
             // Existing
-            new Product { ProductId = Guid.NewGuid(), CategoryId = categoryDict["Fruits"], Name = "Apple", Description = "Fresh red apples", Price = 10000, Unit = "kg", Stock = 100, Status = "Active" },
-            new Product { ProductId = Guid.NewGuid(), CategoryId = categoryDict["Fruits"], Name = "Peach", Description = "Fresh peaches", Price = 10400, Unit = "kg", Stock = 104, Status = "Active" },
-            new Product { ProductId = Guid.NewGuid(), CategoryId = categoryDict["Vegetables"], Name = "Carrot", Description = "Organic carrots", Price = 8000, Unit = "kg", Stock = 150, Status = "Active" },
-            new Product { ProductId = Guid.NewGuid(), CategoryId = categoryDict["Grains"], Name = "Rice", Description = "Brown rice", Price = 25000, Unit = "kg", Stock = 200, Status = "Active" },
+            new Product { ProductId = Guid.NewGuid(), CategoryId = categoryDict["Fresh Produce"], Name = "Apple", Description = "Fresh red apples", Price = 10000, Unit = "kg", Stock = 100, Status = "Active" },
+            new Product { ProductId = Guid.NewGuid(), CategoryId = categoryDict["Fresh Produce"], Name = "Peach", Description = "Fresh peaches", Price = 10400, Unit = "kg", Stock = 104, Status = "Active" },
+            new Product { ProductId = Guid.NewGuid(), CategoryId = categoryDict["Fresh Produce"], Name = "Carrot", Description = "Organic carrots", Price = 8000, Unit = "kg", Stock = 150, Status = "Active" },
+            new Product { ProductId = Guid.NewGuid(), CategoryId = categoryDict["Crops & Grains"], Name = "Rice", Description = "Brown rice", Price = 25000, Unit = "kg", Stock = 200, Status = "Active" },
 
             // Additional 16 (1 product per category)
-            new Product { ProductId = Guid.NewGuid(), CategoryId = categoryDict["Seeds"], Name = "Corn Seeds", Description = "High yield corn seeds", Price = 50000, Unit = "bag", Stock = 50, Status = "Active" },
-            new Product { ProductId = Guid.NewGuid(), CategoryId = categoryDict["Seedlings"], Name = "Tomato Seedlings", Description = "Healthy tomato plants", Price = 3000, Unit = "plant", Stock = 200, Status = "Active" },
-            new Product { ProductId = Guid.NewGuid(), CategoryId = categoryDict["Fertilizers"], Name = "NPK Fertilizer", Description = "Balanced fertilizer", Price = 200000, Unit = "bag", Stock = 80, Status = "Active" },
-            new Product { ProductId = Guid.NewGuid(), CategoryId = categoryDict["Pesticides"], Name = "Insecticide A", Description = "Protect crops from pests", Price = 120000, Unit = "bottle", Stock = 60, Status = "Active" },
-            new Product { ProductId = Guid.NewGuid(), CategoryId = categoryDict["Herbicides"], Name = "Weed Killer", Description = "Effective weed control", Price = 110000, Unit = "bottle", Stock = 70, Status = "Active" },
+            new Product { ProductId = Guid.NewGuid(), CategoryId = categoryDict["Farm Inputs"], Name = "Corn Seeds", Description = "High yield corn seeds", Price = 50000, Unit = "bag", Stock = 50, Status = "Active" },
+            new Product { ProductId = Guid.NewGuid(), CategoryId = categoryDict["Farm Inputs"], Name = "Tomato Seedlings", Description = "Healthy tomato plants", Price = 3000, Unit = "plant", Stock = 200, Status = "Active" },
+            new Product { ProductId = Guid.NewGuid(), CategoryId = categoryDict["Farm Inputs"], Name = "NPK Fertilizer", Description = "Balanced fertilizer", Price = 200000, Unit = "bag", Stock = 80, Status = "Active" },
+            new Product { ProductId = Guid.NewGuid(), CategoryId = categoryDict["Farm Inputs"], Name = "Insecticide A", Description = "Protect crops from pests", Price = 120000, Unit = "bottle", Stock = 60, Status = "Active" },
+            new Product { ProductId = Guid.NewGuid(), CategoryId = categoryDict["Farm Inputs"], Name = "Weed Killer", Description = "Effective weed control", Price = 110000, Unit = "bottle", Stock = 70, Status = "Active" },
 
-            new Product { ProductId = Guid.NewGuid(), CategoryId = categoryDict["Animal Feed"], Name = "Chicken Feed", Description = "Nutritional poultry feed", Price = 180000, Unit = "bag", Stock = 90, Status = "Active" },
-            new Product { ProductId = Guid.NewGuid(), CategoryId = categoryDict["Livestock"], Name = "Young Pig", Description = "Healthy piglet", Price = 1500000, Unit = "unit", Stock = 20, Status = "Active" },
+            new Product { ProductId = Guid.NewGuid(), CategoryId = categoryDict["Livestock & Aquaculture"], Name = "Chicken Feed", Description = "Nutritional poultry feed", Price = 180000, Unit = "bag", Stock = 90, Status = "Active" },
+            new Product { ProductId = Guid.NewGuid(), CategoryId = categoryDict["Livestock & Aquaculture"], Name = "Young Pig", Description = "Healthy piglet", Price = 1500000, Unit = "unit", Stock = 20, Status = "Active" },
+            new Product { ProductId = Guid.NewGuid(), CategoryId = categoryDict["Livestock & Aquaculture"], Name = "Tilapia Fish", Description = "Fresh farmed fish", Price = 60000, Unit = "kg", Stock = 70, Status = "Active" },
 
-            new Product { ProductId = Guid.NewGuid(), CategoryId = categoryDict["Dairy Products"], Name = "Fresh Milk", Description = "Raw cow milk", Price = 30000, Unit = "liter", Stock = 120, Status = "Active" },
-            new Product { ProductId = Guid.NewGuid(), CategoryId = categoryDict["Eggs"], Name = "Chicken Eggs", Description = "Farm fresh eggs", Price = 25000, Unit = "dozen", Stock = 200, Status = "Active" },
+            new Product { ProductId = Guid.NewGuid(), CategoryId = categoryDict["Farm Products"], Name = "Fresh Milk", Description = "Raw cow milk", Price = 30000, Unit = "liter", Stock = 120, Status = "Active" },
+            new Product { ProductId = Guid.NewGuid(), CategoryId = categoryDict["Farm Products"], Name = "Chicken Eggs", Description = "Farm fresh eggs", Price = 25000, Unit = "dozen", Stock = 200, Status = "Active" },
 
-            new Product { ProductId = Guid.NewGuid(), CategoryId = categoryDict["Organic Produce"], Name = "Organic Lettuce", Description = "Certified organic lettuce", Price = 15000, Unit = "kg", Stock = 100, Status = "Active" },
-            new Product { ProductId = Guid.NewGuid(), CategoryId = categoryDict["Aquaculture"], Name = "Tilapia Fish", Description = "Fresh farmed fish", Price = 60000, Unit = "kg", Stock = 70, Status = "Active" },
+            new Product { ProductId = Guid.NewGuid(), CategoryId = categoryDict["Fresh Produce"], Name = "Organic Lettuce", Description = "Certified organic lettuce", Price = 15000, Unit = "kg", Stock = 100, Status = "Active" },
 
-            new Product { ProductId = Guid.NewGuid(), CategoryId = categoryDict["Farm Equipment"], Name = "Hand Tractor", Description = "Small farming tractor", Price = 15000000, Unit = "unit", Stock = 10, Status = "Active" },
-            new Product { ProductId = Guid.NewGuid(), CategoryId = categoryDict["Irrigation"], Name = "Water Pump", Description = "Irrigation water pump", Price = 2500000, Unit = "unit", Stock = 25, Status = "Active" },
+            new Product { ProductId = Guid.NewGuid(), CategoryId = categoryDict["Farm Equipment & Irrigation"], Name = "Hand Tractor", Description = "Small farming tractor", Price = 15000000, Unit = "unit", Stock = 10, Status = "Active" },
+            new Product { ProductId = Guid.NewGuid(), CategoryId = categoryDict["Farm Equipment & Irrigation"], Name = "Water Pump", Description = "Irrigation water pump", Price = 2500000, Unit = "unit", Stock = 25, Status = "Active" },
 
-            new Product { ProductId = Guid.NewGuid(), CategoryId = categoryDict["Soil Amendments"], Name = "Lime Powder", Description = "Improve soil pH", Price = 90000, Unit = "bag", Stock = 60, Status = "Active" },
-            new Product { ProductId = Guid.NewGuid(), CategoryId = categoryDict["Compost"], Name = "Organic Compost", Description = "Natural compost fertilizer", Price = 70000, Unit = "bag", Stock = 100, Status = "Active" },
+            new Product { ProductId = Guid.NewGuid(), CategoryId = categoryDict["Farm Inputs"], Name = "Lime Powder", Description = "Improve soil pH", Price = 90000, Unit = "bag", Stock = 60, Status = "Active" },
+            new Product { ProductId = Guid.NewGuid(), CategoryId = categoryDict["Farm Inputs"], Name = "Organic Compost", Description = "Natural compost fertilizer", Price = 70000, Unit = "bag", Stock = 100, Status = "Active" },
 
-            new Product { ProductId = Guid.NewGuid(), CategoryId = categoryDict["Spices and Herbs"], Name = "Black Pepper", Description = "Dried pepper seeds", Price = 120000, Unit = "kg", Stock = 40, Status = "Active" },
-            new Product { ProductId = Guid.NewGuid(), CategoryId = categoryDict["Plantation Crops"], Name = "Coffee Beans", Description = "Raw coffee beans", Price = 130000, Unit = "kg", Stock = 80, Status = "Active" }
+            new Product { ProductId = Guid.NewGuid(), CategoryId = categoryDict["Crops & Grains"], Name = "Black Pepper", Description = "Dried pepper seeds", Price = 120000, Unit = "kg", Stock = 40, Status = "Active" },
+            new Product { ProductId = Guid.NewGuid(), CategoryId = categoryDict["Crops & Grains"], Name = "Coffee Beans", Description = "Raw coffee beans", Price = 130000, Unit = "kg", Stock = 80, Status = "Active" }
             };
 
             // Get existing product names
