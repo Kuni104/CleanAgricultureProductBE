@@ -78,7 +78,7 @@ namespace CleanAgricultureProductBE.Controllers
         }
 
         [Authorize(Roles = "Admin,Staff")]
-        [HttpPatch("cycle-schedule/cancel/{cycleSheduleId}")]
+        [HttpPatch("cycle-schedule/cancel/{cycleScheduleId}")]
         [SwaggerOperation(Summary = "Hủy giao hàng tuần hoàn (Admin, Staff)")]
         public async Task<IActionResult> CancelCycleScheduleByIdAdmin([FromRoute] Guid cycleScheduleId)
         {
