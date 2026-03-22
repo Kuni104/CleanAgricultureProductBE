@@ -7,7 +7,7 @@
         public int DayCycle { get; set; }
         public bool isMonthly { get; set; }
         public DateTime StartAt { get; set; }
-        public DateTime NextDeliveryTime { get; set; }
+        public DateTime? NextDeliveryTime { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
         public string Status { get; set; } = string.Empty;
