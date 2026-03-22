@@ -7,6 +7,7 @@
         public string Address { get; set; } = string.Empty;
         public DateTime? Schedule { get; set; }
         //public Guid PaymentId { get; set; }
+        public bool isCycle = false;
         public decimal TotalPrice { get; set; }
         public string PaymentMethod { get; set; } = string.Empty;
         public DateTime OrderDate { get; set; }

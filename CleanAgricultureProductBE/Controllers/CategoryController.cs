@@ -129,7 +129,7 @@ namespace CleanAgricultureProductBE.Controllers
 
         // DELETE: api/Category/{id} - Chỉ Admin
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,Staff")]
         [SwaggerOperation(Summary = "Xóa danh mục (Admin)")]
         public async Task<IActionResult> DeleteCategory(Guid id, [FromQuery] bool confirm = false)
         {
@@ -155,7 +155,7 @@ namespace CleanAgricultureProductBE.Controllers
 
         // PATCH: api/Category/{id}/status - Chỉ Admin
         [HttpPatch("{id}/status")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,Staff")]
         [SwaggerOperation(Summary = "Cập nhật trạng thái danh mục (Admin)")]
         public async Task<IActionResult> UpdateCategoryStatus(Guid id, [FromBody] string status)
         {
