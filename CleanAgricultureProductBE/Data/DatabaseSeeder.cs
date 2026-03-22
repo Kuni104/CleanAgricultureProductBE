@@ -414,7 +414,7 @@ namespace CleanAgricultureProductBE.Data
 
                     AddressId = await context.Set<Account>()
                                             .Where(a => a.Email == "user@gmail.com")
-                                            .Select(a => a.UserProfile.Addresses.Where(a => a.AddressDetail == "Ba Đình TP.HCM Quận 8")
+                                            .Select(a => a.UserProfile.Addresses.Where(a => a.AddressDetail == "123")
                                                                                 .Select(a => a.AddressId)
                                                                                 .FirstOrDefault())
                                             .FirstOrDefaultAsync(),
