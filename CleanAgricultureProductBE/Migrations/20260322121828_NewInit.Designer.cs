@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CleanAgricultureProductBE.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260320134906_NewInit")]
+    [Migration("20260322121828_NewInit")]
     partial class NewInit
     {
         /// <inheritdoc />
@@ -217,6 +217,10 @@ namespace CleanAgricultureProductBE.Migrations
                     b.Property<Guid>("ComplaintId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ComplaintType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");

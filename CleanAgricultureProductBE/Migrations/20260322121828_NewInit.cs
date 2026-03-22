@@ -383,6 +383,7 @@ namespace CleanAgricultureProductBE.Migrations
                     ComplaintId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     StaffId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     OrderId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ComplaintType = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Subject = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
