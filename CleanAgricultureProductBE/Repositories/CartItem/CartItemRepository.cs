@@ -15,6 +15,7 @@ namespace CleanAgricultureProductBE.Repositories.CartItem
         public async Task<List<Models.CartItem>> GetCartItemsByCartId(Guid cartId)
         {
             return await context.CartItems.Where(ci => ci.CartId == cartId)
+                                        .Include(ci => ci.Product)
                                           .ToListAsync();
         }
 

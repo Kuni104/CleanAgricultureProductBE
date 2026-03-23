@@ -79,6 +79,18 @@ namespace CleanAgricultureProductBE.Services.Order
                 return null!;
             }
 
+            foreach (var cartItem in cartItems)
+            {
+                if(cartItem.Quantity > cartItem.Product.Stock)
+                {
+                    return new ResultStatusWithData<PlaceOrderResponseDto>
+                    {
+                        Status = "Product Error",
+                        Data = null
+                    };
+                }
+            }
+
             decimal totalCartPrice = await cartRepository.TotalPriceOfCartByCartId(cart.CartId);
             var totalOrderPrice = totalCartPrice + deliveryFee!.FeeAmount;
 
