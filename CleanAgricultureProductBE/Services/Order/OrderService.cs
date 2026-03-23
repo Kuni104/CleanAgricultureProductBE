@@ -542,7 +542,7 @@ namespace CleanAgricultureProductBE.Services.Order
             }
 
             //Handle Cycle Schedule After Complete Order Here
-            if (order.OrderStatus.ToLower() == "completed")
+            if (request.Status.ToLower().Trim() == "completed")
             {
                 var isCycleSchedule = await cycleScheduleRepository.CheckOrderIsCycleSchedule(order.OrderId);
                 if (isCycleSchedule == true)
@@ -567,6 +567,17 @@ namespace CleanAgricultureProductBE.Services.Order
 
                     await scheduleRepository.AddAsync(newSchedule);
                     order.ScheduleId = newSchedule.ScheduleId;
+                }
+            }
+
+            if(request.Status.Trim().ToLower() == "cancelled")
+            {
+                var orderDetails = await orderDetailRepository.GetOrderDetailsByOrderId(orderId);
+                foreach (var items in orderDetails)
+                {
+                    var product = items.Product;
+                    product.Stock = product.Stock + items.Quantity;
+                    await productRepository.UpdateAsync(product);
                 }
             }
 
