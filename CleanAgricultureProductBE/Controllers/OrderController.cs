@@ -164,6 +164,13 @@ namespace CleanAgricultureProductBE.Controllers
                     Success = "false",
                     Message = "Nếu là xoay tua thì số ngày tuần hoàn phải có (nếu là theo tháng thì không cần) "
                 });
+            }else if(result.Status == "Product Error")
+            {
+                return BadRequest(new ResponseObject<string>
+                {
+                    Success = "false",
+                    Message = "Có sản phẩm không còn đủ hàng "
+                });
             }
 
             return Ok(new ResponseObject<PlaceOrderResponseDto>
