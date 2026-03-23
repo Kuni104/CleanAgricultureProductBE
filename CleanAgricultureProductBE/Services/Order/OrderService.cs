@@ -82,15 +82,14 @@ namespace CleanAgricultureProductBE.Services.Order
             decimal totalCartPrice = await cartRepository.TotalPriceOfCartByCartId(cart.CartId);
             var totalOrderPrice = totalCartPrice + deliveryFee!.FeeAmount;
 
-            var payment = new Models.Payment();
-
-            payment.PaymentId = Guid.NewGuid();
-            payment.PaymentMethodId = request.PaymentMethodId;
-            payment.PaymentStatus = "Pending";
-            payment.TotalAmount = totalOrderPrice;
-            payment.CreatedAt = DateTime.UtcNow;
-
-            await paymentRepository.AddPayment(payment);
+            var payment = new Models.Payment
+            {
+                PaymentId = Guid.NewGuid(),
+                PaymentMethodId = request.PaymentMethodId,
+                PaymentStatus = "Pending",
+                TotalAmount = totalOrderPrice,
+                CreatedAt = DateTime.UtcNow
+            };
 
             var order = new Models.Order
             {
@@ -100,9 +99,22 @@ namespace CleanAgricultureProductBE.Services.Order
                 DeliveryFeeId = deliveryFee.DeliveryFeeId,
                 PaymentId = payment.PaymentId,
                 OrderDate = DateTime.UtcNow,
-                OrderStatus = "Pending"
+                OrderStatus = request.PaymentMethodId == 2 ? "Processing" : "Pending"
             };
 
+            string paymentUrl = string.Empty;
+            if (request.PaymentMethodId == 2)
+            {
+                paymentUrl = vnPayService.CreatePaymentUrl(new VNPAY.Models.VnpayPaymentRequest
+                {
+                    Money = (double)totalOrderPrice,
+                    BankCode = 0,
+                    Description = order.OrderId.ToString(),
+                    Language = 0
+                });
+            }
+
+            await paymentRepository.AddPayment(payment);
             await orderRepository.AddOrder(order);
 
             List<Models.OrderDetail> orderDetails = new List<Models.OrderDetail>();
@@ -133,18 +145,6 @@ namespace CleanAgricultureProductBE.Services.Order
             await cartRepository.DeleteAllCartItems(cart.CartId);
 
             order = await orderRepository.GetOrderByOrderId(order.OrderId);
-
-            string paymentUrl = string.Empty;
-
-            if (request.PaymentMethodId == 2) {
-                paymentUrl = vnPayService.CreatePaymentUrl(new VNPAY.Models.VnpayPaymentRequest
-                {
-                    Money = (double)totalOrderPrice,
-                    BankCode = 0,
-                    Description = order.PaymentId.ToString(),
-                    Language = 0
-                });
-            }
 
             //Cycle Schedule Here
             if (isCycleSchedule)
@@ -518,7 +518,7 @@ namespace CleanAgricultureProductBE.Services.Order
                     };
                 }
             }
-            if (request.Status.ToLower() == "delivering" || request.Status.ToLower() == "pending")
+            if (request.Status.ToLower() == "processing" || request.Status.ToLower() == "delivering" || request.Status.ToLower() == "pending")
             {
                 if (order.OrderStatus.ToLower() == "completed" || order.OrderStatus.ToLower() == "cancelled")
                 {
